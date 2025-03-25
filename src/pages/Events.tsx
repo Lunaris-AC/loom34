@@ -1,8 +1,7 @@
-
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Search, Calendar, Calendar, Filter, ChevronDown } from 'lucide-react';
+import { Search, Calendar, Filter, ChevronDown } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import EventCard from '@/components/EventCard';
@@ -15,7 +14,6 @@ const Events = () => {
   const [categoryFilter, setCategoryFilter] = useState('');
   const eventsPerPage = 6;
 
-  // Fetch events
   const { data: events = [], isLoading } = useQuery({
     queryKey: ['events', searchQuery, categoryFilter],
     queryFn: async () => {
@@ -29,9 +27,6 @@ const Events = () => {
         query = query.or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
       }
 
-      // For simplicity, we're not implementing category filtering yet
-      // since the current database schema doesn't have a category field for events
-
       const { data, error } = await query;
       
       if (error) throw error;
@@ -39,7 +34,6 @@ const Events = () => {
     }
   });
 
-  // Calculate pagination
   const totalPages = Math.ceil(events.length / eventsPerPage);
   const paginatedEvents = events.slice(
     (currentPage - 1) * eventsPerPage, 
@@ -50,7 +44,6 @@ const Events = () => {
     <div className="flex flex-col min-h-screen bg-tan/10">
       <Navbar />
       
-      {/* Hero Section */}
       <section className="pt-24 md:pt-36 pb-16 bg-gradient-to-b from-tan/30 to-transparent">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
@@ -65,7 +58,6 @@ const Events = () => {
         </div>
       </section>
       
-      {/* Search and Filter Section */}
       <section className="py-8">
         <div className="container mx-auto px-4">
           <div className="bg-white rounded-xl shadow-sm p-6">
@@ -109,7 +101,6 @@ const Events = () => {
         </div>
       </section>
       
-      {/* Events Grid Section */}
       <section className="py-12">
         <div className="container mx-auto px-4">
           {isLoading ? (
@@ -154,7 +145,6 @@ const Events = () => {
                 ))}
               </div>
               
-              {/* Pagination */}
               {totalPages > 1 && (
                 <div className="mt-12">
                   <Pagination>
@@ -192,7 +182,6 @@ const Events = () => {
         </div>
       </section>
       
-      {/* Call to Action */}
       <section className="py-16 bg-brown text-white">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Want to Host an Event?</h2>
