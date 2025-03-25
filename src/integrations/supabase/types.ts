@@ -9,7 +9,162 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      articles: {
+        Row: {
+          author_id: string | null
+          category: string
+          content: string
+          created_at: string
+          date: string
+          excerpt: string
+          id: string
+          image: string
+          published: boolean
+          slug: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_id?: string | null
+          category: string
+          content: string
+          created_at?: string
+          date?: string
+          excerpt: string
+          id?: string
+          image: string
+          published?: boolean
+          slug: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string | null
+          category?: string
+          content?: string
+          created_at?: string
+          date?: string
+          excerpt?: string
+          id?: string
+          image?: string
+          published?: boolean
+          slug?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      events: {
+        Row: {
+          author_id: string | null
+          created_at: string
+          date: string
+          description: string
+          id: string
+          image: string
+          location: string
+          published: boolean
+          registration_url: string | null
+          slug: string
+          time: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_id?: string | null
+          created_at?: string
+          date: string
+          description: string
+          id?: string
+          image: string
+          location: string
+          published?: boolean
+          registration_url?: string | null
+          slug: string
+          time: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string | null
+          created_at?: string
+          date?: string
+          description?: string
+          id?: string
+          image?: string
+          location?: string
+          published?: boolean
+          registration_url?: string | null
+          slug?: string
+          time?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      gallery_images: {
+        Row: {
+          author_id: string | null
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_id?: string | null
+          category: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string | null
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          is_admin: boolean
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id: string
+          is_admin?: boolean
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          is_admin?: boolean
+          updated_at?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

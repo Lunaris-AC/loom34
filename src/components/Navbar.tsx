@@ -1,217 +1,210 @@
 
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Menu, X, Moon, Sun, CircleUser } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Link, useLocation } from 'react-router-dom';
+import { Menu, X, User, LogIn } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
 
 const Navbar = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const location = useLocation();
+  const { user, profile, signOut, isAdmin } = useAuth();
+  
+  // Handle scroll effect
   useEffect(() => {
     const handleScroll = () => {
-      const offset = window.scrollY;
-      setScrolled(offset > 50);
+      setIsScrolled(window.scrollY > 10);
     };
-
+    
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
+  
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location]);
+  
+  const navLinks = [
+    { name: 'Home', path: '/' },
+    { name: 'About', path: '/about' },
+    { name: 'Events', path: '/events' },
+    { name: 'Shop', path: '/shop' },
+    { name: 'Monsieur Ours', path: '/monsieur-ours' },
+    { name: 'Gallery', path: '/gallery' },
+    { name: 'Partners', path: '/partners' },
+    { name: 'Membership', path: '/membership' },
+  ];
+  
+  const isActive = (path: string) => {
+    return location.pathname === path;
   };
 
-  // For accessibility
-  const toggleHighContrast = () => {
-    document.documentElement.classList.toggle('high-contrast');
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
   };
 
-  const toggleFontSize = () => {
-    const body = document.body;
-    if (body.style.fontSize === '110%') {
-      body.style.fontSize = '100%';
-    } else {
-      body.style.fontSize = '110%';
-    }
+  const handleSignOut = async () => {
+    await signOut();
   };
-
+  
   return (
     <header 
-      className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-        scrolled ? "bg-white/90 backdrop-blur-md shadow-sm py-3" : "bg-transparent py-5"
-      )}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled ? 'bg-white shadow-md py-2' : 'bg-transparent py-4'
+      }`}
     >
-      <div className="container mx-auto flex justify-between items-center px-4">
+      <div className="container mx-auto px-4 flex justify-between items-center">
         {/* Logo */}
-        <Link 
-          to="/" 
-          className="text-2xl font-bold text-brown flex items-center gap-2 animate-fade-in"
-        >
-          <span className="text-gradient">Loom</span>
-        </Link>
-
+        <Link to="/" className="text-2xl font-bold text-brown">LOOM</Link>
+        
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-1">
-          <ul className="flex space-x-1">
-            <li><NavLink to="/">Home</NavLink></li>
-            <li><NavLink to="/about">About Us</NavLink></li>
-            <li><NavLink to="/events">Events</NavLink></li>
-            <li><NavLink to="/shop">Shop</NavLink></li>
-            <li><NavLink to="/monsieur-ours">Monsieur Ours</NavLink></li>
-            <li><NavLink to="/gallery">Gallery</NavLink></li>
-            <li><NavLink to="/partners">Partners</NavLink></li>
-          </ul>
+        <nav className="hidden md:flex space-x-1">
+          {navLinks.map((link) => (
+            <Link
+              key={link.path}
+              to={link.path}
+              className={`px-3 py-2 text-sm rounded-md transition-colors ${
+                isActive(link.path)
+                  ? 'bg-brown/10 text-brown font-medium'
+                  : 'text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              {link.name}
+            </Link>
+          ))}
         </nav>
-
-        {/* Right side buttons */}
-        <div className="hidden md:flex items-center space-x-3">
-          {/* Accessibility controls */}
-          <button 
-            onClick={toggleHighContrast} 
-            className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-            aria-label="Toggle high contrast mode"
-          >
-            <span className="sr-only">High Contrast</span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <path d="M12 2a10 10 0 1 0 0 20 10 10 0 1 0 0-20z"></path>
-              <path d="M2 12h20"></path>
-            </svg>
-          </button>
-          
-          <button 
-            onClick={toggleFontSize} 
-            className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-            aria-label="Toggle font size"
-          >
-            <span className="sr-only">Font Size</span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <text x="6" y="18" fontSize="16" fontWeight="bold">A</text>
-              <text x="12" y="14" fontSize="10" fontWeight="bold">A</text>
-            </svg>
-          </button>
-
-          {/* Membership button */}
-          <Link
-            to="/membership"
-            className="bg-brown text-white px-4 py-2 rounded-lg transition-all hover:bg-brown-dark hover-lift"
-          >
-            Membership
-          </Link>
-
-          {/* Login button */}
-          <Link
-            to="/login"
-            className="flex items-center gap-2 px-4 py-2 rounded-lg border border-brown/20 hover:bg-brown/5 transition-all"
-          >
-            <CircleUser size={18} />
-            <span>Login</span>
-          </Link>
+        
+        {/* Auth/User Menu (Desktop) */}
+        <div className="hidden md:flex items-center">
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="relative rounded-full h-8 w-8 p-0">
+                  {profile?.avatar_url ? (
+                    <img 
+                      src={profile.avatar_url} 
+                      alt={profile.username || 'User'} 
+                      className="rounded-full object-cover" 
+                    />
+                  ) : (
+                    <User className="h-5 w-5" />
+                  )}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <div className="px-2 py-1.5">
+                  <p className="text-sm font-medium">{profile?.full_name || profile?.username || 'User'}</p>
+                  <p className="text-xs text-gray-500">{user.email}</p>
+                </div>
+                <DropdownMenuSeparator />
+                {isAdmin && (
+                  <>
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin/dashboard" className="cursor-pointer">Admin Dashboard</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
+                <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-red-600">
+                  Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Link to="/login">
+              <Button variant="ghost" size="sm" className="flex items-center">
+                <LogIn className="h-4 w-4 mr-2" />
+                Sign In
+              </Button>
+            </Link>
+          )}
         </div>
-
-        {/* Mobile Menu Button */}
+        
+        {/* Mobile Menu Toggle */}
         <button 
-          onClick={toggleMenu}
-          className="md:hidden text-gray-600 hover:text-brown focus:outline-none focus:ring-2 focus:ring-brown rounded-md p-2"
-          aria-expanded={isMenuOpen}
-          aria-controls="mobile-menu"
+          className="md:hidden text-gray-700"
+          onClick={toggleMobileMenu}
+          aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
         >
-          <span className="sr-only">{isMenuOpen ? 'Close menu' : 'Open menu'}</span>
-          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
       
       {/* Mobile Menu */}
-      <div 
-        id="mobile-menu"
-        className={`${isMenuOpen ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'} 
-          fixed top-0 right-0 h-full w-full bg-white transform transition-all duration-300 ease-in-out z-40 md:hidden`}
-      >
-        <div className="flex justify-end p-4">
-          <button 
-            onClick={toggleMenu}
-            className="text-gray-600 hover:text-brown focus:outline-none focus:ring-2 focus:ring-brown rounded-md p-2"
-          >
-            <span className="sr-only">Close menu</span>
-            <X size={24} />
-          </button>
-        </div>
-        <div className="px-4 py-2 space-y-1">
-          <MobileNavLink to="/" onClick={toggleMenu}>Home</MobileNavLink>
-          <MobileNavLink to="/about" onClick={toggleMenu}>About Us</MobileNavLink>
-          <MobileNavLink to="/events" onClick={toggleMenu}>Events</MobileNavLink>
-          <MobileNavLink to="/shop" onClick={toggleMenu}>Shop</MobileNavLink>
-          <MobileNavLink to="/monsieur-ours" onClick={toggleMenu}>Monsieur Ours</MobileNavLink>
-          <MobileNavLink to="/gallery" onClick={toggleMenu}>Gallery</MobileNavLink>
-          <MobileNavLink to="/partners" onClick={toggleMenu}>Partners</MobileNavLink>
-          
-          <div className="pt-4 border-t border-gray-200 mt-4">
-            <MobileNavLink to="/membership" onClick={toggleMenu}>
-              <span className="flex items-center">
-                <span className="text-brown font-medium">Join Membership</span>
-              </span>
-            </MobileNavLink>
-            <MobileNavLink to="/login" onClick={toggleMenu}>
-              <span className="flex items-center gap-2">
-                <CircleUser size={18} />
-                <span>Login</span>
-              </span>
-            </MobileNavLink>
-          </div>
-          
-          {/* Mobile accessibility controls */}
-          <div className="pt-4 border-t border-gray-200 mt-4 flex space-x-4">
-            <button 
-              onClick={toggleHighContrast} 
-              className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-100"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <path d="M12 2a10 10 0 1 0 0 20 10 10 0 1 0 0-20z"></path>
-                <path d="M2 12h20"></path>
-              </svg>
-              <span>High Contrast</span>
-            </button>
+      {mobileMenuOpen && (
+        <div className="md:hidden fixed inset-0 bg-white z-40 pt-16">
+          <div className="container mx-auto px-4 py-6 flex flex-col h-full">
+            <nav className="flex flex-col space-y-2 mb-6">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className={`px-4 py-3 rounded-md ${
+                    isActive(link.path)
+                      ? 'bg-brown/10 text-brown font-medium'
+                      : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              ))}
+            </nav>
             
-            <button 
-              onClick={toggleFontSize} 
-              className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-100"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <text x="6" y="18" fontSize="16" fontWeight="bold">A</text>
-                <text x="12" y="14" fontSize="10" fontWeight="bold">A</text>
-              </svg>
-              <span>Font Size</span>
-            </button>
+            {/* Auth/User (Mobile) */}
+            <div className="mt-auto pb-8">
+              {user ? (
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-3 px-4 py-3">
+                    <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                      {profile?.avatar_url ? (
+                        <img 
+                          src={profile.avatar_url} 
+                          alt={profile.username || 'User'} 
+                          className="rounded-full object-cover h-10 w-10" 
+                        />
+                      ) : (
+                        <User className="h-5 w-5 text-gray-600" />
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-medium">{profile?.full_name || profile?.username || 'User'}</p>
+                      <p className="text-sm text-gray-500">{user.email}</p>
+                    </div>
+                  </div>
+                  
+                  {isAdmin && (
+                    <Link to="/admin/dashboard" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-md">
+                      Admin Dashboard
+                    </Link>
+                  )}
+                  
+                  <button 
+                    onClick={handleSignOut}
+                    className="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 rounded-md"
+                  >
+                    Sign out
+                  </button>
+                </div>
+              ) : (
+                <Link to="/login" className="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-md">
+                  <LogIn className="h-5 w-5 mr-2" />
+                  Sign In
+                </Link>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </header>
-  );
-};
-
-const NavLink = ({ to, children }: { to: string, children: React.ReactNode }) => {
-  return (
-    <Link
-      to={to}
-      className="relative px-3 py-2 rounded-md text-gray-700 hover:text-brown transition-colors duration-200 after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:scale-x-0 after:bg-brown after:transition-transform after:duration-300 hover:after:scale-x-100"
-    >
-      {children}
-    </Link>
-  );
-};
-
-const MobileNavLink = ({ to, onClick, children }: { to: string, onClick?: () => void, children: React.ReactNode }) => {
-  return (
-    <Link
-      to={to}
-      className="block px-3 py-2 rounded-md text-gray-700 hover:text-brown hover:bg-brown/5 transition-colors duration-200"
-      onClick={onClick}
-    >
-      {children}
-    </Link>
   );
 };
 
