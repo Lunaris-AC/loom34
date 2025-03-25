@@ -16,10 +16,11 @@ const Index = () => {
   // Animation on scroll
   const [isVisible, setIsVisible] = useState(false);
 
-  // Fetch latest articles
+  // Fetch latest articles with debugging
   const { data: latestArticles = [], isLoading: isLoadingArticles } = useQuery({
     queryKey: ['latestArticles'],
     queryFn: async () => {
+      console.log('Fetching latest articles...');
       const { data, error } = await supabase
         .from('articles')
         .select('*')
@@ -27,15 +28,20 @@ const Index = () => {
         .order('date', { ascending: false })
         .limit(3);
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching articles:', error);
+        throw error;
+      }
+      console.log('Articles retrieved:', data);
       return data as Tables<'articles'>[];
     }
   });
 
-  // Fetch upcoming events
+  // Fetch upcoming events with debugging
   const { data: upcomingEvents = [], isLoading: isLoadingEvents } = useQuery({
     queryKey: ['upcomingEvents'],
     queryFn: async () => {
+      console.log('Fetching upcoming events...');
       const { data, error } = await supabase
         .from('events')
         .select('*')
@@ -43,7 +49,11 @@ const Index = () => {
         .order('date', { ascending: true })
         .limit(2);
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching events:', error);
+        throw error;
+      }
+      console.log('Events retrieved:', data);
       return data as Tables<'events'>[];
     }
   });
