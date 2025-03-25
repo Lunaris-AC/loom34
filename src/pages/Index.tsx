@@ -2,18 +2,51 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, CalendarDays, ShoppingBag, Users, Image, Heart, ExternalLink } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SectionHeading from '@/components/SectionHeading';
 import ArticleCard from '@/components/ArticleCard';
 import EventCard from '@/components/EventCard';
 import Button from '@/components/Button';
-
-const PLACEHOLDER_IMAGE = 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80';
+import { Tables } from '@/integrations/supabase/types';
 
 const Index = () => {
   // Animation on scroll
   const [isVisible, setIsVisible] = useState(false);
+
+  // Fetch latest articles
+  const { data: latestArticles = [], isLoading: isLoadingArticles } = useQuery({
+    queryKey: ['latestArticles'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('articles')
+        .select('*')
+        .eq('published', true)
+        .order('date', { ascending: false })
+        .limit(3);
+      
+      if (error) throw error;
+      return data as Tables<'articles'>[];
+    }
+  });
+
+  // Fetch upcoming events
+  const { data: upcomingEvents = [], isLoading: isLoadingEvents } = useQuery({
+    queryKey: ['upcomingEvents'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('events')
+        .select('*')
+        .eq('published', true)
+        .order('date', { ascending: true })
+        .limit(2);
+      
+      if (error) throw error;
+      return data as Tables<'events'>[];
+    }
+  });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -29,56 +62,6 @@ const Index = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  const latestArticles = [
-    {
-      title: "Cultural Significance of the Bear Community",
-      excerpt: "Exploring the historical roots and cultural impact of the bear community worldwide.",
-      date: "May 15, 2023",
-      image: "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
-      category: "Culture",
-      slug: "cultural-significance-bear-community"
-    },
-    {
-      title: "Inclusivity in Community Spaces",
-      excerpt: "How we're creating safe and welcoming environments for everyone within our organization.",
-      date: "June 2, 2023",
-      image: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
-      category: "Community",
-      slug: "inclusivity-community-spaces"
-    },
-    {
-      title: "Interview with Local Artist Jean Dupont",
-      excerpt: "We sat down with renowned artist Jean Dupont to discuss his latest exhibition and community influence.",
-      date: "June 12, 2023",
-      image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
-      category: "Art",
-      slug: "interview-jean-dupont"
-    }
-  ];
-
-  const upcomingEvents = [
-    {
-      title: "Summer Community Picnic",
-      description: "Join us for our annual summer picnic in the park. Food, games, and community bonding!",
-      date: "July 15, 2023",
-      time: "12:00 PM - 5:00 PM",
-      location: "Parc des Buttes-Chaumont, Paris",
-      image: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
-      slug: "summer-community-picnic",
-      registrationUrl: "https://helloasso.com/event/picnic2023"
-    },
-    {
-      title: "Pride Month Celebration",
-      description: "A special gathering to celebrate Pride Month with performances, speakers, and community recognition.",
-      date: "June 24, 2023",
-      time: "7:00 PM - 11:00 PM",
-      location: "Le Centre LGBTQ+, Paris",
-      image: "https://images.unsplash.com/photo-1571750007475-09cc42b58613?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
-      slug: "pride-month-celebration",
-      registrationUrl: "https://helloasso.com/event/pride2023"
-    }
-  ];
 
   return (
     <div className="flex flex-col min-h-screen bg-tan/10">
@@ -150,15 +133,46 @@ const Index = () => {
           />
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {latestArticles.map((article, index) => (
-              <ArticleCard key={index} {...article} />
-            ))}
+            {isLoadingArticles ? (
+              // Loading state
+              Array(3).fill(0).map((_, index) => (
+                <div key={index} className="animate-pulse bg-white rounded-xl p-6 h-96">
+                  <div className="w-full h-48 bg-gray-200 rounded-lg mb-4"></div>
+                  <div className="h-6 bg-gray-200 rounded w-1/2 mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                </div>
+              ))
+            ) : latestArticles.length === 0 ? (
+              <div className="col-span-full text-center py-12">
+                <p className="text-gray-500">No articles available at the moment. Check back soon!</p>
+              </div>
+            ) : (
+              latestArticles.map((article) => (
+                <ArticleCard 
+                  key={article.id}
+                  title={article.title}
+                  excerpt={article.excerpt}
+                  date={new Date(article.date).toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                  })}
+                  image={article.image}
+                  category={article.category}
+                  slug={article.slug}
+                />
+              ))
+            )}
           </div>
           
           <div className="mt-12 text-center">
-            <Button variant="outline" rightIcon={<ChevronRight size={18} />}>
-              View All Articles
-            </Button>
+            <Link to="/articles">
+              <Button variant="outline" rightIcon={<ChevronRight size={18} />}>
+                View All Articles
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
@@ -172,15 +186,44 @@ const Index = () => {
           />
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {upcomingEvents.map((event, index) => (
-              <EventCard key={index} {...event} />
-            ))}
+            {isLoadingEvents ? (
+              // Loading state
+              Array(2).fill(0).map((_, index) => (
+                <div key={index} className="animate-pulse bg-white rounded-xl p-6 h-96">
+                  <div className="w-full h-48 bg-gray-200 rounded-lg mb-4"></div>
+                  <div className="h-6 bg-gray-200 rounded w-1/2 mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                </div>
+              ))
+            ) : upcomingEvents.length === 0 ? (
+              <div className="col-span-full text-center py-12">
+                <p className="text-gray-500">No upcoming events at the moment. Check back soon!</p>
+              </div>
+            ) : (
+              upcomingEvents.map((event) => (
+                <EventCard 
+                  key={event.id}
+                  title={event.title}
+                  description={event.description}
+                  date={event.date}
+                  time={event.time}
+                  location={event.location}
+                  image={event.image}
+                  slug={event.slug}
+                  registrationUrl={event.registration_url}
+                />
+              ))
+            )}
           </div>
           
           <div className="mt-12 text-center">
-            <Button rightIcon={<CalendarDays size={18} />}>
-              View Full Calendar
-            </Button>
+            <Link to="/events">
+              <Button rightIcon={<CalendarDays size={18} />}>
+                View Full Calendar
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
@@ -202,13 +245,15 @@ const Index = () => {
                 Our community mascot and ambassador. Monsieur Ours represents the values of our association: 
                 warmth, acceptance, and strength in diversity.
               </p>
-              <Button 
-                variant="secondary" 
-                rightIcon={<ChevronRight size={18} />}
-                className="hover:bg-orange-light"
-              >
-                Discover His Story
-              </Button>
+              <Link to="/monsieur-ours">
+                <Button 
+                  variant="secondary" 
+                  rightIcon={<ChevronRight size={18} />}
+                  className="hover:bg-orange-light"
+                >
+                  Discover His Story
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
@@ -292,12 +337,11 @@ const Index = () => {
           </div>
           
           <div className="mt-12 text-center">
-            <p className="text-gray-600 mb-6">
-              Interested in partnering with us? Join our growing network of community supporters.
-            </p>
-            <Button variant="outline">
-              Become a Partner
-            </Button>
+            <Link to="/partners">
+              <Button variant="outline">
+                Learn About Our Partners
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
@@ -312,21 +356,33 @@ const Index = () => {
             Become a member and enjoy exclusive benefits, participate in events, and help shape our community's future.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              variant="secondary" 
-              size="lg" 
-              rightIcon={<Heart size={18} />}
-              className="bg-orange hover:bg-orange-light transition-all"
+            <a 
+              href="https://www.helloasso.com/associations/your-association/adhesions/membership" 
+              target="_blank" 
+              rel="noopener noreferrer"
             >
-              Become a Member
-            </Button>
-            <Button 
-              variant="outline" 
-              size="lg"
-              className="border-white text-white hover:bg-white/10"
+              <Button 
+                variant="secondary" 
+                size="lg" 
+                rightIcon={<Heart size={18} />}
+                className="bg-orange hover:bg-orange-light transition-all"
+              >
+                Become a Member
+              </Button>
+            </a>
+            <a 
+              href="https://www.helloasso.com/associations/your-association/adhesions/membership-info" 
+              target="_blank" 
+              rel="noopener noreferrer"
             >
-              Learn About Membership
-            </Button>
+              <Button 
+                variant="outline" 
+                size="lg"
+                className="border-white text-white hover:bg-white/10"
+              >
+                Learn About Membership
+              </Button>
+            </a>
           </div>
         </div>
       </section>
@@ -352,12 +408,18 @@ const Index = () => {
                 Whether you're registering for an event, becoming a member, or making a donation,
                 our secure HelloAsso integration makes it simple and safe.
               </p>
-              <Button 
-                rightIcon={<ExternalLink size={18} />}
-                className="bg-[#00ade5] hover:bg-[#0099cc]"
+              <a 
+                href="https://www.helloasso.com/associations/your-association" 
+                target="_blank" 
+                rel="noopener noreferrer"
               >
-                Visit Our HelloAsso Page
-              </Button>
+                <Button 
+                  rightIcon={<ExternalLink size={18} />}
+                  className="bg-[#00ade5] hover:bg-[#0099cc]"
+                >
+                  Visit Our HelloAsso Page
+                </Button>
+              </a>
             </div>
           </div>
         </div>

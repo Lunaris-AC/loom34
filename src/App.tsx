@@ -9,6 +9,11 @@ import { AuthProvider } from "./contexts/AuthContext";
 
 // Pages
 import Index from "./pages/Index";
+import About from "./pages/About";
+import Events from "./pages/Events";
+import MonsieurOurs from "./pages/MonsieurOurs";
+import Gallery from "./pages/Gallery";
+import Partners from "./pages/Partners";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import NotFound from "./pages/NotFound";
@@ -20,6 +25,10 @@ import RequireAuth from "./components/auth/RequireAuth";
 import RequireAdmin from "./components/auth/RequireAdmin";
 
 const queryClient = new QueryClient();
+
+// HelloAsso URLs
+const SHOP_URL = "https://www.helloasso.com/associations/your-association/boutiques/shop";
+const MEMBERSHIP_URL = "https://www.helloasso.com/associations/your-association/adhesions/membership";
 
 const App = () => {
   // Scroll to top on route change
@@ -37,6 +46,21 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Index />} />
               
+              {/* Main Pages */}
+              <Route path="/about" element={<About />} />
+              <Route path="/events" element={<Events />} />
+              <Route path="/monsieur-ours" element={<MonsieurOurs />} />
+              <Route path="/gallery" element={<Gallery />} />
+              <Route path="/partners" element={<Partners />} />
+              
+              {/* External Redirects */}
+              <Route path="/shop" element={
+                <Navigate to={SHOP_URL} replace />
+              } />
+              <Route path="/membership" element={
+                <Navigate to={MEMBERSHIP_URL} replace />
+              } />
+              
               {/* Auth Routes */}
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
@@ -47,15 +71,6 @@ const App = () => {
               <Route path="/admin/articles" element={<RequireAuth><RequireAdmin><AdminArticles /></RequireAdmin></RequireAuth>} />
               <Route path="/admin/events" element={<RequireAuth><RequireAdmin><AdminEvents /></RequireAdmin></RequireAuth>} />
               <Route path="/admin/gallery" element={<RequireAuth><RequireAdmin><AdminGallery /></RequireAdmin></RequireAuth>} />
-              
-              {/* These routes will be implemented in future iterations */}
-              <Route path="/about" element={<NotFound />} />
-              <Route path="/events" element={<NotFound />} />
-              <Route path="/shop" element={<NotFound />} />
-              <Route path="/monsieur-ours" element={<NotFound />} />
-              <Route path="/gallery" element={<NotFound />} />
-              <Route path="/partners" element={<NotFound />} />
-              <Route path="/membership" element={<NotFound />} />
               
               {/* Catch-all route */}
               <Route path="*" element={<NotFound />} />
