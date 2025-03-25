@@ -1,12 +1,369 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { ChevronRight, CalendarDays, ShoppingBag, Users, Image, Heart, ExternalLink } from 'lucide-react';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import SectionHeading from '@/components/SectionHeading';
+import ArticleCard from '@/components/ArticleCard';
+import EventCard from '@/components/EventCard';
+import Button from '@/components/Button';
+
+const PLACEHOLDER_IMAGE = 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80';
 
 const Index = () => {
+  // Animation on scroll
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      if (scrollY > 100) {
+        setIsVisible(true);
+      }
+    };
+
+    // Set initially
+    handleScroll();
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const latestArticles = [
+    {
+      title: "Cultural Significance of the Bear Community",
+      excerpt: "Exploring the historical roots and cultural impact of the bear community worldwide.",
+      date: "May 15, 2023",
+      image: "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+      category: "Culture",
+      slug: "cultural-significance-bear-community"
+    },
+    {
+      title: "Inclusivity in Community Spaces",
+      excerpt: "How we're creating safe and welcoming environments for everyone within our organization.",
+      date: "June 2, 2023",
+      image: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+      category: "Community",
+      slug: "inclusivity-community-spaces"
+    },
+    {
+      title: "Interview with Local Artist Jean Dupont",
+      excerpt: "We sat down with renowned artist Jean Dupont to discuss his latest exhibition and community influence.",
+      date: "June 12, 2023",
+      image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+      category: "Art",
+      slug: "interview-jean-dupont"
+    }
+  ];
+
+  const upcomingEvents = [
+    {
+      title: "Summer Community Picnic",
+      description: "Join us for our annual summer picnic in the park. Food, games, and community bonding!",
+      date: "July 15, 2023",
+      time: "12:00 PM - 5:00 PM",
+      location: "Parc des Buttes-Chaumont, Paris",
+      image: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+      slug: "summer-community-picnic",
+      registrationUrl: "https://helloasso.com/event/picnic2023"
+    },
+    {
+      title: "Pride Month Celebration",
+      description: "A special gathering to celebrate Pride Month with performances, speakers, and community recognition.",
+      date: "June 24, 2023",
+      time: "7:00 PM - 11:00 PM",
+      location: "Le Centre LGBTQ+, Paris",
+      image: "https://images.unsplash.com/photo-1571750007475-09cc42b58613?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+      slug: "pride-month-celebration",
+      registrationUrl: "https://helloasso.com/event/pride2023"
+    }
+  ];
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
-      </div>
+    <div className="flex flex-col min-h-screen bg-tan/10">
+      <Navbar />
+      
+      {/* Hero Section */}
+      <section className="pt-24 md:pt-32 bg-gradient-to-b from-tan/30 to-transparent">
+        <div className="container mx-auto px-4 py-12 md:py-20">
+          <div className="flex flex-col lg:flex-row items-center gap-12">
+            <div className="lg:w-1/2 space-y-6">
+              <div className="inline-flex items-center px-3 py-1 rounded-full bg-orange/10 text-orange text-sm font-medium">
+                <span className="animate-pulse-soft">•</span>
+                <span className="ml-2">Welcome to Loom</span>
+              </div>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-gray-900 animate-fade-in">
+                A Community Where <span className="text-brown">Everyone Belongs</span>
+              </h1>
+              <p className="text-lg md:text-xl text-gray-700 max-w-2xl animate-fade-in" style={{ animationDelay: '0.1s' }}>
+                Join our vibrant community celebrating diversity, connection, and authentic expression. 
+                Discover events, stories, and people that make our community special.
+              </p>
+              <div className="flex flex-wrap gap-4 pt-2 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                <Button size="lg" rightIcon={<ChevronRight size={18} />}>
+                  Join Us
+                </Button>
+                <Button size="lg" variant="outline">
+                  Learn More
+                </Button>
+              </div>
+            </div>
+            <div className="lg:w-1/2 relative">
+              <div className="relative rounded-2xl overflow-hidden shadow-xl animate-float">
+                <img 
+                  src="https://images.unsplash.com/photo-1517457373958-b7bdd4587205?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" 
+                  alt="Community gathering" 
+                  className="w-full h-auto object-cover rounded-2xl"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-brown/30 to-transparent rounded-2xl"></div>
+              </div>
+              <div className="absolute -bottom-6 -left-6 p-4 bg-white rounded-xl shadow-lg hidden md:flex items-center gap-3 animate-slide-in" style={{ animationDelay: '0.4s' }}>
+                <div className="bg-orange/10 rounded-full p-2">
+                  <Users size={24} className="text-orange" />
+                </div>
+                <div>
+                  <p className="text-gray-600 text-sm">Active Members</p>
+                  <p className="text-gray-900 font-bold">1,200+</p>
+                </div>
+              </div>
+              <div className="absolute -top-6 -right-6 p-4 bg-white rounded-xl shadow-lg hidden md:flex items-center gap-3 animate-slide-in" style={{ animationDelay: '0.6s' }}>
+                <div className="bg-yellow/10 rounded-full p-2">
+                  <CalendarDays size={24} className="text-yellow-dark" />
+                </div>
+                <div>
+                  <p className="text-gray-600 text-sm">Annual Events</p>
+                  <p className="text-gray-900 font-bold">50+</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      {/* Latest Articles Section */}
+      <section className={`py-16 md:py-24 transition-opacity duration-700 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
+        <div className="container mx-auto px-4">
+          <SectionHeading 
+            title="Latest Articles" 
+            subtitle="Stay updated with our community news, stories, and perspectives."
+          />
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {latestArticles.map((article, index) => (
+              <ArticleCard key={index} {...article} />
+            ))}
+          </div>
+          
+          <div className="mt-12 text-center">
+            <Button variant="outline" rightIcon={<ChevronRight size={18} />}>
+              View All Articles
+            </Button>
+          </div>
+        </div>
+      </section>
+      
+      {/* Upcoming Events Section */}
+      <section className="py-16 md:py-24 bg-gradient-to-b from-tan/30 to-transparent">
+        <div className="container mx-auto px-4">
+          <SectionHeading 
+            title="Upcoming Events" 
+            subtitle="Join us for these exciting community gatherings and celebrations."
+          />
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {upcomingEvents.map((event, index) => (
+              <EventCard key={index} {...event} />
+            ))}
+          </div>
+          
+          <div className="mt-12 text-center">
+            <Button rightIcon={<CalendarDays size={18} />}>
+              View Full Calendar
+            </Button>
+          </div>
+        </div>
+      </section>
+      
+      {/* Monsieur Ours Spotlight */}
+      <section className="py-16 md:py-24">
+        <div className="container mx-auto px-4">
+          <div className="rounded-3xl overflow-hidden bg-brown text-white relative">
+            <div className="absolute top-0 right-0 w-1/2 h-full bg-[url('https://images.unsplash.com/photo-1525268771113-32d9e9021a97?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')] bg-cover bg-center hidden md:block">
+              <div className="absolute inset-0 bg-gradient-to-r from-brown to-transparent"></div>
+            </div>
+            
+            <div className="md:w-3/5 lg:w-1/2 p-8 md:p-12 lg:p-16 relative z-10">
+              <div className="inline-block mb-4">
+                <div className="w-10 h-1 bg-orange mb-2"></div>
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold mb-6">Meet Monsieur Ours</h2>
+              <p className="text-tan/90 text-lg mb-8">
+                Our community mascot and ambassador. Monsieur Ours represents the values of our association: 
+                warmth, acceptance, and strength in diversity.
+              </p>
+              <Button 
+                variant="secondary" 
+                rightIcon={<ChevronRight size={18} />}
+                className="hover:bg-orange-light"
+              >
+                Discover His Story
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      {/* Features Section */}
+      <section className="py-16 md:py-24 bg-tan/10">
+        <div className="container mx-auto px-4">
+          <SectionHeading 
+            title="Discover Our Community" 
+            subtitle="Explore the different aspects of what makes our association unique."
+            centered
+          />
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
+            {/* Feature 1 */}
+            <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300 hover-lift">
+              <div className="rounded-full bg-brown/10 w-14 h-14 flex items-center justify-center mb-4">
+                <Users size={24} className="text-brown" />
+              </div>
+              <h3 className="text-xl font-semibold mb-3">Active Community</h3>
+              <p className="text-gray-600">
+                Join a vibrant and inclusive community of over 1,200 members.
+              </p>
+            </div>
+            
+            {/* Feature 2 */}
+            <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300 hover-lift">
+              <div className="rounded-full bg-orange/10 w-14 h-14 flex items-center justify-center mb-4">
+                <CalendarDays size={24} className="text-orange" />
+              </div>
+              <h3 className="text-xl font-semibold mb-3">Regular Events</h3>
+              <p className="text-gray-600">
+                Participate in our diverse schedule of events, gatherings, and celebrations.
+              </p>
+            </div>
+            
+            {/* Feature 3 */}
+            <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300 hover-lift">
+              <div className="rounded-full bg-yellow/10 w-14 h-14 flex items-center justify-center mb-4">
+                <ShoppingBag size={24} className="text-yellow-dark" />
+              </div>
+              <h3 className="text-xl font-semibold mb-3">Community Shop</h3>
+              <p className="text-gray-600">
+                Support our mission by shopping our collection of merchandise and memorabilia.
+              </p>
+            </div>
+            
+            {/* Feature 4 */}
+            <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300 hover-lift">
+              <div className="rounded-full bg-tan/30 w-14 h-14 flex items-center justify-center mb-4">
+                <Image size={24} className="text-brown" />
+              </div>
+              <h3 className="text-xl font-semibold mb-3">Photo Gallery</h3>
+              <p className="text-gray-600">
+                Browse our collection of photos documenting community events and members.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      {/* Partners Section */}
+      <section className="py-16 md:py-24">
+        <div className="container mx-auto px-4">
+          <SectionHeading 
+            title="Our Partners" 
+            subtitle="We're grateful for the support of these organizations and businesses."
+            centered
+          />
+          
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 items-center mt-12">
+            {/* Partner logos here (placeholder) */}
+            {Array.from({ length: 5 }).map((_, index) => (
+              <div key={index} className="flex justify-center items-center p-4">
+                <div className="h-16 w-36 bg-gray-200 rounded-md flex items-center justify-center text-gray-400">
+                  Partner {index + 1}
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          <div className="mt-12 text-center">
+            <p className="text-gray-600 mb-6">
+              Interested in partnering with us? Join our growing network of community supporters.
+            </p>
+            <Button variant="outline">
+              Become a Partner
+            </Button>
+          </div>
+        </div>
+      </section>
+      
+      {/* CTA Section */}
+      <section className="py-16 md:py-24 bg-gradient-to-r from-brown to-brown-dark text-white">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6 max-w-3xl mx-auto leading-tight">
+            Join Our Community Today and Be Part of Something Special
+          </h2>
+          <p className="text-tan/90 text-lg mb-8 max-w-2xl mx-auto">
+            Become a member and enjoy exclusive benefits, participate in events, and help shape our community's future.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button 
+              variant="secondary" 
+              size="lg" 
+              rightIcon={<Heart size={18} />}
+              className="bg-orange hover:bg-orange-light transition-all"
+            >
+              Become a Member
+            </Button>
+            <Button 
+              variant="outline" 
+              size="lg"
+              className="border-white text-white hover:bg-white/10"
+            >
+              Learn About Membership
+            </Button>
+          </div>
+        </div>
+      </section>
+      
+      {/* HelloAsso Integration Section */}
+      <section className="py-16 md:py-24 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="max-w-3xl mx-auto text-center">
+            <SectionHeading 
+              title="Support Our Mission" 
+              subtitle="We've partnered with HelloAsso to make supporting our community simple and secure."
+              centered
+            />
+            
+            <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100 mb-8">
+              <div className="flex justify-center mb-6">
+                {/* HelloAsso logo placeholder */}
+                <div className="h-12 bg-gray-200 rounded-md flex items-center justify-center text-gray-400 px-6">
+                  HelloAsso Logo
+                </div>
+              </div>
+              <p className="text-gray-600 mb-6">
+                Whether you're registering for an event, becoming a member, or making a donation,
+                our secure HelloAsso integration makes it simple and safe.
+              </p>
+              <Button 
+                rightIcon={<ExternalLink size={18} />}
+                className="bg-[#00ade5] hover:bg-[#0099cc]"
+              >
+                Visit Our HelloAsso Page
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <Footer />
     </div>
   );
 };

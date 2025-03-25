@@ -1,0 +1,91 @@
+
+import { Link } from 'react-router-dom';
+import { Calendar, Clock, MapPin, ExternalLink } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+interface EventCardProps {
+  title: string;
+  description: string;
+  date: string;
+  time: string;
+  location: string;
+  image: string;
+  slug: string;
+  registrationUrl?: string;
+  className?: string;
+}
+
+const EventCard = ({
+  title,
+  description,
+  date,
+  time,
+  location,
+  image,
+  slug,
+  registrationUrl,
+  className,
+}: EventCardProps) => {
+  return (
+    <article 
+      className={cn(
+        "group overflow-hidden rounded-xl bg-white border border-gray-100 shadow-sm transition-all duration-300 hover:shadow-md hover-lift",
+        className
+      )}
+    >
+      <div className="relative overflow-hidden aspect-[5/3]">
+        <img
+          src={image}
+          alt={title}
+          className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
+          loading="lazy"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+        <div className="absolute bottom-0 left-0 p-4 w-full">
+          <h3 className="text-white text-shadow text-xl font-semibold mb-1">
+            {title}
+          </h3>
+          <div className="flex items-center text-white/90 text-sm">
+            <Calendar size={16} className="mr-1" />
+            <time dateTime={new Date(date).toISOString()}>{date}</time>
+          </div>
+        </div>
+      </div>
+      <div className="p-6">
+        <div className="flex flex-col gap-3 mb-4">
+          <div className="flex items-start">
+            <Clock size={18} className="mr-2 text-orange mt-0.5 flex-shrink-0" />
+            <span>{time}</span>
+          </div>
+          <div className="flex items-start">
+            <MapPin size={18} className="mr-2 text-orange mt-0.5 flex-shrink-0" />
+            <span>{location}</span>
+          </div>
+        </div>
+        <p className="text-gray-600 line-clamp-3 mb-4">
+          {description}
+        </p>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Link 
+            to={`/events/${slug}`} 
+            className="flex-1 inline-flex items-center justify-center bg-brown hover:bg-brown-dark text-white py-2 px-4 rounded-lg transition-colors"
+          >
+            View Details
+          </Link>
+          {registrationUrl && (
+            <a 
+              href={registrationUrl} 
+              className="flex-1 inline-flex items-center justify-center bg-orange hover:bg-orange-dark text-white py-2 px-4 rounded-lg transition-colors"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Register <ExternalLink size={16} className="ml-1" />
+            </a>
+          )}
+        </div>
+      </div>
+    </article>
+  );
+};
+
+export default EventCard;
