@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, CalendarDays, ShoppingBag, Users, Image, Heart, ExternalLink } from 'lucide-react';
@@ -425,60 +426,16 @@ const Index = () => {
             Join Our Community Today and Be Part of Something Special
           </h2>
           <p className="text-tan/90 text-lg mb-8 max-w-2xl mx-auto">
-            Become a member and enjoy exclusive benefits, participate in events, and help shape our community's future.
+            Become a member and enjoy exclusive benefits, special event access, and help support our mission.
           </p>
           <a 
             href="https://www.helloasso.com/associations/your-association/adhesions/membership" 
             target="_blank" 
             rel="noopener noreferrer"
+            className="inline-flex items-center justify-center bg-orange hover:bg-orange-dark text-white py-3 px-6 rounded-lg font-medium transition-colors"
           >
-            <Button 
-              variant="secondary" 
-              size="lg" 
-              rightIcon={<Heart size={18} />}
-              className="bg-orange hover:bg-orange-light transition-all"
-            >
-              Become a Member
-            </Button>
+            Become a Member
           </a>
-        </div>
-      </section>
-      
-      {/* HelloAsso Integration Section */}
-      <section className="py-16 md:py-24 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <SectionHeading 
-              title="Support Our Mission" 
-              subtitle="We've partnered with HelloAsso to make supporting our community simple and secure."
-              centered
-            />
-            
-            <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100 mb-8">
-              <div className="flex justify-center mb-6">
-                {/* HelloAsso logo placeholder */}
-                <div className="h-12 bg-gray-200 rounded-md flex items-center justify-center text-gray-400 px-6">
-                  HelloAsso Logo
-                </div>
-              </div>
-              <p className="text-gray-600 mb-6">
-                Whether you're registering for an event, becoming a member, or making a donation,
-                our secure HelloAsso integration makes it simple and safe.
-              </p>
-              <a 
-                href="https://www.helloasso.com/associations/your-association" 
-                target="_blank" 
-                rel="noopener noreferrer"
-              >
-                <Button 
-                  rightIcon={<ExternalLink size={18} />}
-                  className="bg-[#00ade5] hover:bg-[#0099cc]"
-                >
-                  Visit Our HelloAsso Page
-                </Button>
-              </a>
-            </div>
-          </div>
         </div>
       </section>
       

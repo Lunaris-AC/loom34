@@ -59,12 +59,12 @@ const App = () => {
               <Route path="/gallery" element={<Gallery />} />
               <Route path="/partners" element={<Partners />} />
               
-              {/* External Redirects */}
+              {/* External Redirects - Fixed to redirect directly to external URLs */}
               <Route path="/shop" element={
-                <Navigate to={SHOP_URL} replace />
+                <Navigate to={{ pathname: SHOP_URL }} replace />
               } />
               <Route path="/membership" element={
-                <Navigate to={MEMBERSHIP_URL} replace />
+                <Navigate to={{ pathname: MEMBERSHIP_URL }} replace />
               } />
               
               {/* Auth Routes */}
