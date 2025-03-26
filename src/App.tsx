@@ -23,10 +23,13 @@ import AdminEvents from "./pages/admin/Events";
 import AdminGallery from "./pages/admin/Gallery";
 import RequireAuth from "./components/auth/RequireAuth";
 import RequireAdmin from "./components/auth/RequireAdmin";
+import ArticleDetail from "./pages/ArticleDetail";
+import EventDetail from "./pages/EventDetail";
+import Articles from "./pages/Articles";
 
 const queryClient = new QueryClient();
 
-// HelloAsso URLs
+// HelloAsso URLs - Direct links without host prefixing
 const SHOP_URL = "https://www.helloasso.com/associations/your-association/boutiques/shop";
 const MEMBERSHIP_URL = "https://www.helloasso.com/associations/your-association/adhesions/membership";
 
@@ -49,6 +52,9 @@ const App = () => {
               {/* Main Pages */}
               <Route path="/about" element={<About />} />
               <Route path="/events" element={<Events />} />
+              <Route path="/articles" element={<Articles />} />
+              <Route path="/articles/:slug" element={<ArticleDetail />} />
+              <Route path="/events/:slug" element={<EventDetail />} />
               <Route path="/monsieur-ours" element={<MonsieurOurs />} />
               <Route path="/gallery" element={<Gallery />} />
               <Route path="/partners" element={<Partners />} />

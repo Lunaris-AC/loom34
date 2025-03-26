@@ -6,6 +6,28 @@ import SectionHeading from '@/components/SectionHeading';
 import Button from '@/components/Button';
 
 const MonsieurOurs = () => {
+  // Previous mascots data
+  const previousMascots = [
+    {
+      name: "Olivier L'Ours",
+      period: "2010-2015",
+      description: "The first incarnation of our mascot, known for his classic design and friendly demeanor.",
+      image: "https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+    },
+    {
+      name: "Pierre L'Ours",
+      period: "2015-2018",
+      description: "A more modern take on our mascot, with a sleeker design and vibrant colors.",
+      image: "https://images.unsplash.com/photo-1587922546307-776227941871?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+    },
+    {
+      name: "Monsieur Ours Classic",
+      period: "2018-2022",
+      description: "The refined version that established our mascot's distinguished personality.",
+      image: "https://images.unsplash.com/photo-1566903451935-7e8836199ac5?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+    }
+  ];
+
   return (
     <div className="flex flex-col min-h-screen bg-tan/10">
       <Navbar />
@@ -161,37 +183,32 @@ const MonsieurOurs = () => {
         </div>
       </section>
       
-      {/* Merchandise Section */}
+      {/* Previous Monsieur Ours Section - Replacing "Take Home" section */}
       <section className="py-16">
         <div className="container mx-auto px-4">
-          <div className="bg-brown text-white rounded-3xl overflow-hidden relative">
-            <div className="absolute top-0 right-0 w-1/2 h-full bg-[url('https://images.unsplash.com/photo-1606041008023-472dfb5e530f?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80')] bg-cover bg-center hidden md:block">
-              <div className="absolute inset-0 bg-gradient-to-r from-brown to-transparent"></div>
-            </div>
-            
-            <div className="md:w-3/5 lg:w-1/2 p-8 md:p-12 lg:p-16 relative z-10">
-              <div className="inline-block mb-4">
-                <div className="w-10 h-1 bg-orange mb-2"></div>
+          <SectionHeading 
+            title="Previous Monsieur Ours" 
+            subtitle="The evolution of our beloved mascot through the years."
+            centered
+          />
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
+            {previousMascots.map((mascot, index) => (
+              <div key={index} className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
+                <div className="h-56 overflow-hidden">
+                  <img 
+                    src={mascot.image} 
+                    alt={mascot.name} 
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+                <div className="p-6">
+                  <h3 className="text-xl font-bold mb-1">{mascot.name}</h3>
+                  <p className="text-orange text-sm font-medium mb-3">{mascot.period}</p>
+                  <p className="text-gray-700">{mascot.description}</p>
+                </div>
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-6">Take Home Monsieur Ours</h2>
-              <p className="text-tan/90 text-lg mb-8">
-                Support our community by purchasing Monsieur Ours merchandise. From plush toys to 
-                t-shirts, mugs, and more – all proceeds go toward funding our community programs.
-              </p>
-              <a 
-                href="https://www.helloasso.com/associations/your-association/boutiques/shop" 
-                target="_blank" 
-                rel="noopener noreferrer"
-              >
-                <Button 
-                  variant="secondary" 
-                  rightIcon={<Heart size={18} />}
-                  className="bg-orange hover:bg-orange-light"
-                >
-                  Visit Our Shop
-                </Button>
-              </a>
-            </div>
+            ))}
           </div>
         </div>
       </section>

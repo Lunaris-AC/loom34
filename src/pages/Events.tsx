@@ -1,4 +1,5 @@
-import { useState } from 'react';
+
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Search, Calendar, Filter, ChevronDown } from 'lucide-react';
@@ -7,15 +8,22 @@ import Footer from '@/components/Footer';
 import EventCard from '@/components/EventCard';
 import { Tables } from '@/integrations/supabase/types';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
+import { format } from 'date-fns';
 
 const Events = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
+  const [dateFilter, setDateFilter] = useState<Date | undefined>(undefined);
+  const [categories, setCategories] = useState<string[]>([]);
   const eventsPerPage = 6;
 
+  // Fetch all events
   const { data: events = [], isLoading } = useQuery({
-    queryKey: ['events', searchQuery, categoryFilter],
+    queryKey: ['events', searchQuery, categoryFilter, dateFilter],
     queryFn: async () => {
       let query = supabase
         .from('events')
@@ -24,16 +32,56 @@ const Events = () => {
         .order('date', { ascending: true });
       
       if (searchQuery) {
-        query = query.or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
+        query = query.or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%,location.ilike.%${searchQuery}%`);
+      }
+
+      if (categoryFilter) {
+        // Extract category from description for demo (in a real app, you'd have a category field)
+        // This is a simplified approach since we don't have a category field in the events table
+        query = query.ilike('description', `%${categoryFilter}%`);
       }
 
       const { data, error } = await query;
       
       if (error) throw error;
-      return data as Tables<'events'>[];
+      
+      // Apply date filter in JS (since our date field is text)
+      let filtered = data as Tables<'events'>[];
+      
+      if (dateFilter) {
+        const filterDateStr = format(dateFilter, 'MMMM d, yyyy');
+        filtered = filtered.filter(event => {
+          return event.date.includes(filterDateStr);
+        });
+      }
+      
+      return filtered;
     }
   });
 
+  // Extract categories from events (simplified - in a real app, you'd have a proper category field)
+  useEffect(() => {
+    if (events.length > 0) {
+      const categoryList = [
+        'Workshop',
+        'Community',
+        'Social',
+        'Educational',
+        'Charity',
+        'Art'
+      ];
+      setCategories(categoryList);
+    }
+  }, [events]);
+
+  const clearFilters = () => {
+    setSearchQuery('');
+    setCategoryFilter('');
+    setDateFilter(undefined);
+    setCurrentPage(1);
+  };
+
+  // Calculate pagination
   const totalPages = Math.ceil(events.length / eventsPerPage);
   const paginatedEvents = events.slice(
     (currentPage - 1) * eventsPerPage, 
@@ -71,32 +119,143 @@ const Events = () => {
                   placeholder="Search events..."
                   className="pl-10 w-full h-12 border border-gray-300 rounded-lg focus:ring-brown focus:border-brown"
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setCurrentPage(1); // Reset to first page on new search
+                  }}
                 />
               </div>
-              <div className="flex gap-4">
+              <div className="flex gap-4 flex-col sm:flex-row">
                 <div className="relative">
-                  <button className="flex items-center justify-between w-48 px-4 h-12 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
-                    <div className="flex items-center">
-                      <Calendar size={18} className="mr-2 text-gray-500" />
-                      <span>Filter by Date</span>
-                    </div>
-                    <ChevronDown size={16} />
-                  </button>
-                  {/* Date filter dropdown would go here */}
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="flex justify-between w-full sm:w-48 h-12"
+                      >
+                        <div className="flex items-center">
+                          <Calendar size={18} className="mr-2 text-gray-500" />
+                          <span>{dateFilter ? format(dateFilter, 'PP') : 'Filter by Date'}</span>
+                        </div>
+                        <ChevronDown size={16} />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <CalendarComponent
+                        mode="single"
+                        selected={dateFilter}
+                        onSelect={setDateFilter}
+                        initialFocus
+                      />
+                      {dateFilter && (
+                        <div className="p-3 border-t">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => setDateFilter(undefined)}
+                            className="w-full"
+                          >
+                            Clear Date
+                          </Button>
+                        </div>
+                      )}
+                    </PopoverContent>
+                  </Popover>
                 </div>
                 <div className="relative">
-                  <button className="flex items-center justify-between w-48 px-4 h-12 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                  <button 
+                    className="flex items-center justify-between w-full sm:w-48 h-12 px-4 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                    onClick={() => {
+                      const dropdown = document.getElementById('categoriesDropdown');
+                      if (dropdown) {
+                        dropdown.classList.toggle('hidden');
+                      }
+                    }}
+                  >
                     <div className="flex items-center">
                       <Filter size={18} className="mr-2 text-gray-500" />
-                      <span>All Categories</span>
+                      <span>{categoryFilter || 'All Categories'}</span>
                     </div>
                     <ChevronDown size={16} />
                   </button>
-                  {/* Category filter dropdown would go here */}
+                  {/* Category filter dropdown */}
+                  <div 
+                    id="categoriesDropdown"
+                    className="absolute top-full mt-2 w-full sm:w-48 bg-white rounded-lg shadow-lg overflow-hidden z-10 hidden"
+                  >
+                    <div 
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                      onClick={() => {
+                        setCategoryFilter('');
+                        setCurrentPage(1);
+                        document.getElementById('categoriesDropdown')?.classList.add('hidden');
+                      }}
+                    >
+                      All Categories
+                    </div>
+                    {categories.map((category) => (
+                      <div 
+                        key={category}
+                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                        onClick={() => {
+                          setCategoryFilter(category);
+                          setCurrentPage(1);
+                          document.getElementById('categoriesDropdown')?.classList.add('hidden');
+                        }}
+                      >
+                        {category}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
+            
+            {/* Active filters */}
+            {(searchQuery || categoryFilter || dateFilter) && (
+              <div className="mt-4 flex items-center flex-wrap gap-2">
+                <span className="text-sm text-gray-600">Active filters:</span>
+                {searchQuery && (
+                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-gray-100 text-gray-800 text-sm">
+                    Search: {searchQuery}
+                    <button 
+                      className="ml-2 text-gray-500 hover:text-gray-700"
+                      onClick={() => setSearchQuery('')}
+                    >
+                      ×
+                    </button>
+                  </span>
+                )}
+                {categoryFilter && (
+                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-gray-100 text-gray-800 text-sm">
+                    Category: {categoryFilter}
+                    <button 
+                      className="ml-2 text-gray-500 hover:text-gray-700"
+                      onClick={() => setCategoryFilter('')}
+                    >
+                      ×
+                    </button>
+                  </span>
+                )}
+                {dateFilter && (
+                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-gray-100 text-gray-800 text-sm">
+                    Date: {format(dateFilter, 'PP')}
+                    <button 
+                      className="ml-2 text-gray-500 hover:text-gray-700"
+                      onClick={() => setDateFilter(undefined)}
+                    >
+                      ×
+                    </button>
+                  </span>
+                )}
+                <button 
+                  className="text-sm text-brown hover:text-brown-dark ml-2"
+                  onClick={clearFilters}
+                >
+                  Clear all
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -122,10 +281,19 @@ const Events = () => {
               </div>
               <h3 className="text-2xl font-semibold mb-2">No Events Found</h3>
               <p className="text-gray-600 max-w-md mx-auto">
-                {searchQuery ? 
-                  `No events match your search for "${searchQuery}". Try different keywords or clear your search.` : 
+                {searchQuery || categoryFilter || dateFilter ? 
+                  `No events match your search criteria. Try different filters.` : 
                   "We don't have any upcoming events at the moment. Check back soon!"}
               </p>
+              
+              {(searchQuery || categoryFilter || dateFilter) && (
+                <button 
+                  className="mt-4 text-brown hover:underline font-medium"
+                  onClick={clearFilters}
+                >
+                  Clear all filters
+                </button>
+              )}
             </div>
           ) : (
             <>

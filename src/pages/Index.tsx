@@ -1,5 +1,4 @@
-
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, CalendarDays, ShoppingBag, Users, Image, Heart, ExternalLink } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
@@ -15,6 +14,7 @@ import { Tables } from '@/integrations/supabase/types';
 const Index = () => {
   // Animation on scroll
   const [isVisible, setIsVisible] = useState(false);
+  const partnersRef = useRef<HTMLDivElement>(null);
 
   // Fetch latest articles with debugging
   const { data: latestArticles = [], isLoading: isLoadingArticles } = useQuery({
@@ -58,6 +58,7 @@ const Index = () => {
     }
   });
 
+  // Partners automatic scroll effect
   useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY;
@@ -72,6 +73,52 @@ const Index = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Partners automatic scroll animation
+  useEffect(() => {
+    const partnersContainer = partnersRef.current;
+    if (!partnersContainer) return;
+
+    const scrollWidth = partnersContainer.scrollWidth;
+    const clientWidth = partnersContainer.clientWidth;
+    
+    if (scrollWidth <= clientWidth) return; // No need to scroll if all items fit
+
+    let scrollPosition = 0;
+    const speed = 1; // pixels per frame
+    
+    const scroll = () => {
+      if (!partnersContainer) return;
+      
+      scrollPosition += speed;
+      
+      // Reset position when we've scrolled the full width
+      if (scrollPosition >= scrollWidth / 2) {
+        scrollPosition = 0;
+      }
+      
+      partnersContainer.scrollLeft = scrollPosition;
+      requestAnimationFrame(scroll);
+    };
+    
+    const animationId = requestAnimationFrame(scroll);
+    
+    return () => cancelAnimationFrame(animationId);
+  }, [isVisible]);
+
+  // Partners data
+  const partners = [
+    { id: 1, name: "Community Center Paris", logo: "https://via.placeholder.com/200x100/f3f4f6/666666?text=Partner+1" },
+    { id: 2, name: "Rainbow Foundation", logo: "https://via.placeholder.com/200x100/f3f4f6/666666?text=Partner+2" },
+    { id: 3, name: "Local Bistro", logo: "https://via.placeholder.com/200x100/f3f4f6/666666?text=Partner+3" },
+    { id: 4, name: "Inclusive Spaces Co.", logo: "https://via.placeholder.com/200x100/f3f4f6/666666?text=Partner+4" },
+    { id: 5, name: "City of Paris", logo: "https://via.placeholder.com/200x100/f3f4f6/666666?text=Partner+5" },
+    { id: 6, name: "Pride Alliance", logo: "https://via.placeholder.com/200x100/f3f4f6/666666?text=Partner+6" },
+    { id: 7, name: "Global Diversity Fund", logo: "https://via.placeholder.com/200x100/f3f4f6/666666?text=Partner+7" },
+    { id: 8, name: "Tech for All", logo: "https://via.placeholder.com/200x100/f3f4f6/666666?text=Partner+8" },
+    { id: 9, name: "Eco Friends", logo: "https://via.placeholder.com/200x100/f3f4f6/666666?text=Partner+9" },
+    { id: 10, name: "Youth Support Network", logo: "https://via.placeholder.com/200x100/f3f4f6/666666?text=Partner+10" }
+  ];
 
   return (
     <div className="flex flex-col min-h-screen bg-tan/10">
@@ -326,8 +373,8 @@ const Index = () => {
         </div>
       </section>
       
-      {/* Partners Section */}
-      <section className="py-16 md:py-24">
+      {/* Partners Section - Updated to be scrollable */}
+      <section className="py-16 md:py-24 overflow-hidden">
         <div className="container mx-auto px-4">
           <SectionHeading 
             title="Our Partners" 
@@ -335,28 +382,43 @@ const Index = () => {
             centered
           />
           
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 items-center mt-12">
-            {/* Partner logos here (placeholder) */}
-            {Array.from({ length: 5 }).map((_, index) => (
-              <div key={index} className="flex justify-center items-center p-4">
-                <div className="h-16 w-36 bg-gray-200 rounded-md flex items-center justify-center text-gray-400">
-                  Partner {index + 1}
+          <div 
+            ref={partnersRef}
+            className="flex overflow-x-auto pb-8 mt-12 no-scrollbar"
+            style={{ scrollBehavior: 'smooth' }}
+          >
+            <div className="flex min-w-max space-x-12 px-4">
+              {partners.map((partner) => (
+                <div 
+                  key={partner.id} 
+                  className="flex-shrink-0 w-48 h-32 bg-white rounded-lg p-4 flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-300"
+                >
+                  <img 
+                    src={partner.logo} 
+                    alt={partner.name} 
+                    className="max-w-full max-h-full"
+                  />
                 </div>
-              </div>
-            ))}
-          </div>
-          
-          <div className="mt-12 text-center">
-            <Link to="/partners">
-              <Button variant="outline">
-                Learn About Our Partners
-              </Button>
-            </Link>
+              ))}
+              {/* Duplicate the first few items to create a seamless loop */}
+              {partners.slice(0, 5).map((partner) => (
+                <div 
+                  key={`duplicate-${partner.id}`} 
+                  className="flex-shrink-0 w-48 h-32 bg-white rounded-lg p-4 flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-300"
+                >
+                  <img 
+                    src={partner.logo} 
+                    alt={partner.name} 
+                    className="max-w-full max-h-full"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
       
-      {/* CTA Section */}
+      {/* CTA Section - Updated to only have "Become a Member" button */}
       <section className="py-16 md:py-24 bg-gradient-to-r from-brown to-brown-dark text-white">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6 max-w-3xl mx-auto leading-tight">
@@ -365,35 +427,20 @@ const Index = () => {
           <p className="text-tan/90 text-lg mb-8 max-w-2xl mx-auto">
             Become a member and enjoy exclusive benefits, participate in events, and help shape our community's future.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a 
-              href="https://www.helloasso.com/associations/your-association/adhesions/membership" 
-              target="_blank" 
-              rel="noopener noreferrer"
+          <a 
+            href="https://www.helloasso.com/associations/your-association/adhesions/membership" 
+            target="_blank" 
+            rel="noopener noreferrer"
+          >
+            <Button 
+              variant="secondary" 
+              size="lg" 
+              rightIcon={<Heart size={18} />}
+              className="bg-orange hover:bg-orange-light transition-all"
             >
-              <Button 
-                variant="secondary" 
-                size="lg" 
-                rightIcon={<Heart size={18} />}
-                className="bg-orange hover:bg-orange-light transition-all"
-              >
-                Become a Member
-              </Button>
-            </a>
-            <a 
-              href="https://www.helloasso.com/associations/your-association/adhesions/membership-info" 
-              target="_blank" 
-              rel="noopener noreferrer"
-            >
-              <Button 
-                variant="outline" 
-                size="lg"
-                className="border-white text-white hover:bg-white/10"
-              >
-                Learn About Membership
-              </Button>
-            </a>
-          </div>
+              Become a Member
+            </Button>
+          </a>
         </div>
       </section>
       
