@@ -42,6 +42,7 @@ export default function AdminArticles() {
   const [isCreating, setIsCreating] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
   
@@ -115,6 +116,7 @@ export default function AdminArticles() {
     });
     setIsCreating(true);
     setSelectedArticle(null);
+    setDialogOpen(true);
   };
 
   const handleCreateArticle = async () => {
@@ -147,7 +149,7 @@ export default function AdminArticles() {
       
       toast.success("Article created successfully");
       fetchArticles();
-      resetForm();
+      setDialogOpen(false);
     } catch (error: any) {
       console.error("Error creating article:", error);
       toast.error("Failed to create article: " + error.message);
@@ -185,7 +187,7 @@ export default function AdminArticles() {
       
       toast.success("Article updated successfully");
       fetchArticles();
-      resetForm();
+      setDialogOpen(false);
     } catch (error: any) {
       console.error("Error updating article:", error);
       toast.error("Failed to update article: " + error.message);
@@ -224,6 +226,7 @@ export default function AdminArticles() {
       slug: article.slug
     });
     setIsCreating(false);
+    setDialogOpen(true);
   };
 
   const confirmDelete = (article: Article) => {
@@ -238,112 +241,13 @@ export default function AdminArticles() {
           <h2 className="text-xl font-semibold">Manage Articles</h2>
           <p className="text-gray-500 mt-1">Create, edit, and manage your blog articles</p>
         </div>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button className="bg-brown hover:bg-brown/90" onClick={resetForm}>
-              <Plus className="h-4 w-4 mr-2" />
-              New Article
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>{isCreating ? "Create New Article" : "Edit Article"}</DialogTitle>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="title" className="text-right">Title</Label>
-                <Input
-                  id="title"
-                  name="title"
-                  value={articleForm.title}
-                  onChange={handleInputChange}
-                  className="col-span-3"
-                  placeholder="Article title"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="slug" className="text-right">Slug</Label>
-                <Input
-                  id="slug"
-                  name="slug"
-                  value={articleForm.slug}
-                  onChange={handleInputChange}
-                  className="col-span-3"
-                  placeholder="article-slug"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="category" className="text-right">Category</Label>
-                <Input
-                  id="category"
-                  name="category"
-                  value={articleForm.category}
-                  onChange={handleInputChange}
-                  className="col-span-3"
-                  placeholder="Article category"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-start gap-4">
-                <Label htmlFor="excerpt" className="text-right pt-2">Excerpt</Label>
-                <Textarea
-                  id="excerpt"
-                  name="excerpt"
-                  value={articleForm.excerpt}
-                  onChange={handleInputChange}
-                  className="col-span-3"
-                  placeholder="A short excerpt of the article"
-                  rows={2}
-                />
-              </div>
-              <div className="grid grid-cols-4 items-start gap-4">
-                <Label htmlFor="content" className="text-right pt-2">Content</Label>
-                <Textarea
-                  id="content"
-                  name="content"
-                  value={articleForm.content}
-                  onChange={handleInputChange}
-                  className="col-span-3"
-                  placeholder="Full article content"
-                  rows={10}
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="image" className="text-right">Image URL</Label>
-                <Input
-                  id="image"
-                  name="image"
-                  value={articleForm.image}
-                  onChange={handleInputChange}
-                  className="col-span-3"
-                  placeholder="URL to article image"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="published" className="text-right">Published</Label>
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="published"
-                    checked={articleForm.published}
-                    onCheckedChange={handleSwitchChange}
-                  />
-                  <Label htmlFor="published">
-                    {articleForm.published ? "Published" : "Draft"}
-                  </Label>
-                </div>
-              </div>
-            </div>
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
-              </DialogClose>
-              <DialogClose asChild>
-                <Button onClick={isCreating ? handleCreateArticle : handleUpdateArticle}>
-                  {isCreating ? "Create Article" : "Update Article"}
-                </Button>
-              </DialogClose>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <Button 
+          className="bg-brown hover:bg-brown/90" 
+          onClick={resetForm}
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          New Article
+        </Button>
       </div>
 
       <Separator className="my-4" />
@@ -360,18 +264,13 @@ export default function AdminArticles() {
           <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900">No articles found</h3>
           <p className="text-gray-500 mb-4">You haven't created any articles yet.</p>
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button className="bg-brown hover:bg-brown/90" onClick={resetForm}>
-                <Plus className="h-4 w-4 mr-2" />
-                Create your first article
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-              {/* Same dialog content as above */}
-              {/* ... */}
-            </DialogContent>
-          </Dialog>
+          <Button 
+            className="bg-brown hover:bg-brown/90" 
+            onClick={resetForm}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Create your first article
+          </Button>
         </div>
       ) : (
         <div className="overflow-x-auto">
@@ -408,17 +307,14 @@ export default function AdminArticles() {
                           <span className="sr-only">View</span>
                         </Link>
                       </Button>
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button variant="ghost" size="sm" onClick={() => editArticle(article)}>
-                            <Edit className="h-4 w-4" />
-                            <span className="sr-only">Edit</span>
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-                          {/* Dialog content here (same as above) */}
-                        </DialogContent>
-                      </Dialog>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => editArticle(article)}
+                      >
+                        <Edit className="h-4 w-4" />
+                        <span className="sr-only">Edit</span>
+                      </Button>
                       <Button 
                         variant="ghost" 
                         size="sm" 
@@ -436,6 +332,106 @@ export default function AdminArticles() {
           </Table>
         </div>
       )}
+
+      {/* Article Form Dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{isCreating ? "Create New Article" : "Edit Article"}</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="title" className="text-right">Title</Label>
+              <Input
+                id="title"
+                name="title"
+                value={articleForm.title}
+                onChange={handleInputChange}
+                className="col-span-3"
+                placeholder="Article title"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="slug" className="text-right">Slug</Label>
+              <Input
+                id="slug"
+                name="slug"
+                value={articleForm.slug}
+                onChange={handleInputChange}
+                className="col-span-3"
+                placeholder="article-slug"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="category" className="text-right">Category</Label>
+              <Input
+                id="category"
+                name="category"
+                value={articleForm.category}
+                onChange={handleInputChange}
+                className="col-span-3"
+                placeholder="Article category"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-start gap-4">
+              <Label htmlFor="excerpt" className="text-right pt-2">Excerpt</Label>
+              <Textarea
+                id="excerpt"
+                name="excerpt"
+                value={articleForm.excerpt}
+                onChange={handleInputChange}
+                className="col-span-3"
+                placeholder="A short excerpt of the article"
+                rows={2}
+              />
+            </div>
+            <div className="grid grid-cols-4 items-start gap-4">
+              <Label htmlFor="content" className="text-right pt-2">Content</Label>
+              <Textarea
+                id="content"
+                name="content"
+                value={articleForm.content}
+                onChange={handleInputChange}
+                className="col-span-3"
+                placeholder="Full article content"
+                rows={10}
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="image" className="text-right">Image URL</Label>
+              <Input
+                id="image"
+                name="image"
+                value={articleForm.image}
+                onChange={handleInputChange}
+                className="col-span-3"
+                placeholder="URL to article image"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="published" className="text-right">Published</Label>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="published"
+                  checked={articleForm.published}
+                  onCheckedChange={handleSwitchChange}
+                />
+                <Label htmlFor="published">
+                  {articleForm.published ? "Published" : "Draft"}
+                </Label>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={isCreating ? handleCreateArticle : handleUpdateArticle}>
+              {isCreating ? "Create Article" : "Update Article"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

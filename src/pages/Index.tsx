@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, CalendarDays, ShoppingBag, Users, Image, Heart, ExternalLink } from 'lucide-react';
@@ -142,11 +141,18 @@ const Index = () => {
                 Discover events, stories, and people that make our community special.
               </p>
               <div className="flex flex-wrap gap-4 pt-2 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                <Button size="lg" rightIcon={<ChevronRight size={18} />}>
-                  Join Us
+                <Button
+                  className="bg-orange text-white hover:bg-orange/90"
+                  asChild
+                >
+                  <a href="https://www.helloasso.com/associations/your-association/adhesions/membership" target="_blank" rel="noopener noreferrer">
+                    Join Us
+                  </a>
                 </Button>
-                <Button size="lg" variant="outline">
-                  Learn More
+                <Button variant="outline" className="border-orange text-orange hover:bg-orange/10" asChild>
+                  <Link to="/about">
+                    Learn More
+                  </Link>
                 </Button>
               </div>
             </div>
@@ -445,3 +451,4 @@ const Index = () => {
 };
 
 export default Index;
+

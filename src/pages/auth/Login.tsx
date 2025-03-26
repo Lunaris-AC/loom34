@@ -24,7 +24,10 @@ export default function Login() {
     try {
       await signIn(email, password);
       toast.success("Successfully signed in");
-      navigate(from, { replace: true });
+      // Use a short timeout to ensure state is updated before navigation
+      setTimeout(() => {
+        navigate(from, { replace: true });
+      }, 100);
     } catch (error: any) {
       console.error("Login error:", error);
       toast.error(error.message || "Failed to sign in");

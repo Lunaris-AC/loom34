@@ -6,6 +6,7 @@ import { FileText, CalendarDays, Image as ImageIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({
@@ -45,6 +46,7 @@ export default function AdminDashboard() {
         });
       } catch (error) {
         console.error("Error fetching stats:", error);
+        toast.error("Failed to load statistics");
         setStats(prev => ({ ...prev, loading: false }));
       }
     }

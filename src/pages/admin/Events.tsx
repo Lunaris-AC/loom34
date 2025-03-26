@@ -14,9 +14,7 @@ import {
   DialogContent, 
   DialogHeader, 
   DialogTitle, 
-  DialogTrigger,
-  DialogFooter,
-  DialogClose
+  DialogFooter
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -42,6 +40,7 @@ export default function AdminEvents() {
   const [loading, setLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const { user } = useAuth();
   
@@ -111,6 +110,7 @@ export default function AdminEvents() {
     });
     setIsCreating(true);
     setSelectedEvent(null);
+    setDialogOpen(true);
   };
 
   const handleCreateEvent = async () => {
@@ -145,7 +145,7 @@ export default function AdminEvents() {
       
       toast.success("Event created successfully");
       fetchEvents();
-      resetForm();
+      setDialogOpen(false);
     } catch (error: any) {
       console.error("Error creating event:", error);
       toast.error("Failed to create event: " + error.message);
@@ -185,7 +185,7 @@ export default function AdminEvents() {
       
       toast.success("Event updated successfully");
       fetchEvents();
-      resetForm();
+      setDialogOpen(false);
     } catch (error: any) {
       console.error("Error updating event:", error);
       toast.error("Failed to update event: " + error.message);
@@ -226,6 +226,7 @@ export default function AdminEvents() {
       registration_url: event.registration_url || ""
     });
     setIsCreating(false);
+    setDialogOpen(true);
   };
 
   const confirmDelete = (event: Event) => {
@@ -240,133 +241,13 @@ export default function AdminEvents() {
           <h2 className="text-xl font-semibold">Manage Events</h2>
           <p className="text-gray-500 mt-1">Create, edit, and manage your upcoming events</p>
         </div>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button className="bg-brown hover:bg-brown/90" onClick={resetForm}>
-              <Plus className="h-4 w-4 mr-2" />
-              New Event
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>{isCreating ? "Create New Event" : "Edit Event"}</DialogTitle>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="title" className="text-right">Title</Label>
-                <Input
-                  id="title"
-                  name="title"
-                  value={eventForm.title}
-                  onChange={handleInputChange}
-                  className="col-span-3"
-                  placeholder="Event title"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="slug" className="text-right">Slug</Label>
-                <Input
-                  id="slug"
-                  name="slug"
-                  value={eventForm.slug}
-                  onChange={handleInputChange}
-                  className="col-span-3"
-                  placeholder="event-slug"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="location" className="text-right">Location</Label>
-                <Input
-                  id="location"
-                  name="location"
-                  value={eventForm.location}
-                  onChange={handleInputChange}
-                  className="col-span-3"
-                  placeholder="Event location"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="date" className="text-right">Date</Label>
-                <Input
-                  id="date"
-                  name="date"
-                  value={eventForm.date}
-                  onChange={handleInputChange}
-                  className="col-span-3"
-                  placeholder="Event date (YYYY-MM-DD)"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="time" className="text-right">Time</Label>
-                <Input
-                  id="time"
-                  name="time"
-                  value={eventForm.time}
-                  onChange={handleInputChange}
-                  className="col-span-3"
-                  placeholder="Event time (e.g. 7:00 PM)"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-start gap-4">
-                <Label htmlFor="description" className="text-right pt-2">Description</Label>
-                <Textarea
-                  id="description"
-                  name="description"
-                  value={eventForm.description}
-                  onChange={handleInputChange}
-                  className="col-span-3"
-                  placeholder="Event description"
-                  rows={6}
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="image" className="text-right">Image URL</Label>
-                <Input
-                  id="image"
-                  name="image"
-                  value={eventForm.image}
-                  onChange={handleInputChange}
-                  className="col-span-3"
-                  placeholder="URL to event image"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="registration_url" className="text-right">Registration URL</Label>
-                <Input
-                  id="registration_url"
-                  name="registration_url"
-                  value={eventForm.registration_url}
-                  onChange={handleInputChange}
-                  className="col-span-3"
-                  placeholder="Event registration URL (optional)"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="published" className="text-right">Published</Label>
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="published"
-                    checked={eventForm.published}
-                    onCheckedChange={handleSwitchChange}
-                  />
-                  <Label htmlFor="published">
-                    {eventForm.published ? "Published" : "Draft"}
-                  </Label>
-                </div>
-              </div>
-            </div>
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
-              </DialogClose>
-              <DialogClose asChild>
-                <Button onClick={isCreating ? handleCreateEvent : handleUpdateEvent}>
-                  {isCreating ? "Create Event" : "Update Event"}
-                </Button>
-              </DialogClose>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <Button 
+          className="bg-brown hover:bg-brown/90" 
+          onClick={resetForm}
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          New Event
+        </Button>
       </div>
 
       <Separator className="my-4" />
@@ -383,17 +264,13 @@ export default function AdminEvents() {
           <CalendarDays className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900">No events found</h3>
           <p className="text-gray-500 mb-4">You haven't created any events yet.</p>
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button className="bg-brown hover:bg-brown/90" onClick={resetForm}>
-                <Plus className="h-4 w-4 mr-2" />
-                Create your first event
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-              {/* Same dialog content as above */}
-            </DialogContent>
-          </Dialog>
+          <Button 
+            className="bg-brown hover:bg-brown/90" 
+            onClick={resetForm}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Create your first event
+          </Button>
         </div>
       ) : (
         <div className="overflow-x-auto">
@@ -432,17 +309,14 @@ export default function AdminEvents() {
                           <span className="sr-only">View</span>
                         </Link>
                       </Button>
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button variant="ghost" size="sm" onClick={() => editEvent(event)}>
-                            <Edit className="h-4 w-4" />
-                            <span className="sr-only">Edit</span>
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-                          {/* Dialog content here (same as above) */}
-                        </DialogContent>
-                      </Dialog>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => editEvent(event)}
+                      >
+                        <Edit className="h-4 w-4" />
+                        <span className="sr-only">Edit</span>
+                      </Button>
                       <Button 
                         variant="ghost" 
                         size="sm" 
@@ -460,6 +334,127 @@ export default function AdminEvents() {
           </Table>
         </div>
       )}
+
+      {/* Event Form Dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{isCreating ? "Create New Event" : "Edit Event"}</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="title" className="text-right">Title</Label>
+              <Input
+                id="title"
+                name="title"
+                value={eventForm.title}
+                onChange={handleInputChange}
+                className="col-span-3"
+                placeholder="Event title"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="slug" className="text-right">Slug</Label>
+              <Input
+                id="slug"
+                name="slug"
+                value={eventForm.slug}
+                onChange={handleInputChange}
+                className="col-span-3"
+                placeholder="event-slug"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="location" className="text-right">Location</Label>
+              <Input
+                id="location"
+                name="location"
+                value={eventForm.location}
+                onChange={handleInputChange}
+                className="col-span-3"
+                placeholder="Event location"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="date" className="text-right">Date</Label>
+              <Input
+                id="date"
+                name="date"
+                value={eventForm.date}
+                onChange={handleInputChange}
+                className="col-span-3"
+                placeholder="Event date (YYYY-MM-DD)"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="time" className="text-right">Time</Label>
+              <Input
+                id="time"
+                name="time"
+                value={eventForm.time}
+                onChange={handleInputChange}
+                className="col-span-3"
+                placeholder="Event time (e.g. 7:00 PM)"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-start gap-4">
+              <Label htmlFor="description" className="text-right pt-2">Description</Label>
+              <Textarea
+                id="description"
+                name="description"
+                value={eventForm.description}
+                onChange={handleInputChange}
+                className="col-span-3"
+                placeholder="Event description"
+                rows={6}
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="image" className="text-right">Image URL</Label>
+              <Input
+                id="image"
+                name="image"
+                value={eventForm.image}
+                onChange={handleInputChange}
+                className="col-span-3"
+                placeholder="URL to event image"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="registration_url" className="text-right">Registration URL</Label>
+              <Input
+                id="registration_url"
+                name="registration_url"
+                value={eventForm.registration_url}
+                onChange={handleInputChange}
+                className="col-span-3"
+                placeholder="Event registration URL (optional)"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="published" className="text-right">Published</Label>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="published"
+                  checked={eventForm.published}
+                  onCheckedChange={handleSwitchChange}
+                />
+                <Label htmlFor="published">
+                  {eventForm.published ? "Published" : "Draft"}
+                </Label>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={isCreating ? handleCreateEvent : handleUpdateEvent}>
+              {isCreating ? "Create Event" : "Update Event"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

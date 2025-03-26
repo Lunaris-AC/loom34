@@ -35,12 +35,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const { toast: uiToast } = useToast();
 
   useEffect(() => {
-    async function getInitialSession() {
+    const initAuth = async () => {
       setIsLoading(true);
       
       try {
-        // Check for active session
-        const { data: { session: activeSession }, error: sessionError } = await supabase.auth.getSession();
+        // Set up the auth state change listener first
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+          async (event, currentSession) => {
+            console.log("Auth state changed:", event, currentSession?.user?.id);
+            
+            setSession(currentSession);
+            setUser(currentSession?.user || null);
+            
+            if (currentSession?.user) {
+              await fetchProfile(currentSession.user.id);
+            } else {
+              setProfile(null);
+              setIsAdmin(false);
+            }
+            
+            setIsLoading(false);
+          }
+        );
+        
+        // Then check for existing session
+        const { data: { session: existingSession }, error: sessionError } = 
+          await supabase.auth.getSession();
         
         if (sessionError) {
           console.error("Error getting session:", sessionError);
@@ -51,41 +71,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           });
         }
         
-        setSession(activeSession);
-        setUser(activeSession?.user || null);
-        
-        if (activeSession?.user) {
-          await fetchProfile(activeSession.user.id);
+        if (existingSession) {
+          setSession(existingSession);
+          setUser(existingSession.user);
+          
+          if (existingSession.user) {
+            await fetchProfile(existingSession.user.id);
+          }
         }
+        
+        setIsLoading(false);
+        
+        return () => {
+          subscription.unsubscribe();
+        };
       } catch (error) {
-        console.error("Error in getInitialSession:", error);
-      } finally {
+        console.error("Error in authentication initialization:", error);
         setIsLoading(false);
       }
-    }
-    
-    getInitialSession();
-    
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
-      console.log("Auth state changed:", event, currentSession?.user?.id);
-      
-      setSession(currentSession);
-      setUser(currentSession?.user || null);
-      
-      if (currentSession?.user) {
-        await fetchProfile(currentSession.user.id);
-      } else {
-        setProfile(null);
-        setIsAdmin(false);
-      }
-      
-      setIsLoading(false);
-    });
-    
-    return () => {
-      subscription.unsubscribe();
     };
+    
+    initAuth();
   }, [uiToast]);
   
   async function fetchProfile(userId: string) {
@@ -191,7 +197,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw error;
       }
       
-      // Reset state directly
       setSession(null);
       setUser(null);
       setProfile(null);
@@ -199,7 +204,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       toast.success("You have been signed out");
       
-      // Force a page refresh to clear any cached state
       window.location.href = "/";
     } catch (error) {
       console.error("Sign out error:", error);
