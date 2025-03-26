@@ -102,8 +102,42 @@ export type Database = {
         }
         Relationships: []
       }
+      gallery_albums: {
+        Row: {
+          author_id: string | null
+          cover_image: string
+          created_at: string
+          date: string
+          description: string | null
+          id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_id?: string | null
+          cover_image: string
+          created_at?: string
+          date: string
+          description?: string | null
+          id?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string | null
+          cover_image?: string
+          created_at?: string
+          date?: string
+          description?: string | null
+          id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       gallery_images: {
         Row: {
+          album_id: string | null
           author_id: string | null
           category: string
           created_at: string
@@ -114,6 +148,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          album_id?: string | null
           author_id?: string | null
           category: string
           created_at?: string
@@ -124,6 +159,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          album_id?: string | null
           author_id?: string | null
           category?: string
           created_at?: string
@@ -133,7 +169,15 @@ export type Database = {
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "gallery_images_album_id_fkey"
+            columns: ["album_id"]
+            isOneToOne: false
+            referencedRelation: "gallery_albums"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {

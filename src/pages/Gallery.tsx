@@ -2,85 +2,66 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Search, Filter, ChevronDown, Image as ImageIcon, X, ArrowLeft } from 'lucide-react';
+import { Search, Filter, ChevronDown, ImageIcon, X, ArrowLeft } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Tables } from '@/integrations/supabase/types';
 import SectionHeading from '@/components/SectionHeading';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
 
-// Define types
-interface Album {
-  id: number;
-  title: string;
-  description: string;
-  cover_image: string;
-  date: string;
-  image_count: number;
+interface GalleryAlbum extends Tables<'gallery_albums'> {
+  image_count?: number;
 }
 
 const Gallery = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
-  const [selectedAlbum, setSelectedAlbum] = useState<Album | null>(null);
+  const [selectedAlbum, setSelectedAlbum] = useState<GalleryAlbum | null>(null);
   const [selectedImage, setSelectedImage] = useState<Tables<'gallery_images'> | null>(null);
 
-  // Mock albums data - in a real app, you'd fetch this from Supabase
-  const albums: Album[] = [
-    {
-      id: 1,
-      title: "Annual Community Picnic 2023",
-      description: "Photos from our yearly gathering at Parc Monceau.",
-      cover_image: "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      date: "June 15, 2023",
-      image_count: 24
+  // Fetch albums from database
+  const { data: albums = [], isLoading: isLoadingAlbums } = useQuery({
+    queryKey: ['galleryAlbums'],
+    queryFn: async () => {
+      const { data: albumsData, error: albumsError } = await supabase
+        .from('gallery_albums')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (albumsError) {
+        console.error('Error fetching albums:', albumsError);
+        throw albumsError;
+      }
+
+      // For each album, get the count of images
+      const albumsWithCount: GalleryAlbum[] = await Promise.all(
+        (albumsData || []).map(async (album) => {
+          const { count, error: countError } = await supabase
+            .from('gallery_images')
+            .select('*', { count: 'exact', head: true })
+            .eq('album_id', album.id);
+
+          if (countError) {
+            console.error('Error fetching image count:', countError);
+          }
+
+          return {
+            ...album,
+            image_count: count || 0
+          };
+        })
+      );
+
+      return albumsWithCount;
     },
-    {
-      id: 2,
-      title: "Pride Parade 2023",
-      description: "Celebrating diversity and inclusion at the Paris Pride Parade.",
-      cover_image: "https://images.unsplash.com/photo-1516841273335-e39b37888115?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      date: "June 24, 2023",
-      image_count: 36
-    },
-    {
-      id: 3,
-      title: "Winter Fundraiser",
-      description: "Our annual fundraising gala at Hotel de Ville.",
-      cover_image: "https://images.unsplash.com/photo-1532117182044-031e7cd916ee?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      date: "December 10, 2023",
-      image_count: 18
-    },
-    {
-      id: 4,
-      title: "Art Workshop Series",
-      description: "Photos from our monthly art workshops led by local artists.",
-      cover_image: "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      date: "January - March 2023",
-      image_count: 42
-    },
-    {
-      id: 5,
-      title: "Community Volunteer Day",
-      description: "Our members giving back through various service projects around the city.",
-      cover_image: "https://images.unsplash.com/photo-1559027615-cd4628902d4a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      date: "April 22, 2023",
-      image_count: 29
-    },
-    {
-      id: 6,
-      title: "Summer Family Festival",
-      description: "Our biggest family event of the year with games, food, and performances.",
-      cover_image: "https://images.unsplash.com/photo-1536598065097-53b4573578be?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      date: "August 5, 2023",
-      image_count: 56
-    }
-  ];
+  });
 
   // Filter albums based on search
   const filteredAlbums = albums.filter(album => {
     const matchesSearch = searchQuery === '' || 
       album.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      album.description.toLowerCase().includes(searchQuery.toLowerCase());
+      (album.description && album.description.toLowerCase().includes(searchQuery.toLowerCase()));
     
     return matchesSearch;
   });
@@ -91,30 +72,15 @@ const Gallery = () => {
     queryFn: async () => {
       if (!selectedAlbum) return [];
       
-      // In a real app, you'd fetch images by album ID
-      // For now, we'll just return a filtered set of mock gallery images
       const { data, error } = await supabase
         .from('gallery_images')
         .select('*')
-        .order('created_at', { ascending: false })
-        // Using category as a proxy for album ID in this example
-        .eq('category', selectedAlbum.title)
-        .limit(24);
+        .eq('album_id', selectedAlbum.id)
+        .order('created_at', { ascending: false });
         
-      if (error) throw error;
-      
-      // If no images found, return mock data
-      if (!data || data.length === 0) {
-        return Array(12).fill(0).map((_, index) => ({
-          id: `mock-${selectedAlbum.id}-${index}`,
-          title: `Image ${index + 1}`,
-          description: `Sample image from ${selectedAlbum.title}`,
-          image_url: `https://source.unsplash.com/random/800x600?sig=${selectedAlbum.id}${index}`,
-          category: selectedAlbum.title,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          author_id: null
-        })) as Tables<'gallery_images'>[];
+      if (error) {
+        console.error('Error fetching album images:', error);
+        throw error;
       }
       
       return data as Tables<'gallery_images'>[];
@@ -173,14 +139,22 @@ const Gallery = () => {
                 centered
               />
               
-              {filteredAlbums.length === 0 ? (
+              {isLoadingAlbums ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
+                  {Array(6).fill(0).map((_, index) => (
+                    <Skeleton key={index} className="h-80 rounded-xl" />
+                  ))}
+                </div>
+              ) : filteredAlbums.length === 0 ? (
                 <div className="text-center py-16">
                   <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gray-100 flex items-center justify-center">
                     <ImageIcon size={32} className="text-gray-400" />
                   </div>
                   <h3 className="text-2xl font-semibold mb-2">No Albums Found</h3>
                   <p className="text-gray-600 max-w-md mx-auto">
-                    No albums match your search for "{searchQuery}". Try different keywords or clear your search.
+                    {searchQuery ? 
+                      `No albums match your search for "${searchQuery}". Try different keywords or clear your search.` : 
+                      'There are no albums yet. Albums will appear here once created.'}
                   </p>
                 </div>
               ) : (
@@ -234,7 +208,9 @@ const Gallery = () => {
               <div className="max-w-4xl mx-auto">
                 <h2 className="text-3xl font-bold mb-2">{selectedAlbum.title}</h2>
                 <p className="text-gray-600 mb-2">{selectedAlbum.description}</p>
-                <span className="text-sm text-gray-500">{selectedAlbum.date} • {selectedAlbum.image_count} Photos</span>
+                <span className="text-sm text-gray-500">
+                  {selectedAlbum.date} • {albumImages.length} Photos
+                </span>
               </div>
             </div>
           </section>
@@ -245,8 +221,18 @@ const Gallery = () => {
               {isLoadingImages ? (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {Array(12).fill(0).map((_, index) => (
-                    <div key={index} className="aspect-square bg-gray-200 animate-pulse rounded-lg"></div>
+                    <Skeleton key={index} className="aspect-square rounded-lg" />
                   ))}
+                </div>
+              ) : albumImages.length === 0 ? (
+                <div className="text-center py-16">
+                  <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gray-100 flex items-center justify-center">
+                    <ImageIcon size={32} className="text-gray-400" />
+                  </div>
+                  <h3 className="text-2xl font-semibold mb-2">No Images Found</h3>
+                  <p className="text-gray-600 max-w-md mx-auto">
+                    This album doesn't contain any images yet.
+                  </p>
                 </div>
               ) : (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
