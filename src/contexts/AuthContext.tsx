@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from "react
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 type Profile = {
   id: string;
@@ -31,38 +32,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
-  const { toast } = useToast();
+  const { toast: uiToast } = useToast();
 
   useEffect(() => {
     async function getInitialSession() {
       setIsLoading(true);
       
-      // Check for active session
-      const { data: { session: activeSession }, error: sessionError } = await supabase.auth.getSession();
-      
-      if (sessionError) {
-        console.error("Error getting session:", sessionError);
-        toast({
-          title: "Session Error",
-          description: "There was a problem with your session. Please try again.",
-          variant: "destructive",
-        });
+      try {
+        // Check for active session
+        const { data: { session: activeSession }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error("Error getting session:", sessionError);
+          uiToast({
+            title: "Session Error",
+            description: "There was a problem with your session. Please try again.",
+            variant: "destructive",
+          });
+        }
+        
+        setSession(activeSession);
+        setUser(activeSession?.user || null);
+        
+        if (activeSession?.user) {
+          await fetchProfile(activeSession.user.id);
+        }
+      } catch (error) {
+        console.error("Error in getInitialSession:", error);
+      } finally {
+        setIsLoading(false);
       }
-      
-      setSession(activeSession);
-      setUser(activeSession?.user || null);
-      
-      if (activeSession?.user) {
-        await fetchProfile(activeSession.user.id);
-      }
-      
-      setIsLoading(false);
     }
     
     getInitialSession();
     
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
+      console.log("Auth state changed:", event, currentSession?.user?.id);
+      
       setSession(currentSession);
       setUser(currentSession?.user || null);
       
@@ -79,24 +86,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       subscription.unsubscribe();
     };
-  }, [toast]);
+  }, [uiToast]);
   
   async function fetchProfile(userId: string) {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
+    try {
+      console.log("Fetching profile for user:", userId);
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+        
+      if (error) {
+        console.error("Error fetching profile:", error);
+        setProfile(null);
+        setIsAdmin(false);
+        return;
+      }
       
-    if (error) {
-      console.error("Error fetching profile:", error);
+      console.log("Profile data:", data);
+      setProfile(data);
+      setIsAdmin(data?.is_admin || false);
+    } catch (error) {
+      console.error("Exception in fetchProfile:", error);
       setProfile(null);
       setIsAdmin(false);
-      return;
     }
-    
-    setProfile(data);
-    setIsAdmin(data?.is_admin || false);
   }
   
   async function signIn(email: string, password: string) {
@@ -106,7 +121,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       
       if (error) {
-        toast({
+        uiToast({
           title: "Login Failed",
           description: error.message,
           variant: "destructive",
@@ -114,7 +129,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw error;
       }
       
-      toast({
+      uiToast({
         title: "Login Successful",
         description: "Welcome back!",
       });
@@ -139,7 +154,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
       
       if (error) {
-        toast({
+        uiToast({
           title: "Registration Failed",
           description: error.message,
           variant: "destructive",
@@ -147,7 +162,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw error;
       }
       
-      toast({
+      uiToast({
         title: "Registration Successful",
         description: "Check your email for a confirmation link.",
       });
@@ -160,13 +175,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
   
   async function signOut() {
+    console.log("Attempting to sign out");
     setIsLoading(true);
     
     try {
       const { error } = await supabase.auth.signOut();
       
       if (error) {
-        toast({
+        console.error("Sign out error:", error);
+        uiToast({
           title: "Sign Out Failed",
           description: error.message,
           variant: "destructive",
@@ -174,10 +191,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw error;
       }
       
-      toast({
-        title: "Signed Out",
-        description: "You have been successfully signed out.",
-      });
+      // Reset state directly
+      setSession(null);
+      setUser(null);
+      setProfile(null);
+      setIsAdmin(false);
+      
+      toast.success("You have been signed out");
+      
+      // Force a page refresh to clear any cached state
+      window.location.href = "/";
     } catch (error) {
       console.error("Sign out error:", error);
       throw error;

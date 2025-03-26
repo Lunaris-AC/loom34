@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { FileText, CalendarDays, Image as ImageIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Link } from "react-router-dom";
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({
@@ -111,18 +112,27 @@ export default function AdminDashboard() {
       <div className="mt-8">
         <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <a href="/admin/articles" className="bg-gray-50 hover:bg-gray-100 p-4 rounded-lg border border-gray-200 flex items-center transition-colors">
+          <Link 
+            to="/admin/articles" 
+            className="bg-gray-50 hover:bg-gray-100 p-4 rounded-lg border border-gray-200 flex items-center transition-colors"
+          >
             <FileText className="h-6 w-6 text-blue-500 mr-3" />
             <span className="text-gray-800 font-medium">Manage Articles</span>
-          </a>
-          <a href="/admin/events" className="bg-gray-50 hover:bg-gray-100 p-4 rounded-lg border border-gray-200 flex items-center transition-colors">
+          </Link>
+          <Link 
+            to="/admin/events" 
+            className="bg-gray-50 hover:bg-gray-100 p-4 rounded-lg border border-gray-200 flex items-center transition-colors"
+          >
             <CalendarDays className="h-6 w-6 text-orange mr-3" />
             <span className="text-gray-800 font-medium">Manage Events</span>
-          </a>
-          <a href="/admin/gallery" className="bg-gray-50 hover:bg-gray-100 p-4 rounded-lg border border-gray-200 flex items-center transition-colors">
+          </Link>
+          <Link 
+            to="/admin/gallery" 
+            className="bg-gray-50 hover:bg-gray-100 p-4 rounded-lg border border-gray-200 flex items-center transition-colors"
+          >
             <ImageIcon className="h-6 w-6 text-purple-500 mr-3" />
             <span className="text-gray-800 font-medium">Manage Gallery</span>
-          </a>
+          </Link>
         </div>
       </div>
     </AdminLayout>

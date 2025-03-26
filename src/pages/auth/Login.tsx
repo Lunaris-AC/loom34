@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader } from "lucide-react";
+import { toast } from "sonner";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -22,9 +23,11 @@ export default function Login() {
     
     try {
       await signIn(email, password);
+      toast.success("Successfully signed in");
       navigate(from, { replace: true });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login error:", error);
+      toast.error(error.message || "Failed to sign in");
     } finally {
       setLoading(false);
     }
