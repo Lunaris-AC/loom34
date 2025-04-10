@@ -13,25 +13,19 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [initialLoad, setInitialLoad] = useState(true);
-  const { user, signIn, isLoading: authLoading } = useAuth();
+  const { user, signIn } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
 
   // Check if user is already logged in
   useEffect(() => {
-    console.log("Login page - current user:", user?.id);
-    if (user && !authLoading) {
-      console.log("User already logged in, redirecting to:", from);
+    if (user && initialLoad) {
       // If the user is already logged in, redirect to the previous page or home
       navigate(from, { replace: true });
     }
-    
-    // Only set initialLoad to false after we've checked auth status
-    if (!authLoading) {
-      setInitialLoad(false);
-    }
-  }, [user, navigate, from, authLoading]);
+    setInitialLoad(false);
+  }, [user, navigate, from, initialLoad]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -53,7 +47,7 @@ export default function Login() {
   };
 
   // Don't render the login form if still checking authentication status
-  if (initialLoad || authLoading) {
+  if (initialLoad) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-tan/10">
         <div className="w-16 h-16 border-4 border-brown/20 border-t-brown rounded-full animate-spin"></div>
