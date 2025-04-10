@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, User, LogIn } from 'lucide-react';
@@ -39,11 +38,11 @@ const Navbar = () => {
     { name: 'Home', path: '/' },
     { name: 'About', path: '/about' },
     { name: 'Events', path: '/events' },
-    { name: 'Shop', path: '/shop' },
+    { name: 'Shop', path: 'https://www.helloasso.com/associations/association-les-ours-occitanie-mediterranee-loom#shop', external: true },
     { name: 'Monsieur Ours', path: '/monsieur-ours' },
     { name: 'Gallery', path: '/gallery' },
     { name: 'Partners', path: '/partners' },
-    { name: 'Membership', path: '/membership' },
+    { name: 'Membership', path: 'https://www.helloasso.com/associations/association-les-ours-occitanie-mediterranee-loom/adhesions/adhesion-2024-2025', external: true },
   ];
   
   const isActive = (path: string) => {
@@ -77,19 +76,35 @@ const Navbar = () => {
         
         {/* Desktop Navigation */}
         <nav className="hidden md:flex space-x-1">
-          {navLinks.map((link) => (
-            <Link
-              key={link.path}
-              to={link.path}
-              className={`px-3 py-2 text-sm rounded-md transition-colors ${
-                isActive(link.path)
-                  ? 'bg-brown/10 text-brown font-medium'
-                  : 'text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              {link.name}
-            </Link>
-          ))}
+          {navLinks.map((link) =>
+            link.external ? (
+              <a
+                key={link.path}
+                href={link.path}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`px-3 py-2 text-sm rounded-md transition-colors ${
+                  isActive(link.path)
+                    ? 'bg-brown/10 text-brown font-medium'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                {link.name}
+              </a>
+            ) : (
+              <Link
+                key={link.path}
+                to={link.path}
+                className={`px-3 py-2 text-sm rounded-md transition-colors ${
+                  isActive(link.path)
+                    ? 'bg-brown/10 text-brown font-medium'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                {link.name}
+              </Link>
+            )
+          )}
         </nav>
         
         {/* Auth/User Menu (Desktop) */}
@@ -153,19 +168,35 @@ const Navbar = () => {
         <div className="md:hidden fixed inset-0 bg-white z-40 pt-16">
           <div className="container mx-auto px-4 py-6 flex flex-col h-full">
             <nav className="flex flex-col space-y-2 mb-6">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  className={`px-4 py-3 rounded-md ${
-                    isActive(link.path)
-                      ? 'bg-brown/10 text-brown font-medium'
-                      : 'text-gray-700 hover:bg-gray-100'
-                  }`}
-                >
-                  {link.name}
-                </Link>
-              ))}
+              {navLinks.map((link) =>
+                link.external ? (
+                  <a
+                    key={link.path}
+                    href={link.path}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`px-4 py-3 rounded-md ${
+                      isActive(link.path)
+                        ? 'bg-brown/10 text-brown font-medium'
+                        : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    {link.name}
+                  </a>
+                ) : (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    className={`px-4 py-3 rounded-md ${
+                      isActive(link.path)
+                        ? 'bg-brown/10 text-brown font-medium'
+                        : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    {link.name}
+                  </Link>
+                )
+              )}
             </nav>
             
             {/* Auth/User (Mobile) */}

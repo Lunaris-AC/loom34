@@ -163,7 +163,7 @@ const Index = () => {
             <div className="lg:w-1/2 relative">
               <div className="relative rounded-2xl overflow-hidden shadow-xl animate-float">
                 <img 
-                  src="https://images.unsplash.com/photo-1517457373958-b7bdd4587205?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" 
+                  src="https://media.discordapp.net/attachments/1335572571495731242/1359936546718875708/20241214_232800.jpg?ex=67f94b1b&is=67f7f99b&hm=02cca923294002eb00e199db41aa92520244e28df4460d33ebf045a8e7db8c3a&=&format=webp&width=644&height=483" 
                   alt="Community gathering" 
                   className="w-full h-auto object-cover rounded-2xl"
                 />
