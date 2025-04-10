@@ -142,20 +142,20 @@ const Index = () => {
                 Loom - <span className="text-brown">Les Ours Occitanie Méditerannée.</span>
               </h1>
               <p className="text-lg md:text-xl text-gray-700 max-w-2xl animate-fade-in" style={{ animationDelay: '0.1s' }}>
-                Association Bear créée en 2017. C'est une association pour les Bears mais aussi pour tous ceux qui aiment les Ours, les poils et les tailles allant du XS au XXXXXL.
+                Association Bear fondée en 2017. C'est une association pour les Bears mais aussi pour tous ceux qui aiment les Ours, les poils et les tailles allant du XS au XXXXXL.
               </p>
               <div className="flex flex-wrap gap-4 pt-2 animate-fade-in" style={{ animationDelay: '0.2s' }}>
                 <Button
                   className="bg-orange text-white hover:bg-orange/90"
                   onClick={() => window.open(MEMBERSHIP_URL, '_blank', 'noopener,noreferrer')}
                 >
-                  Join Us
+                  Nous Rejoindre
                 </Button>
                 <Button 
                   variant="outline" 
                   className="border-orange text-orange hover:bg-orange/10"
                 >
-                  <Link to="/about">Learn More</Link>
+                  <Link to="/about">En Savoir Plus</Link>
                 </Button>
               </div>
             </div>
@@ -173,8 +173,8 @@ const Index = () => {
                   <Users size={24} className="text-orange" />
                 </div>
                 <div>
-                  <p className="text-gray-600 text-sm">Active Members</p>
-                  <p className="text-gray-900 font-bold">1,200+</p>
+                  <p className="text-gray-600 text-sm">Membres</p>
+                  <p className="text-gray-900 font-bold">140+</p>
                 </div>
               </div>
               <div className="absolute -top-6 -right-6 p-4 bg-white rounded-xl shadow-lg hidden md:flex items-center gap-3 animate-slide-in" style={{ animationDelay: '0.6s' }}>
@@ -182,8 +182,8 @@ const Index = () => {
                   <CalendarDays size={24} className="text-yellow-dark" />
                 </div>
                 <div>
-                  <p className="text-gray-600 text-sm">Annual Events</p>
-                  <p className="text-gray-900 font-bold">50+</p>
+                  <p className="text-gray-600 text-sm">Chaque année,</p>
+                  <p className="text-gray-900 font-bold">50+ Évènements</p>
                 </div>
               </div>
             </div>
@@ -213,7 +213,7 @@ const Index = () => {
               ))
             ) : latestArticles.length === 0 ? (
               <div className="col-span-full text-center py-12">
-                <p className="text-gray-500">No articles available at the moment. Check back soon!</p>
+                <p className="text-gray-500">Aucun Article Disponible pour le moment - ERR01</p>
               </div>
             ) : (
               latestArticles.map((article) => (
@@ -237,7 +237,7 @@ const Index = () => {
           <div className="mt-12 text-center">
             <Link to="/articles">
               <Button variant="outline" rightIcon={<ChevronRight size={18} />}>
-                View All Articles
+                Voir Tous les Articles
               </Button>
             </Link>
           </div>
@@ -266,7 +266,7 @@ const Index = () => {
               ))
             ) : upcomingEvents.length === 0 ? (
               <div className="col-span-full text-center py-12">
-                <p className="text-gray-500">No upcoming events at the moment. Check back soon!</p>
+                <p className="text-gray-500">Aucun Évènement Disponible pour le moment - ERR02</p>
               </div>
             ) : (
               upcomingEvents.map((event) => (
@@ -288,7 +288,7 @@ const Index = () => {
           <div className="mt-12 text-center">
             <Link to="/events">
               <Button rightIcon={<CalendarDays size={18} />}>
-                View Full Calendar
+                Voir tout le calendrier
               </Button>
             </Link>
           </div>
@@ -309,8 +309,7 @@ const Index = () => {
               </div>
               <h2 className="text-3xl md:text-4xl font-bold mb-6">Meet Monsieur Ours</h2>
               <p className="text-tan/90 text-lg mb-8">
-                Our community mascot and ambassador. Monsieur Ours represents the values of our association: 
-                warmth, acceptance, and strength in diversity.
+               Chaque année, lors de la Montpell Bear's, Monsieur Ours et ses oursons sont élus par la communauté Bear présente lors de cet événement.
               </p>
               <Link to="/monsieur-ours">
                 <Button 
@@ -318,7 +317,7 @@ const Index = () => {
                   rightIcon={<ChevronRight size={18} />}
                   className="hover:bg-orange-light"
                 >
-                  Discover His Story
+                  En savoir plus
                 </Button>
               </Link>
             </div>
@@ -330,8 +329,7 @@ const Index = () => {
       <section className="py-16 md:py-24 bg-tan/10">
         <div className="container mx-auto px-4">
           <SectionHeading 
-            title="Discover Our Community" 
-            subtitle="Explore the different aspects of what makes our association unique."
+            title="Notre communauté" 
             centered
           />
           
@@ -341,9 +339,9 @@ const Index = () => {
               <div className="rounded-full bg-brown/10 w-14 h-14 flex items-center justify-center mb-4">
                 <Users size={24} className="text-brown" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">Active Community</h3>
+              <h3 className="text-xl font-semibold mb-3">Une communauté active</h3>
               <p className="text-gray-600">
-                Join a vibrant and inclusive community of over 1,200 members.
+                Rejoignez une communauté dynamique de plus de 150 personnes !
               </p>
             </div>
             
@@ -352,9 +350,9 @@ const Index = () => {
               <div className="rounded-full bg-orange/10 w-14 h-14 flex items-center justify-center mb-4">
                 <CalendarDays size={24} className="text-orange" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">Regular Events</h3>
+              <h3 className="text-xl font-semibold mb-3">De nombreux événements</h3>
               <p className="text-gray-600">
-                Participate in our diverse schedule of events, gatherings, and celebrations.
+                Rejoignez la communauté et participez à nos événements tout au long de l'année!
               </p>
             </div>
             
@@ -363,9 +361,9 @@ const Index = () => {
               <div className="rounded-full bg-yellow/10 w-14 h-14 flex items-center justify-center mb-4">
                 <ShoppingBag size={24} className="text-yellow-dark" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">Community Shop</h3>
+              <h3 className="text-xl font-semibold mb-3">Boutique Communautaire</h3>
               <p className="text-gray-600">
-                Support our mission by shopping our collection of merchandise and memorabilia.
+                Aidez nous en achetant nos produits dérivés et nos goodies!
               </p>
             </div>
             
@@ -374,68 +372,24 @@ const Index = () => {
               <div className="rounded-full bg-tan/30 w-14 h-14 flex items-center justify-center mb-4">
                 <Image size={24} className="text-brown" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">Photo Gallery</h3>
+              <h3 className="text-xl font-semibold mb-3">Galerie Photo</h3>
               <p className="text-gray-600">
-                Browse our collection of photos documenting community events and members.
+                Explorez notre galerie photo pour revivre les moments forts de nos événements.
               </p>
             </div>
           </div>
         </div>
       </section>
       
-      {/* Partners Section - Updated to be scrollable */}
-      <section className="py-16 md:py-24 overflow-hidden">
-        <div className="container mx-auto px-4">
-          <SectionHeading 
-            title="Our Partners" 
-            subtitle="We're grateful for the support of these organizations and businesses."
-            centered
-          />
-          
-          <div 
-            ref={partnersRef}
-            className="flex overflow-x-auto pb-8 mt-12 no-scrollbar"
-            style={{ scrollBehavior: 'smooth' }}
-          >
-            <div className="flex min-w-max space-x-12 px-4">
-              {partners.map((partner) => (
-                <div 
-                  key={partner.id} 
-                  className="flex-shrink-0 w-48 h-32 bg-white rounded-lg p-4 flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-300"
-                >
-                  <img 
-                    src={partner.logo} 
-                    alt={partner.name} 
-                    className="max-w-full max-h-full"
-                  />
-                </div>
-              ))}
-              {/* Duplicate the first few items to create a seamless loop */}
-              {partners.slice(0, 5).map((partner) => (
-                <div 
-                  key={`duplicate-${partner.id}`} 
-                  className="flex-shrink-0 w-48 h-32 bg-white rounded-lg p-4 flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-300"
-                >
-                  <img 
-                    src={partner.logo} 
-                    alt={partner.name} 
-                    className="max-w-full max-h-full"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
       
       {/* CTA Section - Updated to only have "Become a Member" button */}
       <section className="py-16 md:py-24 bg-gradient-to-r from-brown to-brown-dark text-white">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6 max-w-3xl mx-auto leading-tight">
-            Join Our Community Today and Be Part of Something Special
+            Rejoignez notre communauté et devenez membre de Loom !
           </h2>
           <p className="text-tan/90 text-lg mb-8 max-w-2xl mx-auto">
-            Become a member and enjoy exclusive benefits, special event access, and help support our mission.
+            En devenant membre, vous soutenez nos initiatives et participez à la construction d'un espace inclusif et accueillant pour tous !
           </p>
           <button
             onClick={() => window.open(MEMBERSHIP_URL, '_blank', 'noopener,noreferrer')}
