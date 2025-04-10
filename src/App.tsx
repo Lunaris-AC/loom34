@@ -28,7 +28,14 @@ import EventDetail from "./pages/EventDetail";
 import Articles from "./pages/Articles";
 import ExternalRedirect from "./components/ExternalRedirect";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      staleTime: 30000,
+    },
+  },
+});
 
 // HelloAsso URLs - Direct links without host prefixing
 const SHOP_URL = "https://www.helloasso.com/associations/association-les-ours-occitanie-mediterranee-loom#shop";
@@ -42,8 +49,8 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <AuthProvider>
+      <AuthProvider>
+        <TooltipProvider>
           <Toaster />
           <Sonner />
           <BrowserRouter>
@@ -79,8 +86,8 @@ const App = () => {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
-        </AuthProvider>
-      </TooltipProvider>
+        </TooltipProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 };

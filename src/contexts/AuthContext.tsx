@@ -35,30 +35,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const { toast: uiToast } = useToast();
 
   useEffect(() => {
-    const initAuth = async () => {
-      setIsLoading(true);
-      
-      try {
-        // Set up the auth state change listener first
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(
-          async (event, currentSession) => {
-            console.log("Auth state changed:", event, currentSession?.user?.id);
-            
-            setSession(currentSession);
-            setUser(currentSession?.user || null);
-            
-            if (currentSession?.user) {
-              await fetchProfile(currentSession.user.id);
-            } else {
-              setProfile(null);
-              setIsAdmin(false);
-            }
-            
-            setIsLoading(false);
-          }
-        );
+    console.log("Auth provider initializing...");
+    setIsLoading(true);
+    
+    // First, set up the auth state change listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, currentSession) => {
+        console.log("Auth state changed:", event, currentSession?.user?.id);
         
-        // Then check for existing session
+        setSession(currentSession);
+        setUser(currentSession?.user || null);
+        
+        // Use setTimeout to avoid potential deadlocks with Supabase client
+        if (currentSession?.user) {
+          setTimeout(() => {
+            fetchProfile(currentSession.user.id);
+          }, 0);
+        } else {
+          setProfile(null);
+          setIsAdmin(false);
+        }
+      }
+    );
+    
+    // Then, check for existing session
+    const getInitialSession = async () => {
+      try {
+        console.log("Checking for existing session...");
         const { data: { session: existingSession }, error: sessionError } = 
           await supabase.auth.getSession();
         
@@ -69,30 +72,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             description: "There was a problem with your session. Please try again.",
             variant: "destructive",
           });
+          setIsLoading(false);
+          return;
         }
         
         if (existingSession) {
+          console.log("Found existing session:", existingSession.user?.id);
           setSession(existingSession);
           setUser(existingSession.user);
           
           if (existingSession.user) {
             await fetchProfile(existingSession.user.id);
           }
+        } else {
+          console.log("No existing session found");
+          setIsLoading(false);
         }
-        
-        setIsLoading(false);
-        
-        return () => {
-          subscription.unsubscribe();
-        };
       } catch (error) {
-        console.error("Error in authentication initialization:", error);
+        console.error("Error in getInitialSession:", error);
         setIsLoading(false);
       }
     };
     
-    initAuth();
-  }, [uiToast]);
+    getInitialSession();
+    
+    return () => {
+      console.log("Cleaning up auth subscription");
+      subscription.unsubscribe();
+    };
+  }, []);
   
   async function fetchProfile(userId: string) {
     try {
@@ -107,16 +115,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.error("Error fetching profile:", error);
         setProfile(null);
         setIsAdmin(false);
-        return;
+      } else {
+        console.log("Profile data:", data);
+        setProfile(data);
+        setIsAdmin(data?.is_admin || false);
       }
       
-      console.log("Profile data:", data);
-      setProfile(data);
-      setIsAdmin(data?.is_admin || false);
+      setIsLoading(false);
     } catch (error) {
       console.error("Exception in fetchProfile:", error);
       setProfile(null);
       setIsAdmin(false);
+      setIsLoading(false);
     }
   }
   
@@ -197,14 +207,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw error;
       }
       
+      // Clear all auth state
       setSession(null);
       setUser(null);
       setProfile(null);
       setIsAdmin(false);
       
       toast.success("You have been signed out");
-      
-      window.location.href = "/";
     } catch (error) {
       console.error("Sign out error:", error);
       throw error;
