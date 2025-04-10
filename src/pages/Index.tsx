@@ -136,14 +136,13 @@ const Index = () => {
             <div className="lg:w-1/2 space-y-6">
               <div className="inline-flex items-center px-3 py-1 rounded-full bg-orange/10 text-orange text-sm font-medium">
                 <span className="animate-pulse-soft">•</span>
-                <span className="ml-2">Welcome to Loom</span>
+                <span className="ml-2">~Bienvenue chez Loom !</span>
               </div>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-gray-900 animate-fade-in">
-                A Community Where <span className="text-brown">Everyone Belongs</span>
+                Loom - <span className="text-brown">Les Ours Occitanie Méditerannée.</span>
               </h1>
               <p className="text-lg md:text-xl text-gray-700 max-w-2xl animate-fade-in" style={{ animationDelay: '0.1s' }}>
-                Join our vibrant community celebrating diversity, connection, and authentic expression. 
-                Discover events, stories, and people that make our community special.
+                Association Bear créée en 2017. C'est une association pour les Bears mais aussi pour tous ceux qui aiment les Ours, les poils et les tailles allant du XS au XXXXXL.
               </p>
               <div className="flex flex-wrap gap-4 pt-2 animate-fade-in" style={{ animationDelay: '0.2s' }}>
                 <Button
