@@ -31,8 +31,8 @@ import ExternalRedirect from "./components/ExternalRedirect";
 const queryClient = new QueryClient();
 
 // HelloAsso URLs - Direct links without host prefixing
-const SHOP_URL = "https://www.helloasso.com/associations/your-association/boutiques/shop";
-const MEMBERSHIP_URL = "https://www.helloasso.com/associations/your-association/adhesions/membership";
+const SHOP_URL = "https://www.helloasso.com/associations/association-les-ours-occitanie-mediterranee-loom#shop";
+const MEMBERSHIP_URL = "https://www.helloasso.com/associations/association-les-ours-occitanie-mediterranee-loom/adhesions/adhesion-2024-2025";
 
 const App = () => {
   // Scroll to top on route change
