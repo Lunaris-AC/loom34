@@ -1,4 +1,3 @@
-
 import { BookOpen, Users, Calendar, MapPin } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -13,10 +12,9 @@ const About = () => {
       <section className="pt-24 md:pt-36 pb-16 bg-gradient-to-b from-tan/30 to-transparent">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900">About Our Association</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900">A propos de Loom</h1>
             <p className="text-lg text-gray-700">
-              Founded in 2010, our community has grown to become a vibrant hub for connection, 
-              support, and celebration. Learn about our history, mission, and the people who make it all possible.
+            L'association Les Ours Occitanie Méditerranée (LOOM) a été créée le 9 novembre 2017. C'est une association pour les Bears mais aussi pour tous ceux qui aiment les Ours, les poils et les tailles allant du XS à XXXXXL.
             </p>
           </div>
         </div>
@@ -28,30 +26,23 @@ const About = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div>
               <div className="w-20 h-1.5 bg-orange mb-6"></div>
-              <h2 className="text-3xl font-bold mb-6">Our Mission & Vision</h2>
+              <h2 className="text-3xl font-bold mb-6">Notre vision</h2>
               <p className="text-gray-700 mb-4">
-                We strive to create a welcoming and inclusive community where everyone feels valued and respected. 
-                Our mission is to provide a safe space for connection, self-expression, and celebration of diversity.
+              Nous proposons, tout au long de l'année, des événements griffés Bears, comme des sorties, apéro, resto, ciné, rando, pique-nique. Le tout dans la bonne humeur et la convivialité.
               </p>
               <p className="text-gray-700 mb-4">
-                We envision a world where communities like ours are no longer necessary because everyone is 
-                accepted for who they are. Until then, we'll continue to build bridges, foster understanding, 
-                and create spaces where authentic connections can flourish.
+              Être Bear ce n'est pas qu'un physique c'est aussi un état d'esprit qui se veut bienveillant, convivial, amical et tolérant...
               </p>
               <div className="grid grid-cols-2 gap-4 mt-8">
                 <div className="bg-white rounded-lg p-4 shadow-sm">
                   <div className="rounded-full bg-brown/10 w-12 h-12 flex items-center justify-center mb-3">
                     <BookOpen size={24} className="text-brown" />
                   </div>
-                  <h3 className="font-semibold mb-1">Education</h3>
-                  <p className="text-sm text-gray-600">Providing resources and opportunities for learning</p>
                 </div>
                 <div className="bg-white rounded-lg p-4 shadow-sm">
                   <div className="rounded-full bg-orange/10 w-12 h-12 flex items-center justify-center mb-3">
                     <Users size={24} className="text-orange" />
                   </div>
-                  <h3 className="font-semibold mb-1">Community</h3>
-                  <p className="text-sm text-gray-600">Building connections and fostering belonging</p>
                 </div>
               </div>
             </div>
@@ -70,8 +61,7 @@ const About = () => {
       <section className="py-16 bg-tan/20">
         <div className="container mx-auto px-4">
           <SectionHeading 
-            title="Our History" 
-            subtitle="The journey from our humble beginnings to where we are today."
+            title="Notre Histoire" 
             centered
           />
           
@@ -79,46 +69,43 @@ const About = () => {
             {/* Timeline line */}
             <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-brown/30"></div>
             
-            {/* 2010 */}
+            {/* 2017 */}
             <div className="relative mb-16">
               <div className="absolute left-1/2 transform -translate-x-1/2 -top-4 w-8 h-8 rounded-full border-4 border-brown bg-white z-10"></div>
               <div className="ml-auto mr-auto md:ml-0 md:mr-[50%] md:pr-8 w-full md:w-1/2 text-right">
                 <div className="bg-white p-6 rounded-xl shadow-sm">
-                  <span className="text-brown font-bold">2010</span>
-                  <h3 className="text-xl font-semibold mb-2">Foundation</h3>
+                  <span className="text-brown font-bold">9 Novembre 2017</span>
+                  <h3 className="text-xl font-semibold mb-2">Création</h3>
                   <p className="text-gray-700">
-                    Our association was founded by a small group of friends who wanted to create 
-                    a space where everyone could feel welcome and accepted.
+                    6 copains ont eu l'idée de créer cette association pour ajouter du moelleux et des poils dans l'univers LGBTQ de Montpellier.
                   </p>
                 </div>
               </div>
             </div>
             
-            {/* 2015 */}
+            {/* 2018 */}
             <div className="relative mb-16">
               <div className="absolute left-1/2 transform -translate-x-1/2 -top-4 w-8 h-8 rounded-full border-4 border-orange bg-white z-10"></div>
               <div className="ml-auto mr-auto md:ml-[50%] md:mr-0 md:pl-8 w-full md:w-1/2">
                 <div className="bg-white p-6 rounded-xl shadow-sm">
-                  <span className="text-orange font-bold">2015</span>
-                  <h3 className="text-xl font-semibold mb-2">Growth & Recognition</h3>
+                  <span className="text-orange font-bold">2018</span>
+                  <h3 className="text-xl font-semibold mb-2">Premier Monsieur Ours</h3>
                   <p className="text-gray-700">
-                    Our community grew to over 500 members, and we received our first grant 
-                    to expand our programming and reach.
+                    En juillet 2018 a été élu notre Unique Monsieur Ours Languedoc-Roussillon, Cédric François.
                   </p>
                 </div>
               </div>
             </div>
             
-            {/* 2020 */}
+            {/* 2023 */}
             <div className="relative">
               <div className="absolute left-1/2 transform -translate-x-1/2 -top-4 w-8 h-8 rounded-full border-4 border-brown bg-white z-10"></div>
               <div className="ml-auto mr-auto md:ml-0 md:mr-[50%] md:pr-8 w-full md:w-1/2 text-right">
                 <div className="bg-white p-6 rounded-xl shadow-sm">
-                  <span className="text-brown font-bold">2020</span>
-                  <h3 className="text-xl font-semibold mb-2">Digital Transformation</h3>
+                  <span className="text-brown font-bold">2024</span>
+                  <h3 className="text-xl font-semibold mb-2">Un grand événement</h3>
                   <p className="text-gray-700">
-                    During the pandemic, we pivoted to virtual events and connections, 
-                    allowing us to reach even more people and expand our impact.
+                    En 2024, pour la première fois nous avons participé à la Marche des fièretés, avec notre propre char. C'est aussi l'année où nous avons dépassés les 100 adhérents.
                   </p>
                 </div>
               </div>
@@ -141,16 +128,16 @@ const About = () => {
             <div className="bg-white rounded-xl shadow-sm overflow-hidden hover-lift transition-all duration-300">
               <div className="aspect-square">
                 <img 
-                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
-                  alt="Alexandre Dupont" 
+                  src="https://media.discordapp.net/attachments/1335572571495731242/1359936543543787700/thumbnail_1000049138.jpg?ex=67f94b1a&is=67f7f99a&hm=5543b4fcce7b6cb13e85edae749c874e3abed97319eb2f43a9e68f47400bc491&=&format=webp&width=483&height=483" 
+                  alt="Stephane" 
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-bold mb-1">Alexandre Dupont</h3>
-                <p className="text-orange mb-4">President</p>
+                <h3 className="text-xl font-bold mb-1">Stephane</h3>
+                <p className="text-orange mb-4">Président</p>
                 <p className="text-gray-600">
-                  Alexandre has been with us since the beginning and leads with compassion and vision.
+                  Ours fondateur de l'association.
                 </p>
               </div>
             </div>
@@ -159,16 +146,16 @@ const About = () => {
             <div className="bg-white rounded-xl shadow-sm overflow-hidden hover-lift transition-all duration-300">
               <div className="aspect-square">
                 <img 
-                  src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
-                  alt="Marie Leclerc" 
+                  src="https://media.discordapp.net/attachments/1335572571495731242/1359936541660811448/thumbnail_1000048986.jpg?ex=67f94b19&is=67f7f999&hm=b6f0025dc0dec2f295c999e6c1ba5c8657b20bd1fa2a63e31d8f26b334097b20&=&format=webp" 
+                  alt="Jean-Louis" 
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-bold mb-1">Marie Leclerc</h3>
-                <p className="text-orange mb-4">Secretary</p>
+                <h3 className="text-xl font-bold mb-1">Jean-Louis</h3>
+                <p className="text-orange mb-4">Vice-Président</p>
                 <p className="text-gray-600">
-                  Marie keeps our organization running smoothly with her exceptional organizational skills.
+                  Ours fondateur de l'association.
                 </p>
               </div>
             </div>
@@ -177,16 +164,142 @@ const About = () => {
             <div className="bg-white rounded-xl shadow-sm overflow-hidden hover-lift transition-all duration-300">
               <div className="aspect-square">
                 <img 
-                  src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
-                  alt="Jean Moreau" 
+                  src="https://media.discordapp.net/attachments/1335572571495731242/1359936540687597608/1000049074.jpg?ex=67f94b19&is=67f7f999&hm=3ad363a25fc1897176bcc39c5b02f7cd080471584ed1b7eac183b8b208e906bc&=&format=webp&width=648&height=864" 
+                  alt="Marc" 
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-bold mb-1">Jean Moreau</h3>
-                <p className="text-orange mb-4">Treasurer</p>
+                <h3 className="text-xl font-bold mb-1">Marc</h3>
+                <p className="text-orange mb-4">Trésorier</p>
                 <p className="text-gray-600">
-                  Jean ensures our finances are managed responsibly so we can continue our mission.
+                  Ours responsable des bourses.
+                </p>
+              </div>
+            </div>
+
+            {/* Team Member 4 */}
+            <div className="bg-white rounded-xl shadow-sm overflow-hidden hover-lift transition-all duration-300">
+              <div className="aspect-square">
+                <img 
+                  src="https://media.discordapp.net/attachments/1335572571495731242/1359936543950901369/thumbnail_1000049202.jpg?ex=67f94b1a&is=67f7f99a&hm=16f1ebb2ab46020fd0369cdc970378fab5aced61c75a1de90f814c79108629c2&=&format=webp" 
+                  alt="Pascal" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="p-6">
+                <h3 className="text-xl font-bold mb-1">Pascal</h3>
+                <p className="text-orange mb-4">Co-Secrétaire</p>
+                <p className="text-gray-600">
+                  X
+                </p>
+              </div>
+            </div>
+
+            {/* Team Member 5 */}
+            <div className="bg-white rounded-xl shadow-sm overflow-hidden hover-lift transition-all duration-300">
+              <div className="aspect-square">
+                <img 
+                  src="https://cdn.discordapp.com/attachments/1335572571495731242/1359946118741360720/flo.png?ex=67f95405&is=67f80285&hm=41aea261c6203b8ae96904353bb0510a60955e9d8e6e894af7ad431b2bd202f4&" 
+                  alt="Florent" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="p-6">
+                <h3 className="text-xl font-bold mb-1">Florent</h3>
+                <p className="text-orange mb-4">Co-Secrétaire</p>
+                <p className="text-gray-600">
+                  X
+                </p>
+              </div>
+            </div>
+
+            {/* Team Member 6 */}
+            <div className="bg-white rounded-xl shadow-sm overflow-hidden hover-lift transition-all duration-300">
+              <div className="aspect-square">
+                <img 
+                  src="https://cdn.discordapp.com/attachments/1335572571495731242/1359936542730359077/thumbnail_1000049118.jpg?ex=67f94b1a&is=67f7f99a&hm=7a398519695275068477f9c1e886a5a786426d11885c92450dc2f1ffb74cc96b&" 
+                  alt="Jean-Luc" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="p-6">
+                <h3 className="text-xl font-bold mb-1">Jean-Luc</h3>
+                <p className="text-orange mb-4">Chargé en Relations Publiques</p>
+                <p className="text-gray-600">
+                  Ours à l'appel depuis 2019 !
+                </p>
+              </div>
+            </div>
+
+            {/* Team Member 7 */}
+            <div className="bg-white rounded-xl shadow-sm overflow-hidden hover-lift transition-all duration-300">
+              <div className="aspect-square">
+                <img 
+                  src="https://cdn.discordapp.com/attachments/1335572571495731242/1359936544483573981/1000049203.jpg?ex=67f94b1a&is=67f7f99a&hm=783bd8d4fb40bfd39c367316f7d72ff4915e1ee6b7a6acdd9ca18da9444705b8&" 
+                  alt="Franck" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="p-6">
+                <h3 className="text-xl font-bold mb-1">Franck</h3>
+                <p className="text-orange mb-4">Chargé de communications</p>
+                <p className="text-gray-600">
+                  Un lover des Ours.
+                </p>
+              </div>
+            </div>
+
+            {/* Team Member 8 */}
+            <div className="bg-white rounded-xl shadow-sm overflow-hidden hover-lift transition-all duration-300">
+              <div className="aspect-square">
+                <img 
+                  src="https://cdn.discordapp.com/attachments/1335572571495731242/1359936542155473128/1000048985.jpg?ex=67f94b1a&is=67f7f99a&hm=a7e1e06a21dc38c5296c5c746eef75c898d081455166673784a8117e29464113&" 
+                  alt="Sylfried" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="p-6">
+                <h3 className="text-xl font-bold mb-1">Sylfried</h3>
+                <p className="text-orange mb-4">Adjoint Chargé de relations publiques</p>
+                <p className="text-gray-600">
+                  X
+                </p>
+              </div>
+            </div>
+
+            {/* Team Member 9 */}
+            <div className="bg-white rounded-xl shadow-sm overflow-hidden hover-lift transition-all duration-300">
+              <div className="aspect-square">
+                <img 
+                  src="https://cdn.discordapp.com/attachments/1335572571495731242/1359936547931033800/thumbnail_1000049117.jpg?ex=67f94b1b&is=67f7f99b&hm=43546bd426167fa2f60cb8e99f9cf1747ed4307f79476385ba98bc92d003aa02&" 
+                  alt="Henri" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="p-6">
+                <h3 className="text-xl font-bold mb-1">Henri</h3>
+                <p className="text-orange mb-4">Monsieur Culture</p>
+                <p className="text-gray-600">
+                  X
+                </p>
+              </div>
+            </div>
+
+            {/* Team Member 10 */}
+            <div className="bg-white rounded-xl shadow-sm overflow-hidden hover-lift transition-all duration-300">
+              <div className="aspect-square">
+                <img 
+                  src="https://cdn.discordapp.com/attachments/1335572571495731242/1359936541132324914/thumbnail_1000048987.jpg?ex=67f94b19&is=67f7f999&hm=94d6f0fa95d643b2d06ff4594304514bc9266c955fb20f6109ac5e7bbd2da68d&" 
+                  alt="Étienne" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="p-6">
+                <h3 className="text-xl font-bold mb-1">Étienne</h3>
+                <p className="text-orange mb-4">Administrateur</p>
+                <p className="text-gray-600">
+                  X
                 </p>
               </div>
             </div>
@@ -200,79 +313,70 @@ const About = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div>
               <div className="w-20 h-1.5 bg-orange mb-6"></div>
-              <h2 className="text-3xl font-bold mb-6">Get In Touch</h2>
-              <p className="text-tan/90 mb-8">
-                We'd love to hear from you! Whether you have questions about membership, 
-                upcoming events, or how to get involved, our team is here to help.
-              </p>
+              <h2 className="text-3xl font-bold mb-6">Nous Contacter</h2>
+                <p className="text-tan/90 mb-8">
+                Nous serions ravis de vous entendre ! Que vous ayez des questions sur l'adhésion, 
+                les événements à venir ou comment vous impliquer, notre équipe est là pour vous aider.
+                </p>
               
               <div className="space-y-4">
                 <div className="flex items-start">
                   <MapPin className="mr-4 text-orange mt-1" />
                   <div>
-                    <h3 className="font-semibold mb-1">Visit Us</h3>
-                    <p className="text-tan/90">123 Community Avenue, Paris, 75001</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start">
-                  <Calendar className="mr-4 text-orange mt-1" />
-                  <div>
-                    <h3 className="font-semibold mb-1">Office Hours</h3>
-                    <p className="text-tan/90">Monday to Friday: 10am - 6pm</p>
-                    <p className="text-tan/90">Saturday: 10am - 2pm</p>
+                    <h3 className="font-semibold mb-1">Nous retrouver</h3>
+                    <p className="text-tan/90">49 Rue du faubourg St. Jaumes, Bat E, 34000 Montpellier</p>
                   </div>
                 </div>
               </div>
             </div>
             
             <div className="bg-white text-gray-900 rounded-xl p-8 shadow-lg">
-              <h3 className="text-2xl font-bold mb-6">Contact Form</h3>
+              <h3 className="text-2xl font-bold mb-6">Formulaire de Contact</h3>
               <form>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                    <input 
-                      type="text" 
-                      id="name" 
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-brown focus:border-brown"
-                      placeholder="Your name"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                    <input 
-                      type="email" 
-                      id="email" 
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-brown focus:border-brown"
-                      placeholder="Your email"
-                    />
-                  </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                <div>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Nom</label>
+                <input 
+                  type="text" 
+                  id="name" 
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-brown focus:border-brown"
+                  placeholder="Votre nom"
+                />
                 </div>
-                <div className="mb-4">
-                  <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">Subject</label>
-                  <input 
-                    type="text" 
-                    id="subject" 
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-brown focus:border-brown"
-                    placeholder="Subject"
-                  />
+                <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input 
+                  type="email" 
+                  id="email" 
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-brown focus:border-brown"
+                  placeholder="Votre email"
+                />
                 </div>
-                <div className="mb-6">
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">Message</label>
-                  <textarea 
-                    id="message" 
-                    rows={4}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-brown focus:border-brown"
-                    placeholder="Your message"
-                  ></textarea>
-                </div>
-                <button 
-                  type="submit" 
-                  className="w-full bg-brown hover:bg-brown-dark text-white font-medium py-2 px-4 rounded-lg transition-colors"
-                >
-                  Send Message
-                </button>
+              </div>
+              <div className="mb-4">
+                <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">Sujet</label>
+                <input 
+                type="text" 
+                id="subject" 
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-brown focus:border-brown"
+                placeholder="Sujet"
+                />
+              </div>
+              <div className="mb-6">
+                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">Message</label>
+                <textarea 
+                id="message" 
+                rows={4}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-brown focus:border-brown"
+                placeholder="Votre message"
+                ></textarea>
+              </div>
+              <button 
+                type="submit" 
+                className="w-full bg-brown hover:bg-brown-dark text-white font-medium py-2 px-4 rounded-lg transition-colors"
+              >
+                Envoyer le message
+              </button>
               </form>
             </div>
           </div>

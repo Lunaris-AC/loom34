@@ -139,7 +139,7 @@ const Index = () => {
                 <span className="ml-2">~Bienvenue chez Loom !</span>
               </div>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-gray-900 animate-fade-in">
-                Loom - <span className="text-brown">Les Ours Occitanie Méditerannée.</span>
+                Loom - <span className="text-brown">Les Ours Occitanie Méditerranée.</span>
               </h1>
               <p className="text-lg md:text-xl text-gray-700 max-w-2xl animate-fade-in" style={{ animationDelay: '0.1s' }}>
                 Association Bear fondée en 2017. C'est une association pour les Bears mais aussi pour tous ceux qui aiment les Ours, les poils et les tailles allant du XS au XXXXXL.
@@ -195,8 +195,7 @@ const Index = () => {
       <section className={`py-16 md:py-24 transition-opacity duration-700 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
         <div className="container mx-auto px-4">
           <SectionHeading 
-            title="Latest Articles" 
-            subtitle="Stay updated with our community news, stories, and perspectives."
+            title="Nos derniers Articles" 
           />
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -248,8 +247,7 @@ const Index = () => {
       <section className="py-16 md:py-24 bg-gradient-to-b from-tan/30 to-transparent">
         <div className="container mx-auto px-4">
           <SectionHeading 
-            title="Upcoming Events" 
-            subtitle="Join us for these exciting community gatherings and celebrations."
+            title="Nos prochains événements" 
           />
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -307,7 +305,7 @@ const Index = () => {
               <div className="inline-block mb-4">
                 <div className="w-10 h-1 bg-orange mb-2"></div>
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-6">Meet Monsieur Ours</h2>
+              <h2 className="text-3xl md:text-4xl font-bold mb-6">Monsieur Ours</h2>
               <p className="text-tan/90 text-lg mb-8">
                Chaque année, lors de la Montpell Bear's, Monsieur Ours et ses oursons sont élus par la communauté Bear présente lors de cet événement.
               </p>
@@ -395,7 +393,7 @@ const Index = () => {
             onClick={() => window.open(MEMBERSHIP_URL, '_blank', 'noopener,noreferrer')}
             className="inline-flex items-center justify-center bg-orange hover:bg-orange-dark text-white py-3 px-6 rounded-lg font-medium transition-colors"
           >
-            Become a Member
+            Nous rejoindre !
           </button>
         </div>
       </section>
