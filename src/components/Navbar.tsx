@@ -39,11 +39,11 @@ const Navbar = () => {
     { name: 'Home', path: '/' },
     { name: 'About', path: '/about' },
     { name: 'Events', path: '/events' },
-    { name: 'Shop', url: 'https://www.helloasso.com/associations/association-les-ours-occitanie-mediterranee-loom#shop', external: true },
+    { name: 'Shop', path: '/shop', external: true },
     { name: 'Monsieur Ours', path: '/monsieur-ours' },
     { name: 'Gallery', path: '/gallery' },
     { name: 'Partners', path: '/partners' },
-    { name: 'Membership', url: 'https://www.helloasso.com/associations/association-les-ours-occitanie-mediterranee-loom/adhesions/adhesion-2024-2025', external: true },
+    { name: 'Membership', path: '/membership', external: true },
   ];
   
   const isActive = (path: string) => {
