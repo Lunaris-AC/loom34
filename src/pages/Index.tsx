@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, CalendarDays, ShoppingBag, Users, Image, Heart, ExternalLink } from 'lucide-react';
@@ -120,6 +121,10 @@ const Index = () => {
     { id: 10, name: "Youth Support Network", logo: "https://via.placeholder.com/200x100/f3f4f6/666666?text=Partner+10" }
   ];
 
+  // HelloAsso URLs
+  const SHOP_URL = "https://www.helloasso.com/associations/your-association/boutiques/shop";
+  const MEMBERSHIP_URL = "https://www.helloasso.com/associations/your-association/adhesions/membership";
+
   return (
     <div className="flex flex-col min-h-screen bg-tan/10">
       <Navbar />
@@ -143,16 +148,15 @@ const Index = () => {
               <div className="flex flex-wrap gap-4 pt-2 animate-fade-in" style={{ animationDelay: '0.2s' }}>
                 <Button
                   className="bg-orange text-white hover:bg-orange/90"
-                  asChild
+                  onClick={() => window.open(MEMBERSHIP_URL, '_blank', 'noopener,noreferrer')}
                 >
-                  <a href="https://www.helloasso.com/associations/your-association/adhesions/membership" target="_blank" rel="noopener noreferrer">
-                    Join Us
-                  </a>
+                  Join Us
                 </Button>
-                <Button variant="outline" className="border-orange text-orange hover:bg-orange/10" asChild>
-                  <Link to="/about">
-                    Learn More
-                  </Link>
+                <Button 
+                  variant="outline" 
+                  className="border-orange text-orange hover:bg-orange/10"
+                >
+                  <Link to="/about">Learn More</Link>
                 </Button>
               </div>
             </div>
@@ -434,14 +438,12 @@ const Index = () => {
           <p className="text-tan/90 text-lg mb-8 max-w-2xl mx-auto">
             Become a member and enjoy exclusive benefits, special event access, and help support our mission.
           </p>
-          <a 
-            href="https://www.helloasso.com/associations/your-association/adhesions/membership" 
-            target="_blank" 
-            rel="noopener noreferrer"
+          <button
+            onClick={() => window.open(MEMBERSHIP_URL, '_blank', 'noopener,noreferrer')}
             className="inline-flex items-center justify-center bg-orange hover:bg-orange-dark text-white py-3 px-6 rounded-lg font-medium transition-colors"
           >
             Become a Member
-          </a>
+          </button>
         </div>
       </section>
       
@@ -451,4 +453,3 @@ const Index = () => {
 };
 
 export default Index;
-

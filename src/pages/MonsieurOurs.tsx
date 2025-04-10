@@ -1,62 +1,41 @@
 
-import { Heart } from 'lucide-react';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import SectionHeading from '@/components/SectionHeading';
-import Button from '@/components/Button';
+import { Link } from "react-router-dom";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { Button } from "@/components/ui/button";
+import { Heart, MapPin, Quote, SunMedium, Leaf, Coffee, CircleDot } from "lucide-react";
 
 const MonsieurOurs = () => {
-  // Previous mascots data
-  const previousMascots = [
-    {
-      name: "Olivier L'Ours",
-      period: "2010-2015",
-      description: "The first incarnation of our mascot, known for his classic design and friendly demeanor.",
-      image: "https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-    },
-    {
-      name: "Pierre L'Ours",
-      period: "2015-2018",
-      description: "A more modern take on our mascot, with a sleeker design and vibrant colors.",
-      image: "https://images.unsplash.com/photo-1587922546307-776227941871?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-    },
-    {
-      name: "Monsieur Ours Classic",
-      period: "2018-2022",
-      description: "The refined version that established our mascot's distinguished personality.",
-      image: "https://images.unsplash.com/photo-1566903451935-7e8836199ac5?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-    }
-  ];
-
+  const MEMBERSHIP_URL = "https://www.helloasso.com/associations/your-association/adhesions/membership";
+  
   return (
     <div className="flex flex-col min-h-screen bg-tan/10">
       <Navbar />
       
       {/* Hero Section */}
-      <section className="pt-24 md:pt-32 pb-16 bg-gradient-to-b from-tan/30 to-transparent">
+      <section className="pt-24 md:pt-32 pb-12 bg-gradient-to-b from-tan/30 to-transparent">
         <div className="container mx-auto px-4">
           <div className="flex flex-col lg:flex-row items-center gap-12">
             <div className="lg:w-1/2 space-y-6">
               <div className="inline-flex items-center px-3 py-1 rounded-full bg-orange/10 text-orange text-sm font-medium">
-                <span className="animate-pulse-soft">•</span>
-                <span className="ml-2">Our Mascot</span>
+                <Heart size={16} className="mr-2" />
+                <span>Our Mascot</span>
               </div>
               <h1 className="text-4xl md:text-5xl font-bold leading-tight text-gray-900">
                 Meet <span className="text-brown">Monsieur Ours</span>
               </h1>
               <p className="text-lg text-gray-700">
-                More than just a mascot, Monsieur Ours represents the heart and soul of our community. 
-                His story reflects our values of warmth, acceptance, and strength in diversity.
+                The heart and soul of our community. Monsieur Ours is more than just a mascot; 
+                he represents our values, our history, and our love for diversity and inclusion.
               </p>
             </div>
-            <div className="lg:w-1/2 relative">
-              <div className="relative rounded-2xl overflow-hidden shadow-xl animate-float">
+            <div className="lg:w-1/2">
+              <div className="relative rounded-2xl overflow-hidden shadow-xl">
                 <img 
-                  src="https://images.unsplash.com/photo-1525268771113-32d9e9021a97?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                  src="https://images.unsplash.com/photo-1591652910703-a1a8ceb52e7a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" 
                   alt="Monsieur Ours" 
-                  className="w-full h-auto object-cover rounded-2xl"
+                  className="w-full h-auto object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-brown/30 to-transparent rounded-2xl"></div>
               </div>
             </div>
           </div>
@@ -66,214 +45,210 @@ const MonsieurOurs = () => {
       {/* Story Section */}
       <section className="py-16">
         <div className="container mx-auto px-4">
-          <SectionHeading 
-            title="The Story" 
-            subtitle="How Monsieur Ours came to be the heart of our community."
-          />
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mt-10">
-            <div className="bg-white rounded-xl p-8 shadow-sm hover:shadow-md transition-all duration-300">
-              <h3 className="text-2xl font-semibold mb-4">Origins</h3>
-              <p className="text-gray-700 mb-4">
-                In the early days of our association, we wanted a symbol that would represent 
-                the strength, warmth, and protective nature of our community. The bear, with 
-                its powerful yet gentle demeanor, was the perfect choice.
+          <div className="max-w-3xl mx-auto">
+            <div className="flex justify-center mb-8">
+              <div className="w-20 h-1 bg-brown"></div>
+            </div>
+            <h2 className="text-3xl font-bold text-center mb-8">The Story of Monsieur Ours</h2>
+            
+            <div className="prose prose-lg max-w-none">
+              <p>
+                Monsieur Ours was born in the heart of Paris during a community gathering in 2010. 
+                As our members came together to celebrate diversity and inclusion, we realized we 
+                needed a symbol to represent our values. 
               </p>
-              <p className="text-gray-700">
-                We named him "Monsieur Ours" – Mister Bear in French – to honor the French 
-                heritage of many of our founding members and to give him a touch of distinguished character.
+              
+              <p>
+                Designed by local artist Louise Dubois, Monsieur Ours was inspired by the traditional 
+                French teddy bear, but with a modern and inclusive twist. His warm smile and open arms 
+                represent our community's welcoming nature, while his colorful outfit symbolizes the 
+                diversity we celebrate.
+              </p>
+              
+              <div className="my-12 bg-tan/20 rounded-2xl p-8 text-center">
+                <Quote size={36} className="text-brown mx-auto mb-4" />
+                <p className="text-xl italic text-brown font-medium">
+                  "Monsieur Ours reminds us that everyone belongs, everyone matters, 
+                  and everyone has a place in our community."
+                </p>
+                <p className="mt-4 text-gray-700">— Michelle Laurent, Founder</p>
+              </div>
+              
+              <p>
+                Over the years, Monsieur Ours has become more than just a mascot. He has been present 
+                at every major community event, celebration, and milestone. Through good times and 
+                challenging ones, Monsieur Ours has stood as a symbol of resilience, compassion, 
+                and solidarity.
+              </p>
+              
+              <p>
+                Today, Monsieur Ours continues to be at the heart of our association. 
+                You'll see him at our events, in our materials, and in the stories we share. 
+                He reminds us of our mission to create a world where everyone feels welcome, 
+                valued, and loved for who they are.
               </p>
             </div>
             
-            <div className="bg-white rounded-xl p-8 shadow-sm hover:shadow-md transition-all duration-300">
-              <h3 className="text-2xl font-semibold mb-4">Symbolism</h3>
-              <p className="text-gray-700 mb-4">
-                Monsieur Ours embodies many of the qualities we value in our community. He represents 
-                strength in adversity, the warmth of companionship, and the protective instinct 
-                that drives us to look out for one another.
-              </p>
-              <p className="text-gray-700">
-                His friendly appearance reminds us that even those who might seem intimidating 
-                at first glance often have the biggest hearts – a lesson in not judging by appearances.
-              </p>
-            </div>
-            
-            <div className="bg-white rounded-xl p-8 shadow-sm hover:shadow-md transition-all duration-300">
-              <h3 className="text-2xl font-semibold mb-4">Evolution</h3>
-              <p className="text-gray-700 mb-4">
-                Over the years, Monsieur Ours has evolved alongside our community. His design has been 
-                refined, but his essence remains the same – a guardian figure who welcomes everyone 
-                with open arms.
-              </p>
-              <p className="text-gray-700">
-                Today, he appears at all our events, on our merchandise, and serves as an 
-                instantly recognizable symbol of our association's values and mission.
-              </p>
-            </div>
-            
-            <div className="bg-white rounded-xl p-8 shadow-sm hover:shadow-md transition-all duration-300">
-              <h3 className="text-2xl font-semibold mb-4">Community Icon</h3>
-              <p className="text-gray-700 mb-4">
-                Monsieur Ours has become more than just a mascot – he's a beloved community icon. 
-                Members often share stories of how seeing him at their first event made them 
-                feel immediately welcome and at ease.
-              </p>
-              <p className="text-gray-700">
-                For many, he represents the sense of belonging they've found within our community – 
-                a reminder that everyone has a place here.
-              </p>
+            <div className="my-16">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="bg-white rounded-xl p-6 shadow-sm text-center">
+                  <div className="rounded-full bg-orange/10 w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                    <SunMedium size={28} className="text-orange" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">Warmth</h3>
+                  <p className="text-gray-600">
+                    Representing the warm, welcoming spirit of our community.
+                  </p>
+                </div>
+                <div className="bg-white rounded-xl p-6 shadow-sm text-center">
+                  <div className="rounded-full bg-brown/10 w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                    <Heart size={28} className="text-brown" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">Love</h3>
+                  <p className="text-gray-600">
+                    Symbolizing our love for diversity and inclusion.
+                  </p>
+                </div>
+                <div className="bg-white rounded-xl p-6 shadow-sm text-center">
+                  <div className="rounded-full bg-green-100 w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                    <Leaf size={28} className="text-green-600" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">Growth</h3>
+                  <p className="text-gray-600">
+                    Inspiring personal and community growth and development.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
       
-      {/* Gallery Section */}
+      {/* Timeline Section */}
       <section className="py-16 bg-tan/20">
         <div className="container mx-auto px-4">
-          <SectionHeading 
-            title="Gallery" 
-            subtitle="Monsieur Ours in action throughout our community events."
-            centered
-          />
+          <h2 className="text-3xl font-bold text-center mb-12">Monsieur Ours Through the Years</h2>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
-            <div className="aspect-square rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
-              <img 
-                src="https://images.unsplash.com/photo-1516466723877-e4ec1d736c8a?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
-                alt="Monsieur Ours at Pride" 
-                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-              />
-            </div>
-            <div className="aspect-square rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
-              <img 
-                src="https://images.unsplash.com/photo-1682686580186-b55d2a91053c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
-                alt="Monsieur Ours at community picnic" 
-                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-              />
-            </div>
-            <div className="aspect-square rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
-              <img 
-                src="https://images.unsplash.com/photo-1578269174936-2709b6aeb913?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
-                alt="Monsieur Ours with children" 
-                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-              />
-            </div>
-            <div className="aspect-square rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
-              <img 
-                src="https://images.unsplash.com/photo-1606041008023-472dfb5e530f?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
-                alt="Monsieur Ours merchandise" 
-                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-              />
-            </div>
-            <div className="aspect-square rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
-              <img 
-                src="https://images.unsplash.com/photo-1560806175-c9897c992eba?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
-                alt="Monsieur Ours artwork" 
-                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-              />
-            </div>
-            <div className="aspect-square rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
-              <img 
-                src="https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
-                alt="Monsieur Ours celebration" 
-                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-      
-      {/* Previous Monsieur Ours Section - Replacing "Take Home" section */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <SectionHeading 
-            title="Previous Monsieur Ours" 
-            subtitle="The evolution of our beloved mascot through the years."
-            centered
-          />
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
-            {previousMascots.map((mascot, index) => (
-              <div key={index} className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
-                <div className="h-56 overflow-hidden">
-                  <img 
-                    src={mascot.image} 
-                    alt={mascot.name} 
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                  />
+          <div className="max-w-4xl mx-auto">
+            <div className="relative">
+              {/* Vertical timeline line */}
+              <div className="absolute left-4 md:left-1/2 transform md:-translate-x-1/2 h-full w-0.5 bg-brown/30"></div>
+              
+              {/* Timeline events */}
+              <div className="space-y-12">
+                {/* 2010 */}
+                <div className="relative flex flex-col md:flex-row items-center md:items-start">
+                  <div className="order-1 md:w-1/2 md:pr-8 md:text-right mb-4 md:mb-0">
+                    <div className="bg-white rounded-xl p-6 shadow-sm inline-block">
+                      <h3 className="text-xl font-bold text-brown mb-2">2010</h3>
+                      <p className="text-gray-700">
+                        Monsieur Ours is born during our first community gathering in Paris.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="z-10 flex items-center justify-center w-8 h-8 rounded-full bg-brown border-4 border-white text-white absolute left-0 md:left-1/2 transform md:-translate-x-1/2">
+                    <CircleDot size={16} />
+                  </div>
+                  <div className="order-2 md:w-1/2 md:pl-8 hidden md:block">
+                    {/* Empty space for layout on right timeline events */}
+                  </div>
                 </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold mb-1">{mascot.name}</h3>
-                  <p className="text-orange text-sm font-medium mb-3">{mascot.period}</p>
-                  <p className="text-gray-700">{mascot.description}</p>
+                
+                {/* 2014 */}
+                <div className="relative flex flex-col md:flex-row items-center md:items-start">
+                  <div className="order-2 md:order-2 md:w-1/2 md:pl-8 mb-4 md:mb-0">
+                    <div className="bg-white rounded-xl p-6 shadow-sm inline-block">
+                      <h3 className="text-xl font-bold text-brown mb-2">2014</h3>
+                      <p className="text-gray-700">
+                        Monsieur Ours makes his first public appearance at the Paris Pride Parade.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="z-10 flex items-center justify-center w-8 h-8 rounded-full bg-brown border-4 border-white text-white absolute left-0 md:left-1/2 transform md:-translate-x-1/2">
+                    <CircleDot size={16} />
+                  </div>
+                  <div className="order-1 md:order-1 md:w-1/2 md:pr-8 md:text-right hidden md:block">
+                    {/* Empty space for layout on left timeline events */}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-      
-      {/* Testimonials Section */}
-      <section className="py-16 bg-tan/10">
-        <div className="container mx-auto px-4">
-          <SectionHeading 
-            title="Community Love" 
-            subtitle="What our members say about Monsieur Ours."
-            centered
-          />
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-            <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
-              <div className="flex justify-center mb-4">
-                <div className="w-16 h-16 rounded-full bg-orange/10 flex items-center justify-center">
-                  <span className="text-2xl">❝</span>
+                
+                {/* 2018 */}
+                <div className="relative flex flex-col md:flex-row items-center md:items-start">
+                  <div className="order-1 md:w-1/2 md:pr-8 md:text-right mb-4 md:mb-0">
+                    <div className="bg-white rounded-xl p-6 shadow-sm inline-block">
+                      <h3 className="text-xl font-bold text-brown mb-2">2018</h3>
+                      <p className="text-gray-700">
+                        Monsieur Ours becomes the official logo of our association and appears on all materials.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="z-10 flex items-center justify-center w-8 h-8 rounded-full bg-brown border-4 border-white text-white absolute left-0 md:left-1/2 transform md:-translate-x-1/2">
+                    <CircleDot size={16} />
+                  </div>
+                  <div className="order-2 md:w-1/2 md:pl-8 hidden md:block">
+                    {/* Empty space for layout on right timeline events */}
+                  </div>
                 </div>
-              </div>
-              <p className="text-gray-700 text-center mb-6">
-                "Seeing Monsieur Ours at my first event made me feel instantly welcome. 
-                He's become a symbol of the belonging I've found in this community."
-              </p>
-              <div className="text-center">
-                <h4 className="font-semibold">Thomas L.</h4>
-                <p className="text-sm text-gray-500">Member since 2018</p>
-              </div>
-            </div>
-            
-            <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
-              <div className="flex justify-center mb-4">
-                <div className="w-16 h-16 rounded-full bg-orange/10 flex items-center justify-center">
-                  <span className="text-2xl">❝</span>
+                
+                {/* 2022 */}
+                <div className="relative flex flex-col md:flex-row items-center md:items-start">
+                  <div className="order-2 md:order-2 md:w-1/2 md:pl-8 mb-4 md:mb-0">
+                    <div className="bg-white rounded-xl p-6 shadow-sm inline-block">
+                      <h3 className="text-xl font-bold text-brown mb-2">2022</h3>
+                      <p className="text-gray-700">
+                        Monsieur Ours helps our association reach 1,000 members and celebrates with a special event.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="z-10 flex items-center justify-center w-8 h-8 rounded-full bg-brown border-4 border-white text-white absolute left-0 md:left-1/2 transform md:-translate-x-1/2">
+                    <CircleDot size={16} />
+                  </div>
+                  <div className="order-1 md:order-1 md:w-1/2 md:pr-8 md:text-right hidden md:block">
+                    {/* Empty space for layout on left timeline events */}
+                  </div>
                 </div>
-              </div>
-              <p className="text-gray-700 text-center mb-6">
-                "My kids adore Monsieur Ours! He's helped them understand the values 
-                of acceptance and kindness in a way that's accessible and fun."
-              </p>
-              <div className="text-center">
-                <h4 className="font-semibold">Sophie M.</h4>
-                <p className="text-sm text-gray-500">Member since 2020</p>
-              </div>
-            </div>
-            
-            <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
-              <div className="flex justify-center mb-4">
-                <div className="w-16 h-16 rounded-full bg-orange/10 flex items-center justify-center">
-                  <span className="text-2xl">❝</span>
+                
+                {/* Today */}
+                <div className="relative flex flex-col md:flex-row items-center md:items-start">
+                  <div className="order-1 md:w-1/2 md:pr-8 md:text-right mb-4 md:mb-0">
+                    <div className="bg-white rounded-xl p-6 shadow-sm inline-block">
+                      <h3 className="text-xl font-bold text-brown mb-2">Today</h3>
+                      <p className="text-gray-700">
+                        Monsieur Ours continues to inspire our community and represents our values everywhere we go.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="z-10 flex items-center justify-center w-8 h-8 rounded-full bg-brown border-4 border-white text-white absolute left-0 md:left-1/2 transform md:-translate-x-1/2">
+                    <CircleDot size={16} />
+                  </div>
+                  <div className="order-2 md:w-1/2 md:pl-8 hidden md:block">
+                    {/* Empty space for layout on right timeline events */}
+                  </div>
                 </div>
-              </div>
-              <p className="text-gray-700 text-center mb-6">
-                "I have the Monsieur Ours plushie on my desk at work. It's a daily 
-                reminder of the supportive community I've found here."
-              </p>
-              <div className="text-center">
-                <h4 className="font-semibold">Pierre D.</h4>
-                <p className="text-sm text-gray-500">Member since 2016</p>
               </div>
             </div>
           </div>
         </div>
       </section>
       
+      {/* Community Section */}
+      <section className="py-16 bg-brown text-white">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">Join Monsieur Ours & Our Community</h2>
+          <p className="text-tan/90 text-lg mb-8 max-w-2xl mx-auto">
+            Become a member of our vibrant community today and be part of Monsieur Ours' ongoing story.
+            Together, we can create more spaces where everyone feels welcome and appreciated.
+          </p>
+          <button
+            onClick={() => window.open(MEMBERSHIP_URL, '_blank', 'noopener,noreferrer')}
+            className="inline-flex items-center justify-center bg-orange hover:bg-orange-dark text-white py-3 px-6 rounded-lg font-medium transition-colors"
+          >
+            Become a Member
+          </button>
+        </div>
+      </section>
+      
+      {/* Footer */}
       <Footer />
     </div>
   );

@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, User, LogIn } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
@@ -11,11 +11,13 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const { user, profile, signOut, isAdmin } = useAuth();
   
   // Handle scroll effect
@@ -53,7 +55,14 @@ const Navbar = () => {
   };
 
   const handleSignOut = async () => {
-    await signOut();
+    try {
+      await signOut();
+      toast.success('Successfully signed out');
+      navigate('/');
+    } catch (error) {
+      console.error('Sign out error:', error);
+      toast.error('Failed to sign out');
+    }
   };
   
   return (

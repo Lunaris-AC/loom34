@@ -26,6 +26,7 @@ import RequireAdmin from "./components/auth/RequireAdmin";
 import ArticleDetail from "./pages/ArticleDetail";
 import EventDetail from "./pages/EventDetail";
 import Articles from "./pages/Articles";
+import ExternalRedirect from "./components/ExternalRedirect";
 
 const queryClient = new QueryClient();
 
@@ -59,13 +60,9 @@ const App = () => {
               <Route path="/gallery" element={<Gallery />} />
               <Route path="/partners" element={<Partners />} />
               
-              {/* External Redirects - Fixed to redirect directly to external URLs */}
-              <Route path="/shop" element={
-                <Navigate to={{ pathname: SHOP_URL }} replace />
-              } />
-              <Route path="/membership" element={
-                <Navigate to={{ pathname: MEMBERSHIP_URL }} replace />
-              } />
+              {/* External Redirects - Using ExternalRedirect component */}
+              <Route path="/shop" element={<ExternalRedirect url={SHOP_URL} />} />
+              <Route path="/membership" element={<ExternalRedirect url={MEMBERSHIP_URL} />} />
               
               {/* Auth Routes */}
               <Route path="/login" element={<Login />} />

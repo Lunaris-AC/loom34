@@ -1,18 +1,93 @@
 
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
-import { FileText, CalendarDays, Image as ImageIcon } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { FileText, CalendarDays, Image as ImageIcon, Users, ArrowUpRight } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Link } from "react-router-dom";
 import { toast } from "sonner";
+
+// Stats card component
+const StatsCard = ({ 
+  icon, 
+  title, 
+  count, 
+  loading, 
+  color,
+  path 
+}: { 
+  icon: React.ReactNode, 
+  title: string, 
+  count: number,
+  loading: boolean,
+  color: string,
+  path: string
+}) => {
+  return (
+    <Card className="transition-all duration-300 hover:shadow-md">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-medium text-gray-500">{title}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="flex items-center">
+          <div className={`h-8 w-8 ${color} mr-3 rounded-full flex items-center justify-center`}>
+            {icon}
+          </div>
+          {loading ? (
+            <Skeleton className="h-10 w-20" />
+          ) : (
+            <div className="text-2xl font-bold">{count}</div>
+          )}
+        </div>
+      </CardContent>
+      <CardFooter className="pt-0 pb-3">
+        <Link 
+          to={path}
+          className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
+        >
+          View details
+          <ArrowUpRight className="h-3 w-3 ml-1" />
+        </Link>
+      </CardFooter>
+    </Card>
+  );
+};
+
+// Quick action card component
+const QuickActionCard = ({ 
+  icon, 
+  title, 
+  path 
+}: { 
+  icon: React.ReactNode, 
+  title: string, 
+  path: string 
+}) => {
+  return (
+    <Link 
+      to={path} 
+      className="bg-gray-50 hover:bg-gray-100 p-4 rounded-lg border border-gray-200 
+                flex items-center transition-colors hover:shadow-sm"
+    >
+      {icon}
+      <span className="text-gray-800 font-medium ml-3">{title}</span>
+    </Link>
+  );
+};
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({
     articlesCount: 0,
     eventsCount: 0,
     galleryCount: 0,
+    usersCount: 0,
+    loading: true
+  });
+
+  const [recentActivity, setRecentActivity] = useState({
+    articles: [],
+    events: [],
     loading: true
   });
 
@@ -34,14 +109,21 @@ export default function AdminDashboard() {
           .from('gallery_images')
           .select('*', { count: 'exact', head: true });
 
+        // Fetch users count
+        const { count: usersCount, error: usersError } = await supabase
+          .from('profiles')
+          .select('*', { count: 'exact', head: true });
+
         if (articlesError) console.error("Error fetching articles:", articlesError);
         if (eventsError) console.error("Error fetching events:", eventsError);
         if (galleryError) console.error("Error fetching gallery:", galleryError);
+        if (usersError) console.error("Error fetching users:", usersError);
 
         setStats({
           articlesCount: articlesCount || 0,
           eventsCount: eventsCount || 0,
           galleryCount: galleryCount || 0,
+          usersCount: usersCount || 0,
           loading: false
         });
       } catch (error) {
@@ -51,91 +133,224 @@ export default function AdminDashboard() {
       }
     }
 
+    async function fetchRecentActivity() {
+      try {
+        // Fetch recent articles
+        const { data: recentArticles, error: articlesError } = await supabase
+          .from('articles')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(5);
+
+        // Fetch recent events
+        const { data: recentEvents, error: eventsError } = await supabase
+          .from('events')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(5);
+
+        if (articlesError) console.error("Error fetching recent articles:", articlesError);
+        if (eventsError) console.error("Error fetching recent events:", eventsError);
+
+        setRecentActivity({
+          articles: recentArticles || [],
+          events: recentEvents || [],
+          loading: false
+        });
+      } catch (error) {
+        console.error("Error fetching recent activity:", error);
+        toast.error("Failed to load recent activity");
+        setRecentActivity(prev => ({ ...prev, loading: false }));
+      }
+    }
+
     fetchStats();
+    fetchRecentActivity();
   }, []);
 
   return (
     <AdminLayout title="Dashboard">
-      <h2 className="text-xl font-semibold mb-4">Overview</h2>
+      {/* Welcome section */}
+      <div className="bg-white p-6 rounded-lg shadow-sm mb-8 border border-gray-100">
+        <h2 className="text-2xl font-semibold mb-2">Welcome to Admin Dashboard</h2>
+        <p className="text-gray-600">
+          Manage your website content, monitor activity, and keep everything up to date.
+        </p>
+      </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Articles Stats */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">Articles</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center">
-              <FileText className="h-8 w-8 text-blue-500 mr-3" />
-              {stats.loading ? (
-                <Skeleton className="h-10 w-20" />
-              ) : (
-                <div className="text-2xl font-bold">{stats.articlesCount}</div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Events Stats */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">Events</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center">
-              <CalendarDays className="h-8 w-8 text-orange mr-3" />
-              {stats.loading ? (
-                <Skeleton className="h-10 w-20" />
-              ) : (
-                <div className="text-2xl font-bold">{stats.eventsCount}</div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Gallery Stats */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">Gallery Images</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center">
-              <ImageIcon className="h-8 w-8 text-purple-500 mr-3" />
-              {stats.loading ? (
-                <Skeleton className="h-10 w-20" />
-              ) : (
-                <div className="text-2xl font-bold">{stats.galleryCount}</div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+      {/* Stats section */}
+      <h3 className="text-lg font-medium text-gray-800 mb-4">Overview</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <StatsCard 
+          icon={<FileText className="h-5 w-5 text-white" />} 
+          title="Articles" 
+          count={stats.articlesCount} 
+          loading={stats.loading}
+          color="bg-blue-500"
+          path="/admin/articles"
+        />
+        
+        <StatsCard 
+          icon={<CalendarDays className="h-5 w-5 text-white" />} 
+          title="Events" 
+          count={stats.eventsCount} 
+          loading={stats.loading}
+          color="bg-orange"
+          path="/admin/events"
+        />
+        
+        <StatsCard 
+          icon={<ImageIcon className="h-5 w-5 text-white" />} 
+          title="Gallery Images" 
+          count={stats.galleryCount} 
+          loading={stats.loading}
+          color="bg-purple-500"
+          path="/admin/gallery"
+        />
+        
+        <StatsCard 
+          icon={<Users className="h-5 w-5 text-white" />} 
+          title="Users" 
+          count={stats.usersCount} 
+          loading={stats.loading}
+          color="bg-green-500"
+          path="/admin"
+        />
       </div>
 
-      <div className="mt-8">
-        <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <Link 
-            to="/admin/articles" 
-            className="bg-gray-50 hover:bg-gray-100 p-4 rounded-lg border border-gray-200 flex items-center transition-colors"
-          >
-            <FileText className="h-6 w-6 text-blue-500 mr-3" />
-            <span className="text-gray-800 font-medium">Manage Articles</span>
-          </Link>
-          <Link 
-            to="/admin/events" 
-            className="bg-gray-50 hover:bg-gray-100 p-4 rounded-lg border border-gray-200 flex items-center transition-colors"
-          >
-            <CalendarDays className="h-6 w-6 text-orange mr-3" />
-            <span className="text-gray-800 font-medium">Manage Events</span>
-          </Link>
-          <Link 
-            to="/admin/gallery" 
-            className="bg-gray-50 hover:bg-gray-100 p-4 rounded-lg border border-gray-200 flex items-center transition-colors"
-          >
-            <ImageIcon className="h-6 w-6 text-purple-500 mr-3" />
-            <span className="text-gray-800 font-medium">Manage Gallery</span>
-          </Link>
-        </div>
+      {/* Quick Actions */}
+      <h3 className="text-lg font-medium text-gray-800 mb-4">Quick Actions</h3>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <QuickActionCard 
+          icon={<FileText className="h-5 w-5 text-blue-500" />} 
+          title="Create New Article" 
+          path="/admin/articles"
+        />
+        
+        <QuickActionCard 
+          icon={<CalendarDays className="h-5 w-5 text-orange" />} 
+          title="Schedule New Event" 
+          path="/admin/events"
+        />
+        
+        <QuickActionCard 
+          icon={<ImageIcon className="h-5 w-5 text-purple-500" />} 
+          title="Upload Images" 
+          path="/admin/gallery"
+        />
+      </div>
+
+      {/* Recent Activity */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Recent Articles */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Recent Articles</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {recentActivity.loading ? (
+              <div className="space-y-3">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="flex items-center">
+                    <Skeleton className="h-12 w-12 rounded mr-3" />
+                    <div className="space-y-2 flex-1">
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-3/4" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : recentActivity.articles.length === 0 ? (
+              <div className="text-center py-6 text-gray-500">
+                No articles created yet
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {recentActivity.articles.map((article: any) => (
+                  <div 
+                    key={article.id} 
+                    className="flex items-start p-3 hover:bg-gray-50 rounded-lg transition-colors"
+                  >
+                    <div 
+                      className="h-12 w-12 bg-cover bg-center rounded mr-3 flex-shrink-0"
+                      style={{ backgroundImage: `url(${article.image})` }}
+                    />
+                    <div>
+                      <h4 className="font-medium text-gray-900 line-clamp-1">{article.title}</h4>
+                      <p className="text-sm text-gray-500">
+                        {new Date(article.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+          <CardFooter>
+            <Link 
+              to="/admin/articles" 
+              className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
+            >
+              View all articles
+              <ArrowUpRight className="h-3 w-3 ml-1" />
+            </Link>
+          </CardFooter>
+        </Card>
+
+        {/* Recent Events */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Recent Events</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {recentActivity.loading ? (
+              <div className="space-y-3">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="flex items-center">
+                    <Skeleton className="h-12 w-12 rounded mr-3" />
+                    <div className="space-y-2 flex-1">
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-3/4" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : recentActivity.events.length === 0 ? (
+              <div className="text-center py-6 text-gray-500">
+                No events created yet
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {recentActivity.events.map((event: any) => (
+                  <div 
+                    key={event.id} 
+                    className="flex items-start p-3 hover:bg-gray-50 rounded-lg transition-colors"
+                  >
+                    <div 
+                      className="h-12 w-12 bg-cover bg-center rounded mr-3 flex-shrink-0"
+                      style={{ backgroundImage: `url(${event.image})` }}
+                    />
+                    <div>
+                      <h4 className="font-medium text-gray-900 line-clamp-1">{event.title}</h4>
+                      <p className="text-sm text-gray-500">
+                        {event.date} · {event.time}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+          <CardFooter>
+            <Link 
+              to="/admin/events" 
+              className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
+            >
+              View all events
+              <ArrowUpRight className="h-3 w-3 ml-1" />
+            </Link>
+          </CardFooter>
+        </Card>
       </div>
     </AdminLayout>
   );

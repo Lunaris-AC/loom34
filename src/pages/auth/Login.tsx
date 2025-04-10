@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Input } from "@/components/ui/input";
@@ -12,10 +12,20 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const { signIn } = useAuth();
+  const [initialLoad, setInitialLoad] = useState(true);
+  const { user, signIn } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
+
+  // Check if user is already logged in
+  useEffect(() => {
+    if (user && initialLoad) {
+      // If the user is already logged in, redirect to the previous page or home
+      navigate(from, { replace: true });
+    }
+    setInitialLoad(false);
+  }, [user, navigate, from, initialLoad]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -35,6 +45,41 @@ export default function Login() {
       setLoading(false);
     }
   };
+
+  // Don't render the login form if still checking authentication status
+  if (initialLoad) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-tan/10">
+        <div className="w-16 h-16 border-4 border-brown/20 border-t-brown rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  // Don't render the login form if user is already logged in
+  if (user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-tan/10">
+        <div className="container max-w-md px-4 text-center">
+          <Card>
+            <CardHeader className="space-y-1">
+              <CardTitle className="text-2xl font-bold">Already Signed In</CardTitle>
+              <CardDescription>
+                You are already signed in as {user.email}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button 
+                className="w-full mt-4" 
+                onClick={() => navigate(from, { replace: true })}
+              >
+                Continue to {from === "/" ? "Home" : from}
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-tan/10">

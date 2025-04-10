@@ -5,6 +5,10 @@ import { Facebook, Instagram, Twitter, Linkedin, Mail, Phone, MapPin, Heart } fr
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   
+  // HelloAsso URLs
+  const SHOP_URL = "https://www.helloasso.com/associations/your-association/boutiques/shop";
+  const MEMBERSHIP_URL = "https://www.helloasso.com/associations/your-association/adhesions/membership";
+  
   return (
     <footer className="bg-brown text-white">
       {/* Main Footer */}
@@ -116,6 +120,20 @@ const SocialLink = ({ href, children, ...props }) => {
 };
 
 const FooterLink = ({ to, children }) => {
+  // Check if it's an external link (starts with http or https)
+  if (to === '/shop' || to === '/membership') {
+    // These are special routes handled by our ExternalRedirect component
+    return (
+      <Link 
+        to={to}
+        className="text-tan/90 hover:text-white transition-colors duration-200 block"
+      >
+        {children}
+      </Link>
+    );
+  }
+  
+  // Normal internal link
   return (
     <Link 
       to={to} 
