@@ -23,7 +23,7 @@ import {
 import { CreateUserForm } from "@/components/admin/CreateUserForm";
 import { UserActions } from "@/components/admin/UserActions";
 
-export default function Users() {
+export default function AdminUsers() {
   const { toast } = useToast();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   

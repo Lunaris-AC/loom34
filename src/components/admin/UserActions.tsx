@@ -10,7 +10,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   DropdownMenu,
@@ -34,16 +33,17 @@ export function UserActions({ profile }: UserActionsProps) {
 
   const handleSendPasswordReset = async () => {
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(profile.email || '', {
-        redirectTo: `${window.location.origin}/auth/reset-password`,
-      });
-
-      if (error) throw error;
-
       toast({
-        title: "Success",
-        description: "Password reset email sent",
+        title: "Information",
+        description: "Password reset functionality requires admin API access. Please implement this in a server-side function.",
       });
+      
+      // In a real implementation with proper server-side function:
+      // const { error } = await supabase.functions.invoke('reset-user-password', {
+      //   body: { userId: profile.id }
+      // });
+      // if (error) throw error;
+      
     } catch (error: any) {
       toast({
         title: "Error",
@@ -62,9 +62,9 @@ export function UserActions({ profile }: UserActionsProps) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DialogTrigger asChild>
-            <DropdownMenuItem>Edit User</DropdownMenuItem>
-          </DialogTrigger>
+          <DropdownMenuItem onSelect={() => setIsEditDialogOpen(true)}>
+            Edit User
+          </DropdownMenuItem>
           <DropdownMenuItem onSelect={handleSendPasswordReset}>
             Send Password Reset
           </DropdownMenuItem>
