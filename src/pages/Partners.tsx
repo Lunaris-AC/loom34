@@ -14,7 +14,7 @@ const partnersList = [
     type: "Bar"
   },
   {
-    name: "Rainbow Foundation",
+    name: "Le Mercury Bar",
     logo: "https://mcfiles.inferi.fr/api/public/dl/5pAFPUct?inline=true",
     description: "Pinte de blonde 5€, bière spéciale à 6,50€",
     website: "https://www.instagram.com/lemercurybar/",
