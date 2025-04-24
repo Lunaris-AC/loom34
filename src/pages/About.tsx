@@ -236,7 +236,7 @@ const About = () => {
             <div className="bg-white rounded-xl shadow-sm overflow-hidden hover-lift transition-all duration-300">
               <div className="aspect-square">
                 <img 
-                  src="https://mcfiles.inferi.fr/share/hH8msW18" 
+                  src="https://mcfiles.inferi.fr/api/public/dl/hH8msW18?inline=true" 
                   alt="Franck" 
                   className="w-full h-full object-cover"
                 />
@@ -290,7 +290,7 @@ const About = () => {
             <div className="bg-white rounded-xl shadow-sm overflow-hidden hover-lift transition-all duration-300">
               <div className="aspect-square">
                 <img 
-                  src="https://mcfiles.inferi.fr/share/PIZdu2pA" 
+                  src="https://mcfiles.inferi.fr/api/public/dl/PIZdu2pA?inline=true" 
                   alt="Étienne" 
                   className="w-full h-full object-cover"
                 />
