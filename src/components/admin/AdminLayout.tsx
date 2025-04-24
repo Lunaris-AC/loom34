@@ -1,4 +1,3 @@
-
 import { ReactNode, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -11,7 +10,8 @@ import {
   Image as ImageIcon,
   LogOut,
   Menu,
-  X
+  X,
+  Users
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
@@ -51,6 +51,11 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
       title: "Gallery",
       href: "/admin/gallery",
       icon: <ImageIcon className="h-5 w-5 mr-2" />,
+    },
+    {
+      title: "Users",
+      href: "/admin/users",
+      icon: <Users className="h-5 w-5 mr-2" />,
     },
   ];
 

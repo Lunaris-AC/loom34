@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -74,6 +73,7 @@ const App = () => {
               <Route path="/admin/articles" element={<RequireAuth><RequireAdmin><AdminArticles /></RequireAdmin></RequireAuth>} />
               <Route path="/admin/events" element={<RequireAuth><RequireAdmin><AdminEvents /></RequireAdmin></RequireAuth>} />
               <Route path="/admin/gallery" element={<RequireAuth><RequireAdmin><AdminGallery /></RequireAdmin></RequireAuth>} />
+              <Route path="/admin/users" element={<RequireAuth><RequireAdmin><AdminUsers /></RequireAdmin></RequireAuth>} />
               
               {/* Catch-all route */}
               <Route path="*" element={<NotFound />} />
