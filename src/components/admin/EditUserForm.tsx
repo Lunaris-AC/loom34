@@ -82,7 +82,7 @@ export function EditUserForm({ profile, onSuccess }: EditUserFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
           control={form.control}
           name="username"
@@ -90,7 +90,7 @@ export function EditUserForm({ profile, onSuccess }: EditUserFormProps) {
             <FormItem>
               <FormLabel>Username</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input {...field} className="w-full" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -104,7 +104,7 @@ export function EditUserForm({ profile, onSuccess }: EditUserFormProps) {
             <FormItem>
               <FormLabel>Full Name</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input {...field} className="w-full" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -115,22 +115,26 @@ export function EditUserForm({ profile, onSuccess }: EditUserFormProps) {
           control={form.control}
           name="is_admin"
           render={({ field }) => (
-            <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+            <FormItem className="flex flex-row items-center space-x-3 space-y-0 rounded-md border p-4">
               <FormControl>
                 <Checkbox
                   checked={field.value}
                   onCheckedChange={field.onChange}
                 />
               </FormControl>
-              <FormLabel>Is Admin</FormLabel>
+              <div className="space-y-1 leading-none">
+                <FormLabel>Administrator</FormLabel>
+              </div>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? "Saving..." : "Save Changes"}
-        </Button>
+        <div className="flex justify-end space-x-4">
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? "Saving..." : "Save Changes"}
+          </Button>
+        </div>
       </form>
     </Form>
   );
