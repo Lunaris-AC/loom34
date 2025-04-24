@@ -48,7 +48,7 @@ const About = () => {
             </div>
             <div className="rounded-2xl overflow-hidden shadow-xl">
               <img 
-                src="https://images.unsplash.com/photo-1517457373958-b7bdd4587205?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" 
+                src="https://mcfiles.inferi.fr/api/public/dl/IDTLBxnE?inline=true" 
                 alt="Community gathering" 
                 className="w-full h-full object-cover"
               />
