@@ -128,7 +128,7 @@ const About = () => {
             <div className="bg-white rounded-xl shadow-sm overflow-hidden hover-lift transition-all duration-300">
               <div className="aspect-square">
                 <img 
-                  src="https://media.discordapp.net/attachments/1335572571495731242/1359936543543787700/thumbnail_1000049138.jpg?ex=67f94b1a&is=67f7f99a&hm=5543b4fcce7b6cb13e85edae749c874e3abed97319eb2f43a9e68f47400bc491&=&format=webp&width=483&height=483" 
+                  src="https://mcfiles.inferi.fr/api/public/dl/k9Janer6?inline=true" 
                   alt="Stephane" 
                   className="w-full h-full object-cover"
                 />
@@ -146,7 +146,7 @@ const About = () => {
             <div className="bg-white rounded-xl shadow-sm overflow-hidden hover-lift transition-all duration-300">
               <div className="aspect-square">
                 <img 
-                  src="https://media.discordapp.net/attachments/1335572571495731242/1359936541660811448/thumbnail_1000048986.jpg?ex=67f94b19&is=67f7f999&hm=b6f0025dc0dec2f295c999e6c1ba5c8657b20bd1fa2a63e31d8f26b334097b20&=&format=webp" 
+                  src="https://mcfiles.inferi.fr/api/public/dl/NQtPsDEF?inline=true" 
                   alt="Jean-Louis" 
                   className="w-full h-full object-cover"
                 />
@@ -164,7 +164,7 @@ const About = () => {
             <div className="bg-white rounded-xl shadow-sm overflow-hidden hover-lift transition-all duration-300">
               <div className="aspect-square">
                 <img 
-                  src="https://media.discordapp.net/attachments/1335572571495731242/1359936540687597608/1000049074.jpg?ex=67f94b19&is=67f7f999&hm=3ad363a25fc1897176bcc39c5b02f7cd080471584ed1b7eac183b8b208e906bc&=&format=webp&width=648&height=864" 
+                  src="https://mcfiles.inferi.fr/api/public/dl/MvotYu7L?inline=true" 
                   alt="Marc" 
                   className="w-full h-full object-cover"
                 />
@@ -182,7 +182,7 @@ const About = () => {
             <div className="bg-white rounded-xl shadow-sm overflow-hidden hover-lift transition-all duration-300">
               <div className="aspect-square">
                 <img 
-                  src="https://media.discordapp.net/attachments/1335572571495731242/1359936543950901369/thumbnail_1000049202.jpg?ex=67f94b1a&is=67f7f99a&hm=16f1ebb2ab46020fd0369cdc970378fab5aced61c75a1de90f814c79108629c2&=&format=webp" 
+                  src="https://mcfiles.inferi.fr/api/public/dl/MoeBJVNs?inline=true" 
                   alt="Pascal" 
                   className="w-full h-full object-cover"
                 />
@@ -200,7 +200,7 @@ const About = () => {
             <div className="bg-white rounded-xl shadow-sm overflow-hidden hover-lift transition-all duration-300">
               <div className="aspect-square">
                 <img 
-                  src="https://cdn.discordapp.com/attachments/1335572571495731242/1359946118741360720/flo.png?ex=67f95405&is=67f80285&hm=41aea261c6203b8ae96904353bb0510a60955e9d8e6e894af7ad431b2bd202f4&" 
+                  src="https://mcfiles.inferi.fr/api/public/dl/ZlJxFuwv?inline=true" 
                   alt="Florent" 
                   className="w-full h-full object-cover"
                 />
@@ -218,7 +218,7 @@ const About = () => {
             <div className="bg-white rounded-xl shadow-sm overflow-hidden hover-lift transition-all duration-300">
               <div className="aspect-square">
                 <img 
-                  src="https://cdn.discordapp.com/attachments/1335572571495731242/1359936542730359077/thumbnail_1000049118.jpg?ex=67f94b1a&is=67f7f99a&hm=7a398519695275068477f9c1e886a5a786426d11885c92450dc2f1ffb74cc96b&" 
+                  src="https://mcfiles.inferi.fr/api/public/dl/SCyycrc6?inline=true" 
                   alt="Jean-Luc" 
                   className="w-full h-full object-cover"
                 />
@@ -236,7 +236,7 @@ const About = () => {
             <div className="bg-white rounded-xl shadow-sm overflow-hidden hover-lift transition-all duration-300">
               <div className="aspect-square">
                 <img 
-                  src="https://cdn.discordapp.com/attachments/1335572571495731242/1359936544483573981/1000049203.jpg?ex=67f94b1a&is=67f7f99a&hm=783bd8d4fb40bfd39c367316f7d72ff4915e1ee6b7a6acdd9ca18da9444705b8&" 
+                  src="https://mcfiles.inferi.fr/share/hH8msW18" 
                   alt="Franck" 
                   className="w-full h-full object-cover"
                 />
@@ -254,7 +254,7 @@ const About = () => {
             <div className="bg-white rounded-xl shadow-sm overflow-hidden hover-lift transition-all duration-300">
               <div className="aspect-square">
                 <img 
-                  src="https://cdn.discordapp.com/attachments/1335572571495731242/1359936542155473128/1000048985.jpg?ex=67f94b1a&is=67f7f99a&hm=a7e1e06a21dc38c5296c5c746eef75c898d081455166673784a8117e29464113&" 
+                  src="https://mcfiles.inferi.fr/api/public/dl/GcO8vG8l?inline=true" 
                   alt="Sylfried" 
                   className="w-full h-full object-cover"
                 />
@@ -272,7 +272,7 @@ const About = () => {
             <div className="bg-white rounded-xl shadow-sm overflow-hidden hover-lift transition-all duration-300">
               <div className="aspect-square">
                 <img 
-                  src="https://cdn.discordapp.com/attachments/1335572571495731242/1359936547931033800/thumbnail_1000049117.jpg?ex=67f94b1b&is=67f7f99b&hm=43546bd426167fa2f60cb8e99f9cf1747ed4307f79476385ba98bc92d003aa02&" 
+                  src="https://mcfiles.inferi.fr/api/public/dl/hb_-0wLM?inline=true" 
                   alt="Henri" 
                   className="w-full h-full object-cover"
                 />
@@ -290,7 +290,7 @@ const About = () => {
             <div className="bg-white rounded-xl shadow-sm overflow-hidden hover-lift transition-all duration-300">
               <div className="aspect-square">
                 <img 
-                  src="https://cdn.discordapp.com/attachments/1335572571495731242/1359936541132324914/thumbnail_1000048987.jpg?ex=67f94b19&is=67f7f999&hm=94d6f0fa95d643b2d06ff4594304514bc9266c955fb20f6109ac5e7bbd2da68d&" 
+                  src="https://mcfiles.inferi.fr/share/PIZdu2pA" 
                   alt="Étienne" 
                   className="w-full h-full object-cover"
                 />
