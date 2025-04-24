@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -20,6 +21,7 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import AdminArticles from "./pages/admin/Articles";
 import AdminEvents from "./pages/admin/Events";
 import AdminGallery from "./pages/admin/Gallery";
+import AdminUsers from "./pages/admin/Users"; // Import the AdminUsers component
 import RequireAuth from "./components/auth/RequireAuth";
 import RequireAdmin from "./components/auth/RequireAdmin";
 import ArticleDetail from "./pages/ArticleDetail";
