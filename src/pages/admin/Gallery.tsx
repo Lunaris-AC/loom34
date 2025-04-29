@@ -120,16 +120,26 @@ export default function Gallery() {
 
   const uploadImageMutation = useMutation({
     mutationFn: async ({ file, albumId }: { file: File; albumId: string | null }) => {
-      console.log('Starting upload for file:', file.name);
-      
-      // Upload file to storage
+      if (!user?.id) {
+        throw new Error("Utilisateur non connecté");
+      }
+
+      // Vérifier la taille du fichier (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        throw new Error("Le fichier est trop volumineux (max 10MB)");
+      }
+
+      // Vérifier le type de fichier
+      if (!file.type.startsWith('image/')) {
+        throw new Error("Le fichier doit être une image");
+      }
+
       const fileExt = file.name.split('.').pop();
       const fileName = `${Math.random()}.${fileExt}`;
-      const filePath = `${user?.id}/${albumId || 'unclassified'}/${fileName}`;
+      const filePath = `${user.id}/${albumId || 'unclassified'}/${fileName}`;
 
-      console.log('Uploading to path:', filePath);
-      
       try {
+        // Upload vers le stockage
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from('images')
           .upload(filePath, file, {
@@ -138,52 +148,48 @@ export default function Gallery() {
           });
 
         if (uploadError) {
-          console.error('Upload error:', uploadError);
-          throw uploadError;
+          console.error('Erreur upload:', uploadError);
+          throw new Error(`Erreur lors de l'upload: ${uploadError.message}`);
         }
 
-        console.log('Upload successful:', uploadData);
-
-        // Get public URL
+        // Obtenir l'URL publique
         const { data: { publicUrl } } = supabase.storage
           .from('images')
           .getPublicUrl(filePath);
 
-        console.log('Got public URL:', publicUrl);
-
-        // Create image record
+        // Créer l'enregistrement dans la base de données
         const { data: insertData, error: insertError } = await supabase
           .from('gallery_images')
           .insert({
             title: file.name,
             image_url: publicUrl,
             album_id: albumId,
-            author_id: user?.id,
+            author_id: user.id,
             category: 'default'
           })
           .select()
           .single();
 
         if (insertError) {
-          console.error('Insert error:', insertError);
-          throw insertError;
+          // Si l'insertion échoue, supprimer le fichier uploadé
+          await supabase.storage
+            .from('images')
+            .remove([filePath]);
+          throw new Error(`Erreur lors de l'enregistrement: ${insertError.message}`);
         }
 
-        console.log('Image uploaded and recorded successfully:', insertData);
         return insertData;
-      } catch (error) {
-        console.error('Error in upload process:', error);
+      } catch (error: any) {
+        console.error('Erreur dans le processus d\'upload:', error);
         throw error;
       }
     },
     onSuccess: (data) => {
-      console.log('Mutation successful:', data);
       queryClient.invalidateQueries({ queryKey: ['galleryImages'] });
       toast.success("Image ajoutée avec succès");
     },
     onError: (error: any) => {
-      console.error('Mutation error:', error);
-      toast.error("Erreur lors de l'ajout de l'image: " + error.message);
+      toast.error(error.message || "Erreur lors de l'ajout de l'image");
     }
   });
 
@@ -193,7 +199,7 @@ export default function Gallery() {
         .from('gallery_images')
         .update({ album_id: newAlbumId })
         .eq('id', imageId);
-
+        
       if (error) throw error;
     },
     onSuccess: () => {
@@ -280,13 +286,13 @@ export default function Gallery() {
         {/* Sidebar */}
         <div className="w-64 border-r p-4 space-y-4">
           <Dialog open={isCreatingAlbum} onOpenChange={setIsCreatingAlbum}>
-            <DialogTrigger asChild>
+              <DialogTrigger asChild>
               <Button className="w-full">
-                <Plus className="h-4 w-4 mr-2" />
+                  <Plus className="h-4 w-4 mr-2" />
                 Nouvel Album
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
               <div className="space-y-4">
                 <Label>Nom de l'album</Label>
                 <Input
@@ -301,17 +307,17 @@ export default function Gallery() {
                   Créer
                 </Button>
               </div>
-            </DialogContent>
-          </Dialog>
+              </DialogContent>
+            </Dialog>
 
           <div className="space-y-2">
-            <Button
+                  <Button 
               variant={showUnclassified ? "default" : "ghost"}
               className="w-full justify-start relative"
-              onClick={() => {
+                    onClick={() => {
                 setShowUnclassified(true);
-                setSelectedAlbum(null);
-              }}
+                      setSelectedAlbum(null);
+                    }}
               onDragOver={(e) => {
                 e.preventDefault();
                 e.currentTarget.classList.add('bg-gray-100');
@@ -338,11 +344,11 @@ export default function Gallery() {
             </Button>
 
             {albums.map(album => (
-              <Button
+                <Button 
                 key={album.id}
                 variant={selectedAlbum?.id === album.id ? "default" : "ghost"}
                 className="w-full justify-start relative"
-                onClick={() => {
+                  onClick={() => {
                   setSelectedAlbum(album);
                   setShowUnclassified(false);
                 }}
@@ -393,8 +399,8 @@ export default function Gallery() {
               e.preventDefault();
               e.currentTarget.classList.remove('bg-gray-50');
               handleFileDrop(e);
-            }}
-          >
+                  }}
+                >
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
                 <ImageIcon className="h-12 w-12 mx-auto text-gray-400" />
@@ -416,7 +422,7 @@ export default function Gallery() {
                 >
                   Ou sélectionnez des fichiers
                 </Button>
-              </div>
+          </div>
             </div>
           </div>
 

@@ -77,7 +77,7 @@ const EventCard = ({
             <Link to={`/events/${slug}`} aria-label={`Voir les détails de l'événement : ${title}`}>
               <Info className="w-4 h-4 mr-2" />
               Plus d'infos
-            </Link>
+          </Link>
           </Button>
           {registrationUrl && (
             <Button
@@ -88,8 +88,8 @@ const EventCard = ({
             >
               <Link
                 to={registrationUrl}
-                target="_blank"
-                rel="noopener noreferrer"
+              target="_blank"
+              rel="noopener noreferrer"
                 aria-label={`S'inscrire à l'événement : ${title}`}
               >
                 <Ticket className="w-4 h-4 mr-2" />

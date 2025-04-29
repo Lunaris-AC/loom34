@@ -154,7 +154,7 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
               Se déconnecter
             </Button>
             <Button variant="ghost" className="mt-2 w-full justify-start" onClick={() => window.location.href = "/"}>
-              <ChevronLeft className="h-5 w-5 mr-2" />
+                <ChevronLeft className="h-5 w-5 mr-2" />
               Retour au site
             </Button>
           </div>

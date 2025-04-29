@@ -174,7 +174,7 @@ const Gallery = () => {
                       <div className="p-6">
                         <h3 className="text-xl font-bold mb-2">{album.title}</h3>
                         <p className="text-gray-600 mb-3">{album.description}</p>
-                        <div className="flex items-center justify-between text-sm">
+                        <div className="flex items-center justify-between tesxt-sm">
                           <span className="text-gray-500">{album.date}</span>
                           <span className="bg-tan/20 text-brown px-2 py-1 rounded-full">
                             {album.image_count} Photos
