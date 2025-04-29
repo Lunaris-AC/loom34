@@ -1,12 +1,12 @@
-
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
-import { FileText, CalendarDays, Image as ImageIcon, Users, ArrowUpRight } from "lucide-react";
+import { FileText, CalendarDays, Image as ImageIcon, Users, ArrowUpRight, MessageSquare } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
 
 // Stats card component
 const StatsCard = ({ 
@@ -82,6 +82,7 @@ export default function AdminDashboard() {
     eventsCount: 0,
     galleryCount: 0,
     usersCount: 0,
+    ticketsCount: 0,
     loading: true
   });
 
@@ -89,6 +90,19 @@ export default function AdminDashboard() {
     articles: [],
     events: [],
     loading: true
+  });
+
+  // Fetch tickets count
+  const { data: ticketsData } = useQuery({
+    queryKey: ['ticketsCount'],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from('contact_tickets')
+        .select('*', { count: 'exact', head: true });
+      
+      if (error) throw error;
+      return count;
+    }
   });
 
   useEffect(() => {
@@ -124,6 +138,7 @@ export default function AdminDashboard() {
           eventsCount: eventsCount || 0,
           galleryCount: galleryCount || 0,
           usersCount: usersCount || 0,
+          ticketsCount: ticketsData || 0,
           loading: false
         });
       } catch (error) {
@@ -166,20 +181,20 @@ export default function AdminDashboard() {
 
     fetchStats();
     fetchRecentActivity();
-  }, []);
+  }, [ticketsData]);
 
   return (
     <AdminLayout title="Dashboard">
       {/* Welcome section */}
       <div className="bg-white p-6 rounded-lg shadow-sm mb-8 border border-gray-100">
-        <h2 className="text-2xl font-semibold mb-2">Welcome to Admin Dashboard</h2>
+        <h2 className="text-2xl font-semibold mb-2">Bienvenue sur le tableau de bord</h2>
         <p className="text-gray-600">
-          Manage your website content, monitor activity, and keep everything up to date.
+          Gérez le contenu de votre site, surveillez l'activité et gardez tout à jour.
         </p>
       </div>
       
       {/* Stats section */}
-      <h3 className="text-lg font-medium text-gray-800 mb-4">Overview</h3>
+      <h3 className="text-lg font-medium text-gray-800 mb-4">Vue d'ensemble</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <StatsCard 
           icon={<FileText className="h-5 w-5 text-white" />} 
@@ -192,7 +207,7 @@ export default function AdminDashboard() {
         
         <StatsCard 
           icon={<CalendarDays className="h-5 w-5 text-white" />} 
-          title="Events" 
+          title="Événements" 
           count={stats.eventsCount} 
           loading={stats.loading}
           color="bg-orange"
@@ -201,7 +216,7 @@ export default function AdminDashboard() {
         
         <StatsCard 
           icon={<ImageIcon className="h-5 w-5 text-white" />} 
-          title="Gallery Images" 
+          title="Photos" 
           count={stats.galleryCount} 
           loading={stats.loading}
           color="bg-purple-500"
@@ -210,42 +225,57 @@ export default function AdminDashboard() {
         
         <StatsCard 
           icon={<Users className="h-5 w-5 text-white" />} 
-          title="Users" 
+          title="Utilisateurs" 
           count={stats.usersCount} 
           loading={stats.loading}
           color="bg-green-500"
-          path="/admin"
+          path="/admin/users"
+        />
+
+        <StatsCard 
+          icon={<MessageSquare className="h-5 w-5 text-white" />} 
+          title="Tickets" 
+          count={stats.ticketsCount} 
+          loading={stats.loading}
+          color="bg-red-500"
+          path="/admin/tickets"
         />
       </div>
 
       {/* Quick Actions */}
-      <h3 className="text-lg font-medium text-gray-800 mb-4">Quick Actions</h3>
+      <h3 className="text-lg font-medium text-gray-800 mb-4">Actions rapides</h3>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <QuickActionCard 
           icon={<FileText className="h-5 w-5 text-blue-500" />} 
-          title="Create New Article" 
+          title="Créer un article" 
           path="/admin/articles"
         />
         
         <QuickActionCard 
           icon={<CalendarDays className="h-5 w-5 text-orange" />} 
-          title="Schedule New Event" 
+          title="Planifier un événement" 
           path="/admin/events"
         />
         
         <QuickActionCard 
           icon={<ImageIcon className="h-5 w-5 text-purple-500" />} 
-          title="Upload Images" 
+          title="Ajouter des photos" 
           path="/admin/gallery"
+        />
+
+        <QuickActionCard 
+          icon={<MessageSquare className="h-5 w-5 text-red-500" />} 
+          title="Voir les tickets" 
+          path="/admin/tickets"
         />
       </div>
 
       {/* Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Recent Articles */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Recent Articles</CardTitle>
+            <CardTitle className="text-lg">Articles récents</CardTitle>
           </CardHeader>
           <CardContent>
             {recentActivity.loading ? (
@@ -262,7 +292,7 @@ export default function AdminDashboard() {
               </div>
             ) : recentActivity.articles.length === 0 ? (
               <div className="text-center py-6 text-gray-500">
-                No articles created yet
+                Aucun article créé pour le moment
               </div>
             ) : (
               <div className="space-y-3">
@@ -291,7 +321,7 @@ export default function AdminDashboard() {
               to="/admin/articles" 
               className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
             >
-              View all articles
+              Voir tous les articles
               <ArrowUpRight className="h-3 w-3 ml-1" />
             </Link>
           </CardFooter>
@@ -300,7 +330,7 @@ export default function AdminDashboard() {
         {/* Recent Events */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Recent Events</CardTitle>
+            <CardTitle className="text-lg">Événements récents</CardTitle>
           </CardHeader>
           <CardContent>
             {recentActivity.loading ? (
@@ -317,7 +347,7 @@ export default function AdminDashboard() {
               </div>
             ) : recentActivity.events.length === 0 ? (
               <div className="text-center py-6 text-gray-500">
-                No events created yet
+                Aucun événement créé pour le moment
               </div>
             ) : (
               <div className="space-y-3">
@@ -346,7 +376,7 @@ export default function AdminDashboard() {
               to="/admin/events" 
               className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
             >
-              View all events
+              Voir tous les événements
               <ArrowUpRight className="h-3 w-3 ml-1" />
             </Link>
           </CardFooter>

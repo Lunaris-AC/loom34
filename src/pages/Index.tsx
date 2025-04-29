@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, CalendarDays, ShoppingBag, Users, Image, Heart, ExternalLink } from 'lucide-react';
@@ -123,7 +122,7 @@ const Index = () => {
 
   // HelloAsso URLs
   const SHOP_URL = "https://www.helloasso.com/associations/your-association/boutiques/shop";
-  const MEMBERSHIP_URL = "https://www.helloasso.com/associations/your-association/adhesions/membership";
+  const MEMBERSHIP_URL = "https://www.helloasso.com/associations/association-les-ours-occitanie-mediterranee-loom/adhesions/adhesion-2024-2025";
 
   return (
     <div className="flex flex-col min-h-screen bg-tan/10">

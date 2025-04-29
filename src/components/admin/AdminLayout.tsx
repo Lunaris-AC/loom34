@@ -11,7 +11,8 @@ import {
   LogOut,
   Menu,
   X,
-  Users
+  Users,
+  MessageSquare
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
@@ -33,7 +34,7 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
 
   const menuItems = [
     {
-      title: "Dashboard",
+      title: "Tableau de bord",
       href: "/admin/dashboard",
       icon: <LayoutDashboard className="h-5 w-5 mr-2" />,
     },
@@ -43,19 +44,24 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
       icon: <FileText className="h-5 w-5 mr-2" />,
     },
     {
-      title: "Events",
+      title: "Événements",
       href: "/admin/events",
       icon: <CalendarDays className="h-5 w-5 mr-2" />,
     },
     {
-      title: "Gallery",
+      title: "Photos",
       href: "/admin/gallery",
       icon: <ImageIcon className="h-5 w-5 mr-2" />,
     },
     {
-      title: "Users",
+      title: "Utilisateurs",
       href: "/admin/users",
       icon: <Users className="h-5 w-5 mr-2" />,
+    },
+    {
+      title: "Tickets",
+      href: "/admin/tickets",
+      icon: <MessageSquare className="h-5 w-5 mr-2" />,
     },
   ];
 
@@ -70,7 +76,10 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
               ? "bg-brown text-white font-medium"
               : "text-gray-700 hover:bg-tan/20"
           }`}
-          onClick={() => setOpen(false)}
+          onClick={() => {
+            setOpen(false);
+            window.location.href = item.href;
+          }}
         >
           {item.icon}
           {item.title}
@@ -92,9 +101,9 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
           <SheetContent side="left" className="w-[240px] sm:w-[300px]">
             <div className="flex flex-col h-full">
               <div className="py-4 px-2">
-                <h2 className="text-lg font-bold text-brown mb-1">Admin Panel</h2>
+                <h2 className="text-lg font-bold text-brown mb-1">Panneau d'administration</h2>
                 <p className="text-sm text-gray-500">
-                  Logged in as {profile?.full_name || profile?.username || "Admin"}
+                  Connecté en tant que {profile?.full_name || profile?.username || "Admin"}
                 </p>
               </div>
               <div className="flex-1">
@@ -107,7 +116,7 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
                   onClick={handleSignOut}
                 >
                   <LogOut className="h-5 w-5 mr-2" />
-                  Sign out
+                  Se déconnecter
                 </Button>
               </div>
             </div>
@@ -117,7 +126,7 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
         <Button variant="ghost" size="sm" asChild>
           <Link to="/" className="flex items-center">
             <ChevronLeft className="h-4 w-4 mr-1" />
-            Back
+            Retour
           </Link>
         </Button>
       </header>
@@ -127,7 +136,7 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
         {/* Sidebar (desktop) */}
         <aside className="hidden md:flex md:w-64 flex-col bg-white border-r">
           <div className="p-6">
-            <h1 className="text-xl font-bold text-brown">Admin Panel</h1>
+            <h1 className="text-xl font-bold text-brown">Panneau d'administration</h1>
             <p className="text-sm text-gray-500 mt-1">
               {profile?.full_name || profile?.username || "Admin"}
             </p>
@@ -142,13 +151,11 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
               onClick={handleSignOut}
             >
               <LogOut className="h-5 w-5 mr-2" />
-              Sign out
+              Se déconnecter
             </Button>
-            <Button variant="ghost" className="mt-2 w-full justify-start" asChild>
-              <Link to="/">
-                <ChevronLeft className="h-5 w-5 mr-2" />
-                Back to site
-              </Link>
+            <Button variant="ghost" className="mt-2 w-full justify-start" onClick={() => window.location.href = "/"}>
+              <ChevronLeft className="h-5 w-5 mr-2" />
+              Retour au site
             </Button>
           </div>
         </aside>

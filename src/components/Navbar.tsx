@@ -35,14 +35,14 @@ const Navbar = () => {
   }, [location]);
   
   const navLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'About', path: '/about' },
-    { name: 'Events', path: '/events' },
-    { name: 'Shop', path: 'https://www.helloasso.com/associations/association-les-ours-occitanie-mediterranee-loom#shop', external: true },
+    { name: 'Accueil', path: '/' },
+    { name: 'À propos', path: '/about' },
+    { name: 'Événements', path: '/events' },
+    { name: 'Boutique', path: 'https://www.helloasso.com/associations/association-les-ours-occitanie-mediterranee-loom#shop', external: true },
     { name: 'Monsieur Ours', path: '/monsieur-ours' },
-    { name: 'Gallery', path: '/gallery' },
-    { name: 'Partners', path: '/partners' },
-    { name: 'Membership', path: 'https://www.helloasso.com/associations/association-les-ours-occitanie-mediterranee-loom/adhesions/adhesion-2024-2025', external: true },
+    { name: 'Photos', path: '/gallery' },
+    { name: 'Nos Partenaires', path: '/partners' },
+    { name: 'Adhésion', path: 'https://www.helloasso.com/associations/association-les-ours-occitanie-mediterranee-loom/adhesions/adhesion-2024-2025', external: true },
   ];
   
   const isActive = (path: string) => {
@@ -56,11 +56,11 @@ const Navbar = () => {
   const handleSignOut = async () => {
     try {
       await signOut();
-      toast.success('Successfully signed out');
+      toast.success('Déconnexion réussie');
       navigate('/');
     } catch (error) {
       console.error('Sign out error:', error);
-      toast.error('Failed to sign out');
+      toast.error('Erreur lors de la déconnexion');
     }
   };
   
@@ -72,7 +72,13 @@ const Navbar = () => {
     >
       <div className="container mx-auto px-4 flex justify-between items-center">
         {/* Logo */}
-        <Link to="/" className="text-2xl font-bold text-brown">LOOM</Link>
+        <Link to="/" className="flex items-center">
+          <img 
+            src="/logo.png" 
+            alt="LOOM Logo" 
+            className="h-12 w-auto"
+          />
+        </Link>
         
         {/* Desktop Navigation */}
         <nav className="hidden md:flex space-x-1">
@@ -116,7 +122,7 @@ const Navbar = () => {
                   {profile?.avatar_url ? (
                     <img 
                       src={profile.avatar_url} 
-                      alt={profile.username || 'User'} 
+                      alt={profile.username || 'Utilisateur'} 
                       className="rounded-full object-cover" 
                     />
                   ) : (
@@ -126,20 +132,20 @@ const Navbar = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <div className="px-2 py-1.5">
-                  <p className="text-sm font-medium">{profile?.full_name || profile?.username || 'User'}</p>
+                  <p className="text-sm font-medium">{profile?.full_name || profile?.username || 'Utilisateur'}</p>
                   <p className="text-xs text-gray-500">{user.email}</p>
                 </div>
                 <DropdownMenuSeparator />
                 {isAdmin && (
                   <>
                     <DropdownMenuItem asChild>
-                      <Link to="/admin/dashboard" className="cursor-pointer">Admin Dashboard</Link>
+                      <Link to="/admin/dashboard" className="cursor-pointer">Tableau de bord admin</Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                   </>
                 )}
                 <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-red-600">
-                  Sign out
+                  Se déconnecter
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -147,7 +153,7 @@ const Navbar = () => {
             <Link to="/login">
               <Button variant="ghost" size="sm" className="flex items-center">
                 <LogIn className="h-4 w-4 mr-2" />
-                Sign In
+                Se connecter
               </Button>
             </Link>
           )}
@@ -157,7 +163,7 @@ const Navbar = () => {
         <button 
           className="md:hidden text-gray-700"
           onClick={toggleMobileMenu}
-          aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+          aria-label={mobileMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
         >
           {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
@@ -200,7 +206,7 @@ const Navbar = () => {
             </nav>
             
             {/* Auth/User (Mobile) */}
-            <div className="mt-auto pb-8">
+            <div className="mt-auto">
               {user ? (
                 <div className="space-y-2">
                   <div className="flex items-center space-x-3 px-4 py-3">
@@ -208,7 +214,7 @@ const Navbar = () => {
                       {profile?.avatar_url ? (
                         <img 
                           src={profile.avatar_url} 
-                          alt={profile.username || 'User'} 
+                          alt={profile.username || 'Utilisateur'} 
                           className="rounded-full object-cover h-10 w-10" 
                         />
                       ) : (
@@ -216,14 +222,14 @@ const Navbar = () => {
                       )}
                     </div>
                     <div>
-                      <p className="font-medium">{profile?.full_name || profile?.username || 'User'}</p>
+                      <p className="font-medium">{profile?.full_name || profile?.username || 'Utilisateur'}</p>
                       <p className="text-sm text-gray-500">{user.email}</p>
                     </div>
                   </div>
                   
                   {isAdmin && (
                     <Link to="/admin/dashboard" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-md">
-                      Admin Dashboard
+                      Tableau de bord admin
                     </Link>
                   )}
                   
@@ -231,13 +237,13 @@ const Navbar = () => {
                     onClick={handleSignOut}
                     className="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 rounded-md"
                   >
-                    Sign out
+                    Se déconnecter
                   </button>
                 </div>
               ) : (
                 <Link to="/login" className="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-md">
                   <LogIn className="h-5 w-5 mr-2" />
-                  Sign In
+                  Se connecter
                 </Link>
               )}
             </div>

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
@@ -238,15 +237,15 @@ export default function AdminArticles() {
     <AdminLayout title="Articles">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h2 className="text-xl font-semibold">Manage Articles</h2>
-          <p className="text-gray-500 mt-1">Create, edit, and manage your blog articles</p>
+          <h2 className="text-xl font-semibold">Gestion des articles</h2>
+          <p className="text-gray-500 mt-1">Créez, modifiez et gérez vos articles de blog</p>
         </div>
         <Button 
           className="bg-brown hover:bg-brown/90" 
           onClick={resetForm}
         >
           <Plus className="h-4 w-4 mr-2" />
-          New Article
+          Nouvel article
         </Button>
       </div>
 
@@ -262,14 +261,14 @@ export default function AdminArticles() {
       ) : articles.length === 0 ? (
         <div className="text-center py-12 bg-gray-50 rounded-md border border-gray-200">
           <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900">No articles found</h3>
-          <p className="text-gray-500 mb-4">You haven't created any articles yet.</p>
+          <h3 className="text-lg font-medium text-gray-900">Aucun article trouvé</h3>
+          <p className="text-gray-500 mb-4">Vous n'avez pas encore créé d'articles.</p>
           <Button 
             className="bg-brown hover:bg-brown/90" 
             onClick={resetForm}
           >
             <Plus className="h-4 w-4 mr-2" />
-            Create your first article
+            Créer votre premier article
           </Button>
         </div>
       ) : (
@@ -277,10 +276,10 @@ export default function AdminArticles() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Title</TableHead>
-                <TableHead>Category</TableHead>
+                <TableHead>Titre</TableHead>
+                <TableHead>Catégorie</TableHead>
                 <TableHead>Date</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>Statut</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -296,7 +295,7 @@ export default function AdminArticles() {
                         ? "bg-green-100 text-green-800"
                         : "bg-gray-100 text-gray-800"
                     }`}>
-                      {article.published ? "Published" : "Draft"}
+                      {article.published ? "Publié" : "Brouillon"}
                     </span>
                   </TableCell>
                   <TableCell className="text-right">
@@ -304,7 +303,7 @@ export default function AdminArticles() {
                       <Button variant="ghost" size="sm" asChild>
                         <Link to={`/articles/${article.slug}`}>
                           <Eye className="h-4 w-4" />
-                          <span className="sr-only">View</span>
+                          <span className="sr-only">Voir</span>
                         </Link>
                       </Button>
                       <Button 
@@ -313,7 +312,7 @@ export default function AdminArticles() {
                         onClick={() => editArticle(article)}
                       >
                         <Edit className="h-4 w-4" />
-                        <span className="sr-only">Edit</span>
+                        <span className="sr-only">Modifier</span>
                       </Button>
                       <Button 
                         variant="ghost" 
@@ -322,7 +321,7 @@ export default function AdminArticles() {
                         onClick={() => confirmDelete(article)}
                       >
                         <Trash2 className="h-4 w-4" />
-                        <span className="sr-only">Delete</span>
+                        <span className="sr-only">Supprimer</span>
                       </Button>
                     </div>
                   </TableCell>

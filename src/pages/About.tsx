@@ -2,8 +2,81 @@ import { BookOpen, Users, Calendar, MapPin } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SectionHeading from '@/components/SectionHeading';
+import { useState } from 'react';
+import { supabase, retryOperation, checkConnection } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 const About = () => {
+  const { toast } = useToast();
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
+    try {
+      // Vérifier la connexion avant d'envoyer
+      const isConnected = await checkConnection();
+      if (!isConnected) {
+        toast({
+          title: "Erreur de connexion",
+          description: "Impossible de se connecter au serveur. Veuillez réessayer plus tard.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Utiliser retryOperation pour l'envoi du ticket
+      await retryOperation(async () => {
+        const { error } = await supabase
+          .from('contact_tickets')
+          .insert({
+            ...formData,
+            status: 'Nouveau'
+          });
+
+        if (error) throw error;
+      });
+
+      toast({
+        title: "Message envoyé",
+        description: "Votre message a été envoyé avec succès. Nous vous répondrons dès que possible.",
+      });
+
+      // Réinitialiser le formulaire
+      setFormData({
+        name: '',
+        email: '',
+        subject: '',
+        message: ''
+      });
+    } catch (error: any) {
+      console.error('Erreur lors de l\'envoi du ticket:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de l'envoi du message. Veuillez réessayer.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-tan/10">
       <Navbar />
@@ -23,37 +96,10 @@ const About = () => {
       {/* Mission & Vision Section */}
       <section className="py-16">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="w-20 h-1.5 bg-orange mb-6"></div>
-              <h2 className="text-3xl font-bold mb-6">Notre vision</h2>
-              <p className="text-gray-700 mb-4">
-              Nous proposons, tout au long de l'année, des événements griffés Bears, comme des sorties, apéro, resto, ciné, rando, pique-nique. Le tout dans la bonne humeur et la convivialité.
-              </p>
-              <p className="text-gray-700 mb-4">
-              Être Bear ce n'est pas qu'un physique c'est aussi un état d'esprit qui se veut bienveillant, convivial, amical et tolérant...
-              </p>
-              <div className="grid grid-cols-2 gap-4 mt-8">
-                <div className="bg-white rounded-lg p-4 shadow-sm">
-                  <div className="rounded-full bg-brown/10 w-12 h-12 flex items-center justify-center mb-3">
-                    <BookOpen size={24} className="text-brown" />
-                  </div>
-                </div>
-                <div className="bg-white rounded-lg p-4 shadow-sm">
-                  <div className="rounded-full bg-orange/10 w-12 h-12 flex items-center justify-center mb-3">
-                    <Users size={24} className="text-orange" />
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="rounded-2xl overflow-hidden shadow-xl">
-              <img 
-                src="https://mcfiles.inferi.fr/api/public/dl/IDTLBxnE?inline=true" 
-                alt="Community gathering" 
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </div>
+          <h2 className="text-3xl font-bold text-center mb-12">Notre vision</h2>
+          <p className="text-lg text-gray-700 max-w-3xl mx-auto text-center">
+            Notre vision est de créer un espace inclusif et accueillant pour tous les membres de la communauté Bear.
+          </p>
         </div>
       </section>
       
@@ -330,53 +376,71 @@ const About = () => {
               </div>
             </div>
             
-            <div className="bg-white text-gray-900 rounded-xl p-8 shadow-lg">
+            <div>
               <h3 className="text-2xl font-bold mb-6">Formulaire de Contact</h3>
-              <form>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Nom</label>
-                <input 
-                  type="text" 
-                  id="name" 
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-brown focus:border-brown"
-                  placeholder="Votre nom"
-                />
+              <form onSubmit={handleSubmit}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label htmlFor="name" className="block text-sm font-medium text-white mb-1">Nom</label>
+                    <input 
+                      type="text" 
+                      id="name" 
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-brown focus:border-brown text-gray-900"
+                      placeholder="Votre nom"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-medium text-white mb-1">Email</label>
+                    <input 
+                      type="email" 
+                      id="email" 
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-brown focus:border-brown text-gray-900"
+                      placeholder="Votre email"
+                      required
+                    />
+                  </div>
                 </div>
-                <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                <input 
-                  type="email" 
-                  id="email" 
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-brown focus:border-brown"
-                  placeholder="Votre email"
-                />
+                <div className="mb-4">
+                  <label htmlFor="subject" className="block text-sm font-medium text-white mb-1">Sujet</label>
+                  <input 
+                    type="text" 
+                    id="subject" 
+                    name="subject"
+                    value={formData.subject}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-brown focus:border-brown text-gray-900"
+                    placeholder="Sujet"
+                    required
+                  />
                 </div>
-              </div>
-              <div className="mb-4">
-                <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">Sujet</label>
-                <input 
-                type="text" 
-                id="subject" 
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-brown focus:border-brown"
-                placeholder="Sujet"
-                />
-              </div>
-              <div className="mb-6">
-                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">Message</label>
-                <textarea 
-                id="message" 
-                rows={4}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-brown focus:border-brown"
-                placeholder="Votre message"
-                ></textarea>
-              </div>
-              <button 
-                type="submit" 
-                className="w-full bg-brown hover:bg-brown-dark text-white font-medium py-2 px-4 rounded-lg transition-colors"
-              >
-                Envoyer le message
-              </button>
+                
+                <div className="mb-4">
+                  <label htmlFor="message" className="block text-sm font-medium text-white mb-1">Message</label>
+                  <textarea 
+                    id="message" 
+                    name="message"
+                    value={formData.message}
+                    onChange={handleInputChange}
+                    rows={4}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-brown focus:border-brown text-gray-900"
+                    placeholder="Votre message"
+                    required
+                  ></textarea>
+                </div>
+                <button 
+                  type="submit" 
+                  disabled={isSubmitting}
+                  className="w-full bg-orange hover:bg-orange-dark text-white font-medium py-2 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? 'Envoi en cours...' : 'Envoyer le message'}
+                </button>
               </form>
             </div>
           </div>

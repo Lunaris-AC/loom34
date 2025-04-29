@@ -1,146 +1,68 @@
-
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Facebook, Instagram, Twitter, Linkedin, Mail, Phone, MapPin, Heart } from 'lucide-react';
+import { Facebook, Instagram, Mail, Phone, MapPin, Heart } from 'lucide-react';
+import AccessibilityMenu from './AccessibilityMenu';
 
 const Footer = () => {
-  const currentYear = new Date().getFullYear();
-  
-  // HelloAsso URLs
-  const SHOP_URL = "https://www.helloasso.com/associations/your-association/boutiques/shop";
-  const MEMBERSHIP_URL = "https://www.helloasso.com/associations/your-association/adhesions/membership";
-  
+  const [isAccessibilityOpen, setIsAccessibilityOpen] = useState(false);
+
   return (
-    <footer className="bg-brown text-white">
-      {/* Main Footer */}
-      <div className="container mx-auto py-12 px-4 md:px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {/* About Column */}
-          <div className="space-y-4 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-            <h3 className="text-xl font-bold">Loom</h3>
-            <p className="text-tan/90 leading-relaxed">
-              A welcoming community celebrating diversity and connection. Join us in creating a space where everyone belongs.
-            </p>
-            <div className="flex space-x-4 pt-2">
-              <SocialLink href="https://facebook.com" aria-label="Facebook">
-                <Facebook size={20} />
-              </SocialLink>
-              <SocialLink href="https://instagram.com" aria-label="Instagram">
-                <Instagram size={20} />
-              </SocialLink>
-              <SocialLink href="https://twitter.com" aria-label="Twitter">
-                <Twitter size={20} />
-              </SocialLink>
-              <SocialLink href="https://linkedin.com" aria-label="LinkedIn">
-                <Linkedin size={20} />
-              </SocialLink>
+    <>
+      <footer className="bg-gray-900 text-white py-12">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">À propos</h3>
+              <p className="text-gray-400">
+                Association Bear fondée en 2017. C'est une association pour les Bears mais aussi pour tous ceux qui aiment les Ours, les poils et les tailles allant du XS au XXXXXL.
+              </p>
+            </div>
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Contact</h3>
+              <div className="space-y-2 text-gray-400">
+                <div className="flex items-center">
+                  <MapPin className="h-5 w-5 mr-2" />
+                  <span>49 Rue du faubourg St. Jaumes, Bat E, 34000 Montpellier</span>
+                </div>
+                <div className="flex items-center">
+                  <Mail className="h-5 w-5 mr-2" />
+                  <span>contactloom34@gmail.com</span>
+                </div>
+                <div className="flex items-center">
+                  <Phone className="h-5 w-5 mr-2" />
+                  <span>0767179100</span>
+                </div>
+              </div>
+            </div>
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Suivez-nous</h3>
+              <div className="flex space-x-4">
+                <a href="https://www.facebook.com/groups/1868760663424464/?ref=share_group_link" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
+                  <Facebook className="h-6 w-6" />
+                </a>
+                <a href="https://www.instagram.com/loom_ours_34/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
+                  <Instagram className="h-6 w-6" />
+                </a>
+              </div>
             </div>
           </div>
           
-          {/* Quick Links */}
-          <div className="space-y-4 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-            <h3 className="text-xl font-bold">Quick Links</h3>
-            <ul className="space-y-2">
-              <li><FooterLink to="/about">About Us</FooterLink></li>
-              <li><FooterLink to="/events">Events</FooterLink></li>
-              <li><FooterLink to="/shop">Shop</FooterLink></li>
-              <li><FooterLink to="/gallery">Gallery</FooterLink></li>
-              <li><FooterLink to="/monsieur-ours">Monsieur Ours</FooterLink></li>
-            </ul>
-          </div>
-          
-          {/* Join & Support */}
-          <div className="space-y-4 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-            <h3 className="text-xl font-bold">Join & Support</h3>
-            <ul className="space-y-2">
-              <li><FooterLink to="/membership">Become a Member</FooterLink></li>
-              <li><FooterLink to="/partners">Our Partners</FooterLink></li>
-              <li><FooterLink to="/partners/become">Become a Partner</FooterLink></li>
-              <li><FooterLink to="/donate">Donate</FooterLink></li>
-              <li><FooterLink to="/volunteer">Volunteer</FooterLink></li>
-            </ul>
-          </div>
-          
-          {/* Contact Info */}
-          <div className="space-y-4 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-            <h3 className="text-xl font-bold">Contact Us</h3>
-            <div className="space-y-3">
-              <div className="flex items-start space-x-3">
-                <MapPin size={20} className="text-tan flex-shrink-0 mt-1" />
-                <span className="text-tan/90">123 Community Street, Paris, France</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <Mail size={20} className="text-tan" />
-                <a href="mailto:contact@loom.org" className="text-tan/90 hover:text-white transition-colors">
-                  contact@loom.org
-                </a>
-              </div>
-              <div className="flex items-center space-x-3">
-                <Phone size={20} className="text-tan" />
-                <a href="tel:+33123456789" className="text-tan/90 hover:text-white transition-colors">
-                  +33 1 23 45 67 89
-                </a>
-              </div>
+          <div className="mt-12 pt-8 border-t border-gray-800">
+            <div className="flex flex-wrap justify-center gap-4">
+              <Link to="/privacy-policy" className="text-gray-400 hover:text-white">Privacy Policy</Link>
+              <Link to="/terms" className="text-gray-400 hover:text-white">Terms of Use</Link>
+              <button onClick={() => setIsAccessibilityOpen(true)} className="text-gray-400 hover:text-white">Accessibilité</button>
+            </div>
+            <div className="mt-4 flex items-center justify-center text-gray-400">
+              <Heart className="h-4 w-4 mr-1" />
+              <span>Made with love in Montpellier</span>
             </div>
           </div>
         </div>
-      </div>
+      </footer>
       
-      {/* Bottom Footer */}
-      <div className="bg-brown-dark py-4">
-        <div className="container mx-auto px-4 md:px-6 flex flex-col md:flex-row justify-between items-center text-tan/80 text-sm">
-          <div className="mb-4 md:mb-0">
-            © {currentYear} Loom. All rights reserved.
-          </div>
-          <div className="flex flex-wrap justify-center gap-4 md:gap-6">
-            <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
-            <Link to="/terms" className="hover:text-white transition-colors">Terms of Use</Link>
-            <Link to="/accessibility" className="hover:text-white transition-colors">Accessibility</Link>
-          </div>
-          <div className="mt-4 md:mt-0 flex items-center gap-1">
-            Made with <Heart size={16} className="text-orange animate-pulse-soft" /> in Paris
-          </div>
-        </div>
-      </div>
-    </footer>
-  );
-};
-
-const SocialLink = ({ href, children, ...props }) => {
-  return (
-    <a 
-      href={href} 
-      className="h-9 w-9 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors duration-300"
-      target="_blank"
-      rel="noopener noreferrer"
-      {...props}
-    >
-      {children}
-    </a>
-  );
-};
-
-const FooterLink = ({ to, children }) => {
-  // Check if it's an external link (starts with http or https)
-  if (to === '/shop' || to === '/membership') {
-    // These are special routes handled by our ExternalRedirect component
-    return (
-      <Link 
-        to={to}
-        className="text-tan/90 hover:text-white transition-colors duration-200 block"
-      >
-        {children}
-      </Link>
-    );
-  }
-  
-  // Normal internal link
-  return (
-    <Link 
-      to={to} 
-      className="text-tan/90 hover:text-white transition-colors duration-200 block"
-    >
-      {children}
-    </Link>
+      <AccessibilityMenu isOpen={isAccessibilityOpen} onClose={() => setIsAccessibilityOpen(false)} />
+    </>
   );
 };
 

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,6 +20,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/contexts/AuthContext";
+
+const formatDate = (dateStr: string) => {
+  return new Date(dateStr).toLocaleDateString('fr-FR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+};
 
 interface Event {
   id: string;
@@ -235,18 +242,18 @@ export default function AdminEvents() {
   };
 
   return (
-    <AdminLayout title="Events">
+    <AdminLayout title="Événements">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h2 className="text-xl font-semibold">Manage Events</h2>
-          <p className="text-gray-500 mt-1">Create, edit, and manage your upcoming events</p>
+          <h2 className="text-xl font-semibold">Gestion des événements</h2>
+          <p className="text-gray-500 mt-1">Créez, modifiez et gérez vos événements</p>
         </div>
         <Button 
           className="bg-brown hover:bg-brown/90" 
           onClick={resetForm}
         >
           <Plus className="h-4 w-4 mr-2" />
-          New Event
+          Nouvel événement
         </Button>
       </div>
 
@@ -262,14 +269,14 @@ export default function AdminEvents() {
       ) : events.length === 0 ? (
         <div className="text-center py-12 bg-gray-50 rounded-md border border-gray-200">
           <CalendarDays className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900">No events found</h3>
-          <p className="text-gray-500 mb-4">You haven't created any events yet.</p>
+          <h3 className="text-lg font-medium text-gray-900">Aucun événement trouvé</h3>
+          <p className="text-gray-500 mb-4">Vous n'avez pas encore créé d'événements.</p>
           <Button 
             className="bg-brown hover:bg-brown/90" 
             onClick={resetForm}
           >
             <Plus className="h-4 w-4 mr-2" />
-            Create your first event
+            Créer votre premier événement
           </Button>
         </div>
       ) : (
@@ -277,11 +284,10 @@ export default function AdminEvents() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Title</TableHead>
+                <TableHead>Titre</TableHead>
+                <TableHead>Lieu</TableHead>
                 <TableHead>Date</TableHead>
-                <TableHead>Time</TableHead>
-                <TableHead>Location</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>Statut</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -289,16 +295,15 @@ export default function AdminEvents() {
               {events.map((event) => (
                 <TableRow key={event.id}>
                   <TableCell className="font-medium">{event.title}</TableCell>
-                  <TableCell>{event.date}</TableCell>
-                  <TableCell>{event.time}</TableCell>
                   <TableCell>{event.location}</TableCell>
+                  <TableCell>{formatDate(event.date)}</TableCell>
                   <TableCell>
                     <span className={`px-2 py-1 rounded-full text-xs ${
                       event.published
                         ? "bg-green-100 text-green-800"
                         : "bg-gray-100 text-gray-800"
                     }`}>
-                      {event.published ? "Published" : "Draft"}
+                      {event.published ? "Publié" : "Brouillon"}
                     </span>
                   </TableCell>
                   <TableCell className="text-right">
@@ -306,7 +311,7 @@ export default function AdminEvents() {
                       <Button variant="ghost" size="sm" asChild>
                         <Link to={`/events/${event.slug}`}>
                           <Eye className="h-4 w-4" />
-                          <span className="sr-only">View</span>
+                          <span className="sr-only">Voir</span>
                         </Link>
                       </Button>
                       <Button 
@@ -315,7 +320,7 @@ export default function AdminEvents() {
                         onClick={() => editEvent(event)}
                       >
                         <Edit className="h-4 w-4" />
-                        <span className="sr-only">Edit</span>
+                        <span className="sr-only">Modifier</span>
                       </Button>
                       <Button 
                         variant="ghost" 
@@ -324,7 +329,7 @@ export default function AdminEvents() {
                         onClick={() => confirmDelete(event)}
                       >
                         <Trash2 className="h-4 w-4" />
-                        <span className="sr-only">Delete</span>
+                        <span className="sr-only">Supprimer</span>
                       </Button>
                     </div>
                   </TableCell>

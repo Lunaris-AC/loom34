@@ -1,7 +1,6 @@
-
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { Session, User } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, retryOperation, checkConnection } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { toast } from "sonner";
 
@@ -34,85 +33,111 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAdmin, setIsAdmin] = useState(false);
   const { toast: uiToast } = useToast();
 
+  // Fonction pour réinitialiser l'état d'authentification
+  const resetAuthState = () => {
+    setSession(null);
+    setUser(null);
+    setProfile(null);
+    setIsAdmin(false);
+  };
+
+  // Fonction pour mettre à jour l'état d'authentification
+  const updateAuthState = async (currentSession: Session | null) => {
+    setSession(currentSession);
+    setUser(currentSession?.user || null);
+    
+    if (currentSession?.user) {
+      await fetchProfile(currentSession.user.id);
+    } else {
+      resetAuthState();
+    }
+  };
+
   useEffect(() => {
+    let mounted = true;
+    let authSubscription: { data: { subscription: { unsubscribe: () => void } } } | null = null;
+
     const initAuth = async () => {
+      if (!mounted) return;
       setIsLoading(true);
       
       try {
-        // Set up the auth state change listener first
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(
-          async (event, currentSession) => {
-            console.log("Auth state changed:", event, currentSession?.user?.id);
-            
-            setSession(currentSession);
-            setUser(currentSession?.user || null);
-            
-            if (currentSession?.user) {
-              await fetchProfile(currentSession.user.id);
-            } else {
-              setProfile(null);
-              setIsAdmin(false);
-            }
-            
-            setIsLoading(false);
-          }
-        );
-        
-        // Then check for existing session
+        // Vérifier la connexion avant de commencer
+        const isConnected = await checkConnection();
+        if (!isConnected) {
+          console.error("Pas de connexion à la base de données");
+          resetAuthState();
+          setIsLoading(false);
+          return;
+        }
+
+        // Récupérer la session avec retry
         const { data: { session: existingSession }, error: sessionError } = 
-          await supabase.auth.getSession();
+          await retryOperation(() => supabase.auth.getSession());
         
         if (sessionError) {
           console.error("Error getting session:", sessionError);
-          uiToast({
-            title: "Session Error",
-            description: "There was a problem with your session. Please try again.",
-            variant: "destructive",
-          });
+          resetAuthState();
+          setIsLoading(false);
+          return;
         }
         
         if (existingSession) {
-          setSession(existingSession);
-          setUser(existingSession.user);
-          
-          if (existingSession.user) {
-            await fetchProfile(existingSession.user.id);
-          }
+          await updateAuthState(existingSession);
         }
         
-        setIsLoading(false);
+        // Configurer l'écouteur d'état d'authentification
+        authSubscription = supabase.auth.onAuthStateChange(
+          async (event, currentSession) => {
+            if (!mounted) return;
+            
+            console.log("Auth state changed:", event, currentSession?.user?.id);
+            await updateAuthState(currentSession);
+          }
+        );
         
-        return () => {
-          subscription.unsubscribe();
-        };
+        setIsLoading(false);
       } catch (error) {
         console.error("Error in authentication initialization:", error);
+        resetAuthState();
         setIsLoading(false);
       }
     };
     
     initAuth();
+
+    // Nettoyage
+    return () => {
+      mounted = false;
+      if (authSubscription) {
+        authSubscription.data.subscription.unsubscribe();
+      }
+    };
   }, [uiToast]);
   
   async function fetchProfile(userId: string) {
     try {
-      console.log("Fetching profile for user:", userId);
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
-        
-      if (error) {
-        console.error("Error fetching profile:", error);
+      const isConnected = await checkConnection();
+      if (!isConnected) {
+        console.error("Pas de connexion à la base de données lors de la récupération du profil");
         setProfile(null);
         setIsAdmin(false);
         return;
       }
-      
-      console.log("Profile data:", data);
-      setProfile(data);
-      setIsAdmin(data?.is_admin || false);
+
+      const result = await retryOperation(async () => {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', userId)
+          .single();
+        
+        if (error) throw error;
+        return data;
+      });
+        
+      setProfile(result);
+      setIsAdmin(result?.is_admin || false);
     } catch (error) {
       console.error("Exception in fetchProfile:", error);
       setProfile(null);
@@ -128,7 +153,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       if (error) {
         uiToast({
-          title: "Login Failed",
+          title: "Échec de la connexion",
           description: error.message,
           variant: "destructive",
         });
@@ -136,8 +161,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       
       uiToast({
-        title: "Login Successful",
-        description: "Welcome back!",
+        title: "Connexion réussie",
+        description: "Bienvenue !",
       });
     } catch (error) {
       console.error("Sign in error:", error);
@@ -161,7 +186,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       if (error) {
         uiToast({
-          title: "Registration Failed",
+          title: "Échec de l'inscription",
           description: error.message,
           variant: "destructive",
         });
@@ -169,8 +194,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       
       uiToast({
-        title: "Registration Successful",
-        description: "Check your email for a confirmation link.",
+        title: "Inscription réussie",
+        description: "Vérifiez votre email pour le lien de confirmation.",
       });
     } catch (error) {
       console.error("Sign up error:", error);

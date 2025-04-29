@@ -54,6 +54,39 @@ export type Database = {
         }
         Relationships: []
       }
+      contact_tickets: {
+        Row: {
+          id: number
+          name: string
+          email: string
+          subject: string
+          message: string
+          status: 'Nouveau' | 'En attente' | 'Répondu' | 'Fermé'
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          name: string
+          email: string
+          subject: string
+          message: string
+          status?: 'Nouveau' | 'En attente' | 'Répondu' | 'Fermé'
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          name?: string
+          email?: string
+          subject?: string
+          message?: string
+          status?: 'Nouveau' | 'En attente' | 'Répondu' | 'Fermé'
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       events: {
         Row: {
           author_id: string | null

@@ -1,13 +1,32 @@
-
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { Heart, MapPin, Quote, SunMedium, Leaf, Coffee, CircleDot } from "lucide-react";
+import { Heart, MapPin, Quote, SunMedium, Leaf, Coffee, CircleDot, X } from "lucide-react";
+import { useState } from "react";
 
 const MonsieurOurs = () => {
+  // HelloAsso URLs
+  const SHOP_URL = "https://www.helloasso.com/associations/your-association/boutiques/shop";
   const MEMBERSHIP_URL = "https://www.helloasso.com/associations/association-les-ours-occitanie-mediterranee-loom/adhesions/adhesion-2024-2025";
   
+  const [selectedYear, setSelectedYear] = useState<string | null>(null);
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+
+  const timelineItems = [
+    { year: '2017', title: 'Création de Loom', description: 'L\'association est fondée' },
+    { year: '2018', title: 'Premier Monsieur Ours', description: 'Élection du premier Monsieur Ours' },
+    { year: '2019', title: 'Expansion', description: 'L\'association grandit' },
+    { year: '2020', title: 'Adaptation', description: 'Période de pandémie' },
+    { year: '2021', title: 'Renaissance', description: 'Retour des événements' },
+    { year: '2022', title: 'Nouveau Monsieur Ours', description: 'Élection du nouveau Monsieur Ours' },
+  ];
+
+  const handleTimelineClick = (year: string) => {
+    setSelectedYear(year);
+    setIsGalleryOpen(true);
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-tan/10">
       <Navbar />
@@ -41,111 +60,57 @@ const MonsieurOurs = () => {
         </div>
       </section>
       {/* Timeline Section */}
-      <section className="py-16 bg-tan/20">
+      <section className="py-16">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">Monsieur Ours au fil des ans</h2>
-          
-          <div className="max-w-4xl mx-auto">
-            <div className="relative">
-              {/* Vertical timeline line */}
-              <div className="absolute left-4 md:left-1/2 transform md:-translate-x-1/2 h-full w-0.5 bg-brown/30"></div>
-              
-              {/* Timeline events */}
-              <div className="space-y-12">
-                {/* 2017 */}
-                <div className="relative flex flex-col md:flex-row items-center md:items-start">
-                  <div className="order-1 md:w-1/2 md:pr-8 md:text-right mb-4 md:mb-0">
-                    <div className="bg-white rounded-xl p-6 shadow-sm inline-block">
-                      <h3 className="text-xl font-bold text-brown mb-2">2017</h3>
-                      <p className="text-gray-700">
-                        Cédric François
-                      </p>
-                    </div>
-                  </div>
-                  <div className="z-10 flex items-center justify-center w-8 h-8 rounded-full bg-brown border-4 border-white text-white absolute left-0 md:left-1/2 transform md:-translate-x-1/2">
-                    <CircleDot size={16} />
-                  </div>
-                  <div className="order-2 md:w-1/2 md:pl-8 hidden md:block">
-                    {/* Empty space for layout on right timeline events */}
-                  </div>
-                </div>
-                
-                {/* 2014 */}
-                <div className="relative flex flex-col md:flex-row items-center md:items-start">
-                  <div className="order-2 md:order-2 md:w-1/2 md:pl-8 mb-4 md:mb-0">
-                    <div className="bg-white rounded-xl p-6 shadow-sm inline-block">
-                      <h3 className="text-xl font-bold text-brown mb-2">2018-2020</h3>
-                      <p className="text-gray-700">
-                        Romain Tertrais
-                      </p>
-                    </div>
-                  </div>
-                  <div className="z-10 flex items-center justify-center w-8 h-8 rounded-full bg-brown border-4 border-white text-white absolute left-0 md:left-1/2 transform md:-translate-x-1/2">
-                    <CircleDot size={16} />
-                  </div>
-                  <div className="order-1 md:order-1 md:w-1/2 md:pr-8 md:text-right hidden md:block">
-                    {/* Empty space for layout on left timeline events */}
+          <h2 className="text-3xl font-bold text-center mb-12">Notre histoire</h2>
+          <div className="relative">
+            <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-brown/30"></div>
+            <div className="space-y-12">
+              {timelineItems.map((item, index) => (
+                <div
+                  key={item.year}
+                  className={`relative flex items-center ${
+                    index % 2 === 0 ? 'justify-start' : 'justify-end'
+                  }`}
+                >
+                  <div
+                    className={`w-1/2 p-6 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow bg-white ${
+                      index % 2 === 0 ? 'mr-auto' : 'ml-auto'
+                    }`}
+                    onClick={() => handleTimelineClick(item.year)}
+                  >
+                    <div className={`absolute top-1/2 transform -translate-y-1/2 w-4 h-4 rounded-full bg-brown ${
+                      index % 2 === 0 ? 'right-0 translate-x-1/2' : 'left-0 -translate-x-1/2'
+                    }`}></div>
+                    <h3 className="text-xl font-bold mb-2">{item.year}</h3>
+                    <h4 className="text-lg font-semibold mb-2">{item.title}</h4>
+                    <p className="text-gray-600">{item.description}</p>
                   </div>
                 </div>
-                
-                {/* 2018 */}
-                <div className="relative flex flex-col md:flex-row items-center md:items-start">
-                  <div className="order-1 md:w-1/2 md:pr-8 md:text-right mb-4 md:mb-0">
-                    <div className="bg-white rounded-xl p-6 shadow-sm inline-block">
-                      <h3 className="text-xl font-bold text-brown mb-2">2023</h3>
-                      <p className="text-gray-700">
-                        Lucas Milani
-                      </p>
-                    </div>
-                  </div>
-                  <div className="z-10 flex items-center justify-center w-8 h-8 rounded-full bg-brown border-4 border-white text-white absolute left-0 md:left-1/2 transform md:-translate-x-1/2">
-                    <CircleDot size={16} />
-                  </div>
-                  <div className="order-2 md:w-1/2 md:pl-8 hidden md:block">
-                    {/* Empty space for layout on right timeline events */}
-                  </div>
-                </div>
-                
-                {/* 2022 */}
-                <div className="relative flex flex-col md:flex-row items-center md:items-start">
-                  <div className="order-2 md:order-2 md:w-1/2 md:pl-8 mb-4 md:mb-0">
-                    <div className="bg-white rounded-xl p-6 shadow-sm inline-block">
-                      <h3 className="text-xl font-bold text-brown mb-2">2024</h3>
-                      <p className="text-gray-700">
-                       Antonio Gabriel
-                      </p>
-                    </div>
-                  </div>
-                  <div className="z-10 flex items-center justify-center w-8 h-8 rounded-full bg-brown border-4 border-white text-white absolute left-0 md:left-1/2 transform md:-translate-x-1/2">
-                    <CircleDot size={16} />
-                  </div>
-                  <div className="order-1 md:order-1 md:w-1/2 md:pr-8 md:text-right hidden md:block">
-                    {/* Empty space for layout on left timeline events */}
-                  </div>
-                </div>
-                
-                {/* Today */}
-                <div className="relative flex flex-col md:flex-row items-center md:items-start">
-                  <div className="order-1 md:w-1/2 md:pr-8 md:text-right mb-4 md:mb-0">
-                    <div className="bg-white rounded-xl p-6 shadow-sm inline-block">
-                      <h3 className="text-xl font-bold text-brown mb-2">2025</h3>
-                      <p className="text-gray-700">
-                        Élection le 28 Juin 2025!
-                      </p>
-                    </div>
-                  </div>
-                  <div className="z-10 flex items-center justify-center w-8 h-8 rounded-full bg-brown border-4 border-white text-white absolute left-0 md:left-1/2 transform md:-translate-x-1/2">
-                    <CircleDot size={16} />
-                  </div>
-                  <div className="order-2 md:w-1/2 md:pl-8 hidden md:block">
-                    {/* Empty space for layout on right timeline events */}
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
+      
+      {isGalleryOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg max-w-4xl w-full">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-2xl font-bold">Galerie {selectedYear}</h3>
+              <button
+                onClick={() => setIsGalleryOpen(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+            <div className="text-center text-gray-500">
+              Les photos seront ajoutées prochainement
+            </div>
+          </div>
+        </div>
+      )}
       
       {/* Community Section */}
       <section className="py-16 bg-brown text-white">

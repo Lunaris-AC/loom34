@@ -1,4 +1,3 @@
-
 import { Heart, Users, Shield, Sparkles } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -114,7 +113,7 @@ const partnersList = [
   {
     name: "Bears n Breakfast",
     logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSODkdTS1CNGwmybx7xMiaAdTgUtz2ZjlefgA&s",
-    description: "10 % sur le prix d’un séjour au gite à Condom",
+    description: "10 % sur le prix d'un séjour au gite à Condom",
     website: "https://www.bearsnbreakfast.com/",
     type: "Chambres d'hôtes LGBTQIA+"
   },
@@ -130,22 +129,22 @@ const Partners = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900">
-              Our Partners & Supporters
+              Nos Partenaires
             </h1>
             <p className="text-lg text-gray-700">
-              We're grateful for the organizations and businesses that support our mission. 
-              Together, we're creating a stronger, more inclusive community.
+              Nous sommes reconnaissants envers les organisations et entreprises qui soutiennent notre mission.
+              Ensemble, nous créons une communauté plus forte et plus inclusive.
             </p>
           </div>
         </div>
       </section>
       
       {/* Partners Grid Section */}
-      <section className="py-16">
+      <section className="py-12">
         <div className="container mx-auto px-4">
           <SectionHeading 
-            title="Meet Our Partners" 
-            subtitle="The organizations and businesses that help make our work possible."
+            title="Découvrez nos partenaires" 
+            subtitle="Les organisations et entreprises qui rendent notre travail possible."
             centered
           />
           
@@ -173,7 +172,7 @@ const Partners = () => {
                     rel="noopener noreferrer" 
                     className="text-brown font-medium hover:underline inline-flex items-center"
                   >
-                    Visit Website
+                    Visiter le site
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
                     </svg>
@@ -188,34 +187,21 @@ const Partners = () => {
       <section className="py-16 bg-brown text-white">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl font-bold mb-6">Interested in Becoming a Partner?</h2>
+            <h2 className="text-3xl font-bold mb-6">Intéressé pour devenir partenaire ?</h2>
             <p className="text-tan/90 text-lg mb-8">
-              We'd love to discuss how we can create a meaningful partnership that aligns with your 
-              organization's values and goals while supporting our community.
+              Nous serions ravis de discuter de la façon dont nous pouvons créer un partenariat significatif qui s'aligne 
+              avec les valeurs et les objectifs de votre organisation tout en soutenant notre communauté.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a 
-                href="https://www.helloasso.com/associations/your-association/formulaires/partner-inquiry" 
-                target="_blank" 
-                rel="noopener noreferrer"
-              >
-                <Button 
-                  variant="secondary" 
-                  size="lg" 
-                  className="bg-orange hover:bg-orange-light transition-all"
-                >
-                  Become a Partner
-                </Button>
-              </a>
-              <a 
-                href="mailto:partnerships@yourdomain.com"
+                href="mailto:contactloom34@gmail.com"
               >
                 <Button 
                   variant="outline" 
                   size="lg"
                   className="border-white text-white hover:bg-white/10"
                 >
-                  Contact Us
+                  Nous contacter
                 </Button>
               </a>
             </div>

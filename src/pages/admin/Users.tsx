@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import {
@@ -42,7 +41,7 @@ export default function AdminUsers() {
 
   if (isLoading) {
     return (
-      <AdminLayout title="Users Management">
+      <AdminLayout title="Gestion des utilisateurs">
         <div className="animate-pulse space-y-4">
           <div className="h-10 bg-gray-200 rounded w-1/4"></div>
           <div className="h-64 bg-gray-200 rounded"></div>
@@ -52,16 +51,16 @@ export default function AdminUsers() {
   }
 
   return (
-    <AdminLayout title="Users Management">
+    <AdminLayout title="Gestion des utilisateurs">
       <div className="mb-6 flex justify-between items-center">
-        <h2 className="text-xl font-semibold">Users</h2>
+        <h2 className="text-xl font-semibold">Utilisateurs</h2>
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
           <DialogTrigger asChild>
-            <Button>Create User</Button>
+            <Button>Créer un utilisateur</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Create New User</DialogTitle>
+              <DialogTitle>Créer un nouvel utilisateur</DialogTitle>
             </DialogHeader>
             <CreateUserForm onSuccess={() => setIsCreateDialogOpen(false)} />
           </DialogContent>
@@ -72,10 +71,10 @@ export default function AdminUsers() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Username</TableHead>
-              <TableHead>Full Name</TableHead>
-              <TableHead>Admin Status</TableHead>
-              <TableHead>Created At</TableHead>
+              <TableHead>Nom d'utilisateur</TableHead>
+              <TableHead>Nom complet</TableHead>
+              <TableHead>Statut admin</TableHead>
+              <TableHead>Créé le</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -84,7 +83,7 @@ export default function AdminUsers() {
               <TableRow key={profile.id}>
                 <TableCell>{profile.username || '-'}</TableCell>
                 <TableCell>{profile.full_name || '-'}</TableCell>
-                <TableCell>{profile.is_admin ? 'Yes' : 'No'}</TableCell>
+                <TableCell>{profile.is_admin ? 'Oui' : 'Non'}</TableCell>
                 <TableCell>
                   {new Date(profile.created_at).toLocaleDateString()}
                 </TableCell>

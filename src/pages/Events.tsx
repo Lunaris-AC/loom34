@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -96,11 +95,11 @@ const Events = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900">
-              Upcoming Events
+              Événements à venir
             </h1>
             <p className="text-lg text-gray-700">
-              Discover and join our community gatherings, celebrations, and activities. 
-              Our events are the perfect opportunity to connect with others and have fun.
+              Découvrez et rejoignez nos rassemblements communautaires, nos célébrations et nos activités.
+              Nos événements sont l'occasion parfaite de rencontrer d'autres personnes et de s'amuser.
             </p>
           </div>
         </div>
@@ -116,7 +115,7 @@ const Events = () => {
                 </div>
                 <input
                   type="text"
-                  placeholder="Search events..."
+                  placeholder="Rechercher des événements..."
                   className="pl-10 w-full h-12 border border-gray-300 rounded-lg focus:ring-brown focus:border-brown"
                   value={searchQuery}
                   onChange={(e) => {
@@ -135,7 +134,7 @@ const Events = () => {
                       >
                         <div className="flex items-center">
                           <Calendar size={18} className="mr-2 text-gray-500" />
-                          <span>{dateFilter ? format(dateFilter, 'PP') : 'Filter by Date'}</span>
+                          <span>{dateFilter ? format(dateFilter, 'PP') : 'Filtrer par date'}</span>
                         </div>
                         <ChevronDown size={16} />
                       </Button>
@@ -174,7 +173,7 @@ const Events = () => {
                   >
                     <div className="flex items-center">
                       <Filter size={18} className="mr-2 text-gray-500" />
-                      <span>{categoryFilter || 'All Categories'}</span>
+                      <span>{categoryFilter || 'Toutes les catégories'}</span>
                     </div>
                     <ChevronDown size={16} />
                   </button>
@@ -214,10 +213,10 @@ const Events = () => {
             {/* Active filters */}
             {(searchQuery || categoryFilter || dateFilter) && (
               <div className="mt-4 flex items-center flex-wrap gap-2">
-                <span className="text-sm text-gray-600">Active filters:</span>
+                <span className="text-sm text-gray-600">Filtres actifs :</span>
                 {searchQuery && (
                   <span className="inline-flex items-center px-3 py-1 rounded-full bg-gray-100 text-gray-800 text-sm">
-                    Search: {searchQuery}
+                    Recherche : {searchQuery}
                     <button 
                       className="ml-2 text-gray-500 hover:text-gray-700"
                       onClick={() => setSearchQuery('')}
@@ -228,7 +227,7 @@ const Events = () => {
                 )}
                 {categoryFilter && (
                   <span className="inline-flex items-center px-3 py-1 rounded-full bg-gray-100 text-gray-800 text-sm">
-                    Category: {categoryFilter}
+                    Catégorie : {categoryFilter}
                     <button 
                       className="ml-2 text-gray-500 hover:text-gray-700"
                       onClick={() => setCategoryFilter('')}
@@ -239,7 +238,7 @@ const Events = () => {
                 )}
                 {dateFilter && (
                   <span className="inline-flex items-center px-3 py-1 rounded-full bg-gray-100 text-gray-800 text-sm">
-                    Date: {format(dateFilter, 'PP')}
+                    Date : {format(dateFilter, 'PP')}
                     <button 
                       className="ml-2 text-gray-500 hover:text-gray-700"
                       onClick={() => setDateFilter(undefined)}
@@ -279,11 +278,11 @@ const Events = () => {
               <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gray-100 flex items-center justify-center">
                 <Calendar size={32} className="text-gray-400" />
               </div>
-              <h3 className="text-2xl font-semibold mb-2">No Events Found</h3>
+              <h3 className="text-2xl font-semibold mb-2">Aucun événement trouvé</h3>
               <p className="text-gray-600 max-w-md mx-auto">
                 {searchQuery || categoryFilter || dateFilter ? 
-                  `No events match your search criteria. Try different filters.` : 
-                  "We don't have any upcoming events at the moment. Check back soon!"}
+                  `Aucun événement ne correspond à vos critères de recherche. Essayez d'autres filtres.` : 
+                  "Nous n'avons pas d'événements à venir pour le moment. Revenez bientôt !"}
               </p>
               
               {(searchQuery || categoryFilter || dateFilter) && (
@@ -291,7 +290,7 @@ const Events = () => {
                   className="mt-4 text-brown hover:underline font-medium"
                   onClick={clearFilters}
                 >
-                  Clear all filters
+                  Effacer tous les filtres
                 </button>
               )}
             </div>
@@ -347,22 +346,6 @@ const Events = () => {
               )}
             </>
           )}
-        </div>
-      </section>
-      
-      <section className="py-16 bg-brown text-white">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-6">Want to Host an Event?</h2>
-          <p className="text-tan/90 text-lg mb-8 max-w-2xl mx-auto">
-            We're always looking for community members to host events. If you have an idea for 
-            an event, we'd love to hear from you and help make it happen.
-          </p>
-          <a 
-            href="mailto:events@yourdomain.com" 
-            className="inline-flex items-center justify-center bg-orange hover:bg-orange-dark text-white py-3 px-6 rounded-lg font-medium transition-colors"
-          >
-            Contact Our Events Team
-          </a>
         </div>
       </section>
       

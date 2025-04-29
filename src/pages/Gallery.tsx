@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -298,16 +297,16 @@ const Gallery = () => {
       {/* Call to Action */}
       <section className="py-16 bg-brown text-white mt-8">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-6">Have Photos to Share?</h2>
+          <h2 className="text-3xl font-bold mb-6">Vous avez des photos à partager ?</h2>
           <p className="text-tan/90 text-lg mb-8 max-w-2xl mx-auto">
-            If you've captured special moments at our events, we'd love to see them! 
-            Share your photos with us to be featured in our community gallery.
+            Si vous avez capturé des moments spéciaux lors de nos événements, nous serions ravis de les voir !
+            Partagez vos photos avec nous pour qu'elles apparaissent dans notre galerie communautaire.
           </p>
           <a 
-            href="mailto:gallery@yourdomain.com" 
+            href="mailto:contactloom34@gmail.com" 
             className="inline-flex items-center justify-center bg-orange hover:bg-orange-dark text-white py-3 px-6 rounded-lg font-medium transition-colors"
           >
-            Submit Your Photos
+            Envoyer vos photos
           </a>
         </div>
       </section>

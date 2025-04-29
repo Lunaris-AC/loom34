@@ -1,7 +1,7 @@
-
 import { Link } from 'react-router-dom';
-import { Calendar, Clock, MapPin, ExternalLink } from 'lucide-react';
+import { Calendar, Clock, MapPin, ExternalLink, Info, Ticket } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 
 interface EventCardProps {
   title: string;
@@ -36,7 +36,7 @@ const EventCard = ({
       <div className="relative overflow-hidden aspect-[5/3]">
         <img
           src={image}
-          alt={title}
+          alt={`Image de l'événement : ${title}`}
           className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
           loading="lazy"
         />
@@ -59,28 +59,43 @@ const EventCard = ({
           </div>
           <div className="flex items-start">
             <MapPin size={18} className="mr-2 text-orange mt-0.5 flex-shrink-0" />
-            <span>{location}</span>
+            <span className="text-sm text-gray-600">
+              {location}
+            </span>
           </div>
         </div>
         <p className="text-gray-600 line-clamp-3 mb-4">
           {description}
         </p>
         <div className="flex flex-col sm:flex-row gap-3">
-          <Link 
-            to={`/events/${slug}`} 
-            className="flex-1 inline-flex items-center justify-center bg-brown hover:bg-brown-dark text-white py-2 px-4 rounded-lg transition-colors"
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full"
+            asChild
           >
-            View Details
-          </Link>
+            <Link to={`/events/${slug}`} aria-label={`Voir les détails de l'événement : ${title}`}>
+              <Info className="w-4 h-4 mr-2" />
+              Plus d'infos
+            </Link>
+          </Button>
           {registrationUrl && (
-            <a 
-              href={registrationUrl} 
-              className="flex-1 inline-flex items-center justify-center bg-orange hover:bg-orange-dark text-white py-2 px-4 rounded-lg transition-colors"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Button
+              variant="default"
+              size="sm"
+              className="w-full"
+              asChild
             >
-              Register <ExternalLink size={16} className="ml-1" />
-            </a>
+              <Link
+                to={registrationUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`S'inscrire à l'événement : ${title}`}
+              >
+                <Ticket className="w-4 h-4 mr-2" />
+                S'inscrire
+              </Link>
+            </Button>
           )}
         </div>
       </div>

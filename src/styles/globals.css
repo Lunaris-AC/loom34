@@ -1,0 +1,27 @@
+/* Accessibilité */
+:root {
+  --text-size: 100%;
+}
+
+body {
+  font-size: var(--text-size);
+}
+
+.high-contrast {
+  --background-color: #000;
+  --text-color: #fff;
+  --link-color: #ffff00;
+}
+
+.high-contrast body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.high-contrast a {
+  color: var(--link-color);
+}
+
+.underline-links a {
+  text-decoration: underline;
+} 
