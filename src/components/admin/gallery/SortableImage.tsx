@@ -2,9 +2,15 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2, MoreVertical } from 'lucide-react';
 import { Tables } from '@/integrations/supabase/types';
 import { Pencil } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface SortableImageProps {
   image: Tables<'gallery_images'>;
@@ -30,6 +36,8 @@ export function SortableImage({ image, albums, onEdit, onDelete }: SortableImage
     cursor: 'grab'
   };
 
+  const album = albums.find(a => a.id === image.album_id);
+
   return (
     <div
       ref={setNodeRef}
@@ -38,7 +46,7 @@ export function SortableImage({ image, albums, onEdit, onDelete }: SortableImage
       {...listeners}
       className="relative group bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
     >
-      <div className="aspect-square">
+      <div className="aspect-square bg-gray-100 flex items-center justify-center">
         <img
           src={image.image_url}
           alt={image.title || 'Image'}
@@ -53,9 +61,9 @@ export function SortableImage({ image, albums, onEdit, onDelete }: SortableImage
             {image.description}
           </p>
         )}
-        {image.album_id && (
+        {album && (
           <p className="text-gray-500 text-xs mt-1">
-            Album: {albums.find(a => a.id === image.album_id)?.title || 'Inconnu'}
+            Album: {album.title}
           </p>
         )}
         <div className="mt-1 inline-block px-2 py-0.5 text-xs bg-gray-100 rounded-full">
@@ -63,29 +71,37 @@ export function SortableImage({ image, albums, onEdit, onDelete }: SortableImage
         </div>
       </div>
 
-      <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 bg-white/80 hover:bg-white"
-          onClick={(e) => {
-            e.stopPropagation();
-            onEdit();
-          }}
-        >
-          <Pencil className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 bg-white/80 hover:bg-white"
-          onClick={(e) => {
-            e.stopPropagation();
-            onDelete();
-          }}
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
+      <div className="absolute top-2 right-2">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 bg-white/80 hover:bg-white"
+            >
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={(e) => {
+              e.stopPropagation();
+              onEdit();
+            }}>
+              <Edit className="h-4 w-4 mr-2" />
+              Modifier
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete();
+              }}
+              className="text-red-600"
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Supprimer
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );

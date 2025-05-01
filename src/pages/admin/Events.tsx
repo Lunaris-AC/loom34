@@ -20,6 +20,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/contexts/AuthContext";
+import { ImageUpload } from '@/components/admin/ImageUpload';
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CalendarIcon, Clock } from "lucide-react";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
+import { cn } from "@/lib/utils";
 
 const formatDate = (dateStr: string) => {
   return new Date(dateStr).toLocaleDateString('fr-FR', {
@@ -382,25 +389,29 @@ export default function AdminEvents() {
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="date" className="text-right">Date</Label>
-              <Input
-                id="date"
-                name="date"
-                value={eventForm.date}
-                onChange={handleInputChange}
-                className="col-span-3"
-                placeholder="Event date (YYYY-MM-DD)"
-              />
+              <div className="col-span-3">
+                <Input
+                  id="date"
+                  name="date"
+                  type="date"
+                  value={eventForm.date}
+                  onChange={handleInputChange}
+                  className="col-span-3"
+                />
+              </div>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="time" className="text-right">Time</Label>
-              <Input
-                id="time"
-                name="time"
-                value={eventForm.time}
-                onChange={handleInputChange}
-                className="col-span-3"
-                placeholder="Event time (e.g. 7:00 PM)"
-              />
+              <Label htmlFor="time" className="text-right">Heure</Label>
+              <div className="col-span-3">
+                <Input
+                  id="time"
+                  name="time"
+                  type="time"
+                  value={eventForm.time}
+                  onChange={handleInputChange}
+                  className="col-span-3"
+                />
+              </div>
             </div>
             <div className="grid grid-cols-4 items-start gap-4">
               <Label htmlFor="description" className="text-right pt-2">Description</Label>
@@ -414,16 +425,14 @@ export default function AdminEvents() {
                 rows={6}
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="image" className="text-right">Image URL</Label>
-              <Input
-                id="image"
-                name="image"
-                value={eventForm.image}
-                onChange={handleInputChange}
-                className="col-span-3"
-                placeholder="URL to event image"
-              />
+            <div className="grid grid-cols-4 items-start gap-4">
+              <Label htmlFor="image" className="text-right pt-2">Image</Label>
+              <div className="col-span-3">
+                <ImageUpload
+                  onImageUploaded={(url) => setEventForm(prev => ({ ...prev, image: url }))}
+                  defaultImage={eventForm.image}
+                />
+              </div>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="registration_url" className="text-right">Registration URL</Label>

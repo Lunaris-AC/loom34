@@ -22,6 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/contexts/AuthContext";
+import { ImageUpload } from '@/components/admin/ImageUpload';
 
 interface Article {
   id: string;
@@ -396,16 +397,14 @@ export default function AdminArticles() {
                 rows={10}
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="image" className="text-right">Image URL</Label>
-              <Input
-                id="image"
-                name="image"
-                value={articleForm.image}
-                onChange={handleInputChange}
-                className="col-span-3"
-                placeholder="URL to article image"
-              />
+            <div className="grid grid-cols-4 items-start gap-4">
+              <Label htmlFor="image" className="text-right pt-2">Image</Label>
+              <div className="col-span-3">
+                <ImageUpload
+                  onImageUploaded={(url) => setArticleForm(prev => ({ ...prev, image: url }))}
+                  defaultImage={articleForm.image}
+                />
+              </div>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="published" className="text-right">Published</Label>

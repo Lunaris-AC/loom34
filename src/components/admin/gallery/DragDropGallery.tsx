@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, useSensor, useSensors, PointerSensor } from '@dnd-kit/core';
-import { SortableContext, arrayMove } from '@dnd-kit/sortable';
+import { SortableContext, arrayMove, rectSortingStrategy } from '@dnd-kit/sortable';
 import { createPortal } from 'react-dom';
-import { Plus, ImageIcon } from 'lucide-react';
+import { Plus, ImageIcon, Edit, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { AlbumForm } from './AlbumForm';
@@ -108,6 +108,28 @@ export function DragDropGallery({
     setActiveId(null);
   };
 
+  const handleEditAlbum = async (data: any) => {
+    await onUpdateAlbum(data);
+    setSelectedAlbum(null);
+  };
+
+  const handleDeleteAlbum = async (albumId: string) => {
+    if (window.confirm("Êtes-vous sûr de vouloir supprimer cet album ? Les photos seront déplacées dans la section non classée.")) {
+      await onDeleteAlbum(albumId);
+    }
+  };
+
+  const handleEditImage = async (data: any) => {
+    await onUpdateImage(data);
+    setSelectedImage(null);
+  };
+
+  const handleDeleteImage = async (imageId: string) => {
+    if (window.confirm("Êtes-vous sûr de vouloir supprimer cette photo ?")) {
+      await onDeleteImage(imageId);
+    }
+  };
+
   return (
     <div className="space-y-8">
       {/* Albums Section */}
@@ -117,27 +139,50 @@ export function DragDropGallery({
             <h2 className="text-xl font-semibold">Albums</h2>
             <p className="text-gray-500 mt-1">Organisez vos albums par glisser-déposer</p>
           </div>
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button 
-                className="bg-brown hover:bg-brown/90"
-                onClick={() => {
-                  setIsCreatingAlbum(true);
-                  setSelectedAlbum(null);
-                }}
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Nouvel Album
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <AlbumForm
-                isCreating={isCreatingAlbum}
-                defaultValues={selectedAlbum ?? undefined}
-                onSubmit={isCreatingAlbum ? onCreateAlbum : onUpdateAlbum}
-              />
-            </DialogContent>
-          </Dialog>
+          <div className="flex gap-2">
+            {selectedAlbum && (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setSelectedAlbum(selectedAlbum);
+                    setIsCreatingAlbum(false);
+                  }}
+                >
+                  <Edit className="h-4 w-4 mr-2" />
+                  Modifier l'album
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => handleDeleteAlbum(selectedAlbum.id)}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Supprimer l'album
+                </Button>
+              </>
+            )}
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button 
+                  className="bg-brown hover:bg-brown/90"
+                  onClick={() => {
+                    setIsCreatingAlbum(true);
+                    setSelectedAlbum(null);
+                  }}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Nouvel Album
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <AlbumForm
+                  isCreating={isCreatingAlbum}
+                  defaultValues={selectedAlbum ?? undefined}
+                  onSubmit={isCreatingAlbum ? onCreateAlbum : handleEditAlbum}
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
 
         <DndContext
@@ -155,7 +200,7 @@ export function DragDropGallery({
                     setSelectedAlbum(album);
                     setIsCreatingAlbum(false);
                   }}
-                  onDelete={() => onDeleteAlbum(album.id)}
+                  onDelete={() => handleDeleteAlbum(album.id)}
                 />
               ))}
             </SortableContext>
@@ -187,28 +232,51 @@ export function DragDropGallery({
             <h2 className="text-xl font-semibold">Images</h2>
             <p className="text-gray-500 mt-1">Glissez les images dans les albums</p>
           </div>
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button 
-                className="bg-brown hover:bg-brown/90"
-                onClick={() => {
-                  setIsCreatingImage(true);
-                  setSelectedImage(null);
-                }}
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Ajouter une Image
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <ImageForm
-                albums={albums}
-                isCreating={isCreatingImage}
-                defaultValues={selectedImage ?? undefined}
-                onSubmit={isCreatingImage ? onCreateImage : onUpdateImage}
-              />
-            </DialogContent>
-          </Dialog>
+          <div className="flex gap-2">
+            {selectedImage && (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setSelectedImage(selectedImage);
+                    setIsCreatingImage(false);
+                  }}
+                >
+                  <Edit className="h-4 w-4 mr-2" />
+                  Modifier l'image
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => handleDeleteImage(selectedImage.id)}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Supprimer l'image
+                </Button>
+              </>
+            )}
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button 
+                  className="bg-brown hover:bg-brown/90"
+                  onClick={() => {
+                    setIsCreatingImage(true);
+                    setSelectedImage(null);
+                  }}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Ajouter une Image
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <ImageForm
+                  albums={albums}
+                  isCreating={isCreatingImage}
+                  defaultValues={selectedImage ?? undefined}
+                  onSubmit={isCreatingImage ? onCreateImage : handleEditImage}
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
 
         <DndContext
@@ -227,7 +295,7 @@ export function DragDropGallery({
                     setSelectedImage(image);
                     setIsCreatingImage(false);
                   }}
-                  onDelete={() => onDeleteImage(image.id)}
+                  onDelete={() => handleDeleteImage(image.id)}
                 />
               ))}
             </SortableContext>
