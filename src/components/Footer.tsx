@@ -51,7 +51,10 @@ const Footer = () => {
             <div className="flex flex-wrap justify-center gap-4">
               <Link to="/privacy-policy" className="text-gray-400 hover:text-white">Privacy Policy</Link>
               <Link to="/terms" className="text-gray-400 hover:text-white">Terms of Use</Link>
-              <button onClick={() => setIsAccessibilityOpen(true)} className="text-gray-400 hover:text-white">Accessibilité</button>
+              <button onClick={() => setIsAccessibilityOpen(true)} className="text-white bg-blue-600 border-2 border-yellow-400 rounded-full px-4 py-2 flex items-center gap-2 shadow-lg hover:bg-yellow-400 hover:text-black focus:outline-none focus:ring-4 focus:ring-yellow-300 transition-all" style={{fontWeight:'bold'}}>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m0 14v1m8-8h-1M5 12H4m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" /></svg>
+                Accessibilité
+              </button>
             </div>
             <div className="mt-4 flex items-center justify-center text-gray-400">
               <Heart className="h-4 w-4 mr-1" />

@@ -96,11 +96,10 @@ const Gallery = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900">
-              Community Gallery
+              Galerie Communautaire
             </h1>
             <p className="text-lg text-gray-700">
-              Browse through memories from our events and community activities organized in albums.
-              These photos capture the spirit and joy of our vibrant community.
+            Explorez les archives photographiques des Ours!
             </p>
           </div>
         </div>
@@ -119,7 +118,7 @@ const Gallery = () => {
                   </div>
                   <input
                     type="text"
-                    placeholder="Search albums..."
+                    placeholder="Rechercher un album..."
                     className="pl-10 w-full h-12 border border-gray-300 rounded-lg focus:ring-brown focus:border-brown"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -132,11 +131,6 @@ const Gallery = () => {
           {/* Albums Grid */}
           <section className="py-12">
             <div className="container mx-auto px-4">
-              <SectionHeading
-                title="Photo Albums"
-                subtitle="Explore our collections of memories organized by event or theme."
-                centered
-              />
               
               {isLoadingAlbums ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
@@ -149,11 +143,11 @@ const Gallery = () => {
                   <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gray-100 flex items-center justify-center">
                     <ImageIcon size={32} className="text-gray-400" />
                   </div>
-                  <h3 className="text-2xl font-semibold mb-2">No Albums Found</h3>
+                  <h3 className="text-2xl font-semibold mb-2">Aucun Album Disponible pour le moment - ERR03 </h3>
                   <p className="text-gray-600 max-w-md mx-auto">
                     {searchQuery ? 
-                      `No albums match your search for "${searchQuery}". Try different keywords or clear your search.` : 
-                      'There are no albums yet. Albums will appear here once created.'}
+                      `Aucun album ne correspond à votre recherche "${searchQuery}". Essayez d'autres mots-clés ou réinitialisez votre recherche.` : 
+                      "Il n'y a pas encore d'albums. Les albums apparaîtront ici une fois créés."}
                   </p>
                 </div>
               ) : (
@@ -201,14 +195,14 @@ const Gallery = () => {
                 }}
               >
                 <ArrowLeft size={18} className="mr-1" />
-                Back to Albums
+                Retour aux albums
               </button>
               
               <div className="max-w-4xl mx-auto">
                 <h2 className="text-3xl font-bold mb-2">{selectedAlbum.title}</h2>
                 <p className="text-gray-600 mb-2">{selectedAlbum.description}</p>
                 <span className="text-sm text-gray-500">
-                  {selectedAlbum.date} • {albumImages.length} Photos
+                  {selectedAlbum.date} • {albumImages.length} Images
                 </span>
               </div>
             </div>
@@ -230,7 +224,7 @@ const Gallery = () => {
                   </div>
                   <h3 className="text-2xl font-semibold mb-2">No Images Found</h3>
                   <p className="text-gray-600 max-w-md mx-auto">
-                    This album doesn't contain any images yet.
+                    Cet album ne contient pas encore d'images.
                   </p>
                 </div>
               ) : (

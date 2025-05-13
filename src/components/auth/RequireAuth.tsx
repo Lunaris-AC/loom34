@@ -1,28 +1,37 @@
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
-import { ReactNode } from "react";
-import { Navigate, useLocation } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
-import { Skeleton } from "@/components/ui/skeleton";
+interface RequireAuthProps {
+  redirectTo?: string;
+}
 
-export default function RequireAuth({ children }: { children: ReactNode }) {
-  const { user, isLoading } = useAuth();
+/**
+ * Component to protect routes that require authentication
+ */
+export default function RequireAuth({ redirectTo = '/auth/login' }: RequireAuthProps) {
+  const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
 
+  // Show loading state while checking authentication
   if (isLoading) {
     return (
-      <div className="flex flex-col space-y-4 p-8">
-        <Skeleton className="h-8 w-64" />
-        <Skeleton className="h-32 w-full" />
-        <Skeleton className="h-8 w-full" />
-        <Skeleton className="h-8 w-3/4" />
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
-  if (!user) {
-    // Redirect to login but save the location they were trying to access
-    return <Navigate to="/login" state={{ from: location }} replace />;
+  // Redirect to login if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <Navigate 
+        to={redirectTo} 
+        state={{ from: location }} 
+        replace 
+      />
+    );
   }
 
-  return <>{children}</>;
+  // Render child routes if authenticated
+  return <Outlet />;
 }

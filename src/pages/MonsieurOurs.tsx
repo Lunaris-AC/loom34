@@ -60,35 +60,28 @@ const MonsieurOurs = () => {
         </div>
       </section>
       {/* Timeline Section */}
-      <section className="py-16">
+      <section className="py-16 bg-tan/20">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Notre histoire</h2>
-          <div className="relative">
-            <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-brown/30"></div>
-            <div className="space-y-12">
-              {timelineItems.map((item, index) => (
-                <div
-                  key={item.year}
-                  className={`relative flex items-center ${
-                    index % 2 === 0 ? 'justify-start' : 'justify-end'
-                  }`}
-                >
-                  <div
-                    className={`w-1/2 p-6 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow bg-white ${
-                      index % 2 === 0 ? 'mr-auto' : 'ml-auto'
-                    }`}
-                    onClick={() => handleTimelineClick(item.year)}
-                  >
-                    <div className={`absolute top-1/2 transform -translate-y-1/2 w-4 h-4 rounded-full bg-brown ${
-                      index % 2 === 0 ? 'right-0 translate-x-1/2' : 'left-0 -translate-x-1/2'
-                    }`}></div>
-                    <h3 className="text-xl font-bold mb-2">{item.year}</h3>
-                    <h4 className="text-lg font-semibold mb-2">{item.title}</h4>
-                    <p className="text-gray-600">{item.description}</p>
+          <div className="relative max-w-3xl mx-auto mt-16">
+            {/* Timeline line */}
+            <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-brown/30"></div>
+            {timelineItems.map((item, index) => {
+              // Alternance pastille orange ou brown
+              const isOrange = index === 1;
+              return (
+                <div className={`relative mb-16`} key={item.year}>
+                  <div className={`absolute left-1/2 transform -translate-x-1/2 -top-4 w-8 h-8 rounded-full border-4 ${isOrange ? 'border-orange' : 'border-brown'} bg-white z-10`}></div>
+                  <div className={`ml-auto mr-auto ${index % 2 === 0 ? 'md:ml-0 md:mr-[50%] md:pr-8 text-right' : 'md:ml-[50%] md:mr-0 md:pl-8'} w-full md:w-1/2`}> 
+                    <div className="bg-white p-6 rounded-xl shadow-sm cursor-pointer hover:shadow-md transition-shadow" onClick={() => handleTimelineClick(item.year)}>
+                      <span className={`${isOrange ? 'text-orange' : 'text-brown'} font-bold`}>{item.year}</span>
+                      <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
+                      <p className="text-gray-700">{item.description}</p>
+                    </div>
                   </div>
                 </div>
-              ))}
-            </div>
+              );
+            })}
           </div>
         </div>
       </section>

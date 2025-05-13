@@ -1,27 +1,48 @@
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
-import { ReactNode } from "react";
-import { Navigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
-import { Skeleton } from "@/components/ui/skeleton";
+interface RequireAdminProps {
+  redirectTo?: string;
+}
 
-export default function RequireAdmin({ children }: { children: ReactNode }) {
-  const { isAdmin, isLoading } = useAuth();
+/**
+ * Component to protect routes that require admin privileges
+ */
+export default function RequireAdmin({ redirectTo = '/auth/login' }: RequireAdminProps) {
+  const { isAuthenticated, isAdmin, isLoading } = useAuth();
+  const location = useLocation();
 
+  // Show loading state while checking authentication
   if (isLoading) {
     return (
-      <div className="flex flex-col space-y-4 p-8">
-        <Skeleton className="h-8 w-64" />
-        <Skeleton className="h-32 w-full" />
-        <Skeleton className="h-8 w-full" />
-        <Skeleton className="h-8 w-3/4" />
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
-  if (!isAdmin) {
-    // Redirect to home page if not an admin
-    return <Navigate to="/" replace />;
+  // Redirect to login if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <Navigate 
+        to={redirectTo} 
+        state={{ from: location }} 
+        replace 
+      />
+    );
   }
 
-  return <>{children}</>;
+  // Redirect to unauthorized page if not an admin
+  if (!isAdmin) {
+    return (
+      <Navigate 
+        to="/unauthorized" 
+        state={{ from: location }} 
+        replace 
+      />
+    );
+  }
+
+  // Render child routes if user is an admin
+  return <Outlet />;
 }

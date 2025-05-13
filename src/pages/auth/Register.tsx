@@ -1,118 +1,164 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { toast } from 'sonner';
 
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader } from "lucide-react";
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+
+// Registration form validation schema
+const registerSchema = z.object({
+  fullName: z.string().min(2, 'Full name must be at least 2 characters'),
+  username: z.string().min(3, 'Username must be at least 3 characters'),
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+});
+
+type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function Register() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [username, setUsername] = useState("");
-  const [loading, setLoading] = useState(false);
   const { signUp } = useAuth();
   const navigate = useNavigate();
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Form validation
+  const form = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      fullName: '',
+      username: '',
+      email: '',
+      password: '',
+    },
+  });
+  
+  // Handle form submission
+  const onSubmit = async (data: RegisterFormValues) => {
     try {
-      await signUp(email, password, {
-        full_name: fullName,
-        username,
+      setIsLoading(true);
+      await signUp(data.email, data.password, {
+        full_name: data.fullName,
+        username: data.username,
       });
       
-      navigate("/login", { 
-        replace: true,
-        state: { message: "Please check your email to confirm your account before logging in." }
+      toast.success('Account created! Please check your email to confirm your registration.');
+      navigate('/auth/login', { 
+        replace: true
       });
     } catch (error) {
-      console.error("Registration error:", error);
+      console.error('Registration error:', error);
+      // Error toast is already shown in the auth context
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
-
+  
   return (
-    <div className="flex items-center justify-center min-h-screen bg-tan/10">
-      <div className="container max-w-md px-4">
-        <Card>
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-center">Create an Account</CardTitle>
-            <CardDescription className="text-center">
-              Enter your information to create an account
-            </CardDescription>
-          </CardHeader>
-          <form onSubmit={handleSubmit}>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <label htmlFor="fullName" className="text-sm font-medium">Full Name</label>
-                <Input
-                  id="fullName"
-                  placeholder="John Doe"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <label htmlFor="username" className="text-sm font-medium">Username</label>
-                <Input
-                  id="username"
-                  placeholder="johndoe"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <label htmlFor="email" className="text-sm font-medium">Email</label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="your.email@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <label htmlFor="password" className="text-sm font-medium">Password</label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  minLength={6}
-                />
-                <p className="text-xs text-gray-500">Password must be at least 6 characters long</p>
-              </div>
-            </CardContent>
-            <CardFooter className="flex flex-col space-y-4">
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? <Loader className="mr-2 h-4 w-4 animate-spin" /> : "Create Account"}
-              </Button>
-              <div className="text-center text-sm">
-                Already have an account?{" "}
-                <Link to="/login" className="text-brown hover:underline">
-                  Sign in
-                </Link>
-              </div>
-              <div className="text-center text-sm">
-                <Link to="/" className="text-gray-500 hover:underline">
-                  Back to home
-                </Link>
-              </div>
-            </CardFooter>
-          </form>
-        </Card>
-      </div>
+    <div className="flex justify-center items-center min-h-screen bg-slate-100 p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl font-bold">Create Account</CardTitle>
+          <CardDescription>
+            Enter your information to create a new account
+          </CardDescription>
+        </CardHeader>
+        
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="fullName">Full Name</Label>
+              <Input
+                id="fullName"
+                placeholder="John Doe"
+                disabled={isLoading}
+                {...form.register('fullName')}
+              />
+              {form.formState.errors.fullName && (
+                <span className="text-sm text-red-500">
+                  {form.formState.errors.fullName.message}
+                </span>
+              )}
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="username">Username</Label>
+              <Input
+                id="username"
+                placeholder="johndoe"
+                disabled={isLoading}
+                {...form.register('username')}
+              />
+              {form.formState.errors.username && (
+                <span className="text-sm text-red-500">
+                  {form.formState.errors.username.message}
+                </span>
+              )}
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="email@example.com"
+                autoComplete="email"
+                disabled={isLoading}
+                {...form.register('email')}
+              />
+              {form.formState.errors.email && (
+                <span className="text-sm text-red-500">
+                  {form.formState.errors.email.message}
+                </span>
+              )}
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                autoComplete="new-password"
+                disabled={isLoading}
+                {...form.register('password')}
+              />
+              {form.formState.errors.password && (
+                <span className="text-sm text-red-500">
+                  {form.formState.errors.password.message}
+                </span>
+              )}
+              <p className="text-xs text-gray-500">
+                Password must be at least 6 characters long
+              </p>
+            </div>
+          </CardContent>
+          
+          <CardFooter className="flex flex-col space-y-4">
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Creating account...' : 'Create Account'}
+            </Button>
+            
+            <div className="text-center text-sm">
+              Already have an account?{' '}
+              <a
+                href="/auth/login"
+                className="text-blue-600 hover:text-blue-800 font-medium"
+              >
+                Sign in
+              </a>
+            </div>
+          </CardFooter>
+        </form>
+      </Card>
     </div>
   );
 }
