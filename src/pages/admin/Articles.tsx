@@ -242,6 +242,7 @@ export default function AdminArticles() {
           <p className="text-gray-500 mt-1">Créez, modifiez et gérez vos articles de blog</p>
         </div>
         <Button 
+          variant="brown"
           className="bg-brown hover:bg-brown/90" 
           onClick={resetForm}
         >
@@ -265,6 +266,7 @@ export default function AdminArticles() {
           <h3 className="text-lg font-medium text-gray-900">Aucun article trouvé</h3>
           <p className="text-gray-500 mb-4">Vous n'avez pas encore créé d'articles.</p>
           <Button 
+            variant="brown"
             className="bg-brown hover:bg-brown/90" 
             onClick={resetForm}
           >
@@ -424,7 +426,7 @@ export default function AdminArticles() {
             <Button variant="outline" onClick={() => setDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={isCreating ? handleCreateArticle : handleUpdateArticle}>
+            <Button variant="brown" onClick={isCreating ? handleCreateArticle : handleUpdateArticle}>
               {isCreating ? "Create Article" : "Update Article"}
             </Button>
           </DialogFooter>

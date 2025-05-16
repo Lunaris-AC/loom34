@@ -421,7 +421,7 @@ export default function Gallery() {
         <div className="w-64 border-r p-4 space-y-4">
           <Dialog open={isCreatingAlbum} onOpenChange={setIsCreatingAlbum}>
             <DialogTrigger asChild>
-              <Button className="w-full">
+              <Button variant="brown" className="w-full">
                 <Plus className="h-4 w-4 mr-2" />
                 Nouvel Album
               </Button>
@@ -435,6 +435,7 @@ export default function Gallery() {
                   placeholder="Entrez le nom de l'album"
                 />
                 <Button
+                  variant="brown"
                   onClick={() => createAlbumMutation.mutate(newAlbumName)}
                   disabled={!newAlbumName.trim()}
                 >
@@ -502,7 +503,7 @@ export default function Gallery() {
                   }}
                 >
                   <ImageIcon className="h-4 w-4 mr-2" />
-                  {album.title}
+                  <span className="truncate block max-w-[140px]" title={album.title}>{album.title}</span>
                   <span className="ml-auto text-sm text-gray-500">
                     {album.image_count}
                   </span>

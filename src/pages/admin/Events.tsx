@@ -256,6 +256,7 @@ export default function AdminEvents() {
           <p className="text-gray-500 mt-1">Créez, modifiez et gérez vos événements</p>
         </div>
         <Button 
+          variant="brown"
           className="bg-brown hover:bg-brown/90" 
           onClick={resetForm}
         >
@@ -279,6 +280,7 @@ export default function AdminEvents() {
           <h3 className="text-lg font-medium text-gray-900">Aucun événement trouvé</h3>
           <p className="text-gray-500 mb-4">Vous n'avez pas encore créé d'événements.</p>
           <Button 
+            variant="brown"
             className="bg-brown hover:bg-brown/90" 
             onClick={resetForm}
           >
@@ -463,7 +465,7 @@ export default function AdminEvents() {
             <Button variant="outline" onClick={() => setDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={isCreating ? handleCreateEvent : handleUpdateEvent}>
+            <Button variant="brown" onClick={isCreating ? handleCreateEvent : handleUpdateEvent}>
               {isCreating ? "Create Event" : "Update Event"}
             </Button>
           </DialogFooter>

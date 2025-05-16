@@ -164,7 +164,8 @@ export function DragDropGallery({
             <Dialog>
               <DialogTrigger asChild>
                 <Button 
-                  className="bg-brown hover:bg-brown/90"
+                  variant="brown"
+                  className="text-white"
                   onClick={() => {
                     setIsCreatingAlbum(true);
                     setSelectedAlbum(null);
@@ -257,7 +258,8 @@ export function DragDropGallery({
             <Dialog>
               <DialogTrigger asChild>
                 <Button 
-                  className="bg-brown hover:bg-brown/90"
+                  variant="brown"
+                  className="text-white"
                   onClick={() => {
                     setIsCreatingImage(true);
                     setSelectedImage(null);

@@ -55,7 +55,7 @@ export function SortableAlbum({ album, onEdit, onDelete }: SortableAlbumProps) {
       </div>
       
       <div className="p-4">
-        <h3 className="font-medium text-gray-900">{album.title}</h3>
+        <h3 className="font-medium text-gray-900 block truncate max-w-[180px]" title={album.title}>{album.title}</h3>
         <p className="text-sm text-gray-500 mt-1">
           {album.image_count ?? 0} {album.image_count === 1 ? 'image' : 'images'}
         </p>

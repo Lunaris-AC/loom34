@@ -107,4 +107,9 @@ body {
   border: 1px solid #888 !important;
   padding: 0.3em 0.6em;
   margin-bottom: 1em;
+}
+
+/* Fix: force white text on brown disabled buttons */
+button.bg-brown:disabled, .bg-brown:disabled {
+  color: #fff !important;
 } 

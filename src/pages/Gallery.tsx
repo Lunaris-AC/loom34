@@ -33,9 +33,10 @@ const Gallery = () => {
         throw albumsError;
       }
 
-      // For each album, get the count of images
+      // For each album, get the count of images and the latest image as cover
       const albumsWithCount: GalleryAlbum[] = await Promise.all(
         (albumsData || []).map(async (album) => {
+          // Get image count
           const { count, error: countError } = await supabase
             .from('gallery_images')
             .select('*', { count: 'exact', head: true })
@@ -45,9 +46,23 @@ const Gallery = () => {
             console.error('Error fetching image count:', countError);
           }
 
+          // Get latest image for cover
+          const { data: latestImage, error: latestImageError } = await supabase
+            .from('gallery_images')
+            .select('image_url')
+            .eq('album_id', album.id)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single();
+
+          if (latestImageError && latestImageError.code !== 'PGRST116') { // ignore no rows found
+            console.error('Error fetching latest image:', latestImageError);
+          }
+
           return {
             ...album,
-            image_count: count || 0
+            image_count: count || 0,
+            cover_image: latestImage?.image_url || album.cover_image,
           };
         })
       );
@@ -158,11 +173,12 @@ const Gallery = () => {
                       className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer hover-lift"
                       onClick={() => setSelectedAlbum(album)}
                     >
-                      <div className="h-56 overflow-hidden">
+                      <div className="h-56 overflow-hidden flex items-center justify-center bg-gray-100">
                         <img 
                           src={album.cover_image} 
                           alt={album.title} 
-                          className="w-full h-full object-cover"
+                          className="max-h-56 w-auto h-auto mx-auto"
+                          style={{ maxWidth: '100%', maxHeight: '100%' }}
                         />
                       </div>
                       <div className="p-6">
@@ -232,13 +248,15 @@ const Gallery = () => {
                   {albumImages.map((image) => (
                     <div 
                       key={image.id}
-                      className="aspect-square rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
+                      className="rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition-opacity flex items-center justify-center bg-gray-100"
+                      style={{ aspectRatio: '1/1' }}
                       onClick={() => setSelectedImage(image)}
                     >
                       <img 
                         src={image.image_url} 
                         alt={image.title || 'Gallery image'} 
-                        className="w-full h-full object-cover"
+                        className="max-h-60 w-auto h-auto mx-auto"
+                        style={{ maxWidth: '100%', maxHeight: '100%' }}
                       />
                     </div>
                   ))}

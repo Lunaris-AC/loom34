@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { DialogHeader } from "@/components/admin/DialogHeader";
 import { DialogFooter } from "@/components/ui/dialog";
@@ -98,7 +97,7 @@ export function AlbumForm({ defaultValues, onSubmit, isCreating = true }: AlbumF
           <Button variant="outline">Cancel</Button>
         </DialogClose>
         <DialogClose asChild>
-          <Button onClick={handleSubmit}>
+          <Button variant="brown" className="text-white" onClick={handleSubmit}>
             {isCreating ? "Create Album" : "Update Album"}
           </Button>
         </DialogClose>

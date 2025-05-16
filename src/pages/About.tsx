@@ -151,7 +151,7 @@ const About = () => {
                   <span className="text-brown font-bold">2024</span>
                   <h3 className="text-xl font-semibold mb-2">Un grand événement</h3>
                   <p className="text-gray-700">
-                    En 2024, pour la première fois nous avons participé à la Marche des fièretés, avec notre propre char. C'est aussi l'année où nous avons dépassés les 100 adhérents.
+                    En 2024, pour la première fois nous avons participé à la Marche des fiertés, avec notre propre char. C'est aussi l'année où nous avons dépassés les 100 adhérents.
                   </p>
                 </div>
               </div>
@@ -164,8 +164,8 @@ const About = () => {
       <section className="py-16">
         <div className="container mx-auto px-4">
           <SectionHeading 
-            title="Meet Our Team" 
-            subtitle="The dedicated individuals who make our community thrive."
+            title="Rencontrez les Ours!" 
+            subtitle=""
             centered
           />
           

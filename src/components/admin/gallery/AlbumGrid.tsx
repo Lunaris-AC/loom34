@@ -1,4 +1,3 @@
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2 } from "lucide-react";
@@ -31,7 +30,7 @@ export function AlbumGrid({ albums, onEdit, onDelete }: AlbumGridProps) {
             </div>
           </div>
           <CardContent className="p-4">
-            <h3 className="font-semibold text-lg">{album.title}</h3>
+            <h3 className="font-semibold text-lg block truncate max-w-[180px]" title={album.title}>{album.title}</h3>
             {album.description && <p className="text-gray-500 text-sm mt-1">{album.description}</p>}
             <p className="text-gray-400 text-xs mt-2">{album.date}</p>
           </CardContent>

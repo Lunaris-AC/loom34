@@ -56,7 +56,7 @@ export default function AdminUsers() {
         <h2 className="text-xl font-semibold">Utilisateurs</h2>
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
           <DialogTrigger asChild>
-            <Button>Créer un utilisateur</Button>
+            <Button variant="brown">Créer un utilisateur</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>

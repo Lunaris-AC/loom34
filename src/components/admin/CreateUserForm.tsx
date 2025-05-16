@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -158,7 +157,7 @@ export function CreateUserForm({ onSuccess }: CreateUserFormProps) {
           )}
         />
 
-        <Button type="submit" className="w-full" disabled={isLoading}>
+        <Button type="submit" variant="brown" className="w-full" disabled={isLoading}>
           {isLoading ? "Creating..." : "Create User"}
         </Button>
       </form>
