@@ -24,7 +24,7 @@ const ArticleDetail = () => {
         .single();
       
       if (error) {
-        console.error('Error fetching article:', error);
+        console.error('ERREUR:', error);
         throw error;
       }
       
@@ -61,14 +61,14 @@ const ArticleDetail = () => {
         <Navbar />
         <div className="container mx-auto px-4 py-24 flex-1">
           <div className="max-w-3xl mx-auto text-center py-12">
-            <h1 className="text-3xl md:text-4xl font-bold mb-6 text-gray-900">Article Not Found</h1>
+            <h1 className="text-3xl md:text-4xl font-bold mb-6 text-gray-900">Article non trouvé</h1>
             <p className="text-lg text-gray-700 mb-8">
-              The article you're looking for doesn't exist or has been removed.
+              L'article que vous cherchez n'existe pas ou a été supprimé.
             </p>
             <Link to="/articles">
               <Button>
                 <ChevronLeft size={18} className="mr-2" />
-                Back to Articles
+                Retour aux articles
               </Button>
             </Link>
           </div>
@@ -88,7 +88,7 @@ const ArticleDetail = () => {
           <div className="max-w-4xl mx-auto">
             <Link to="/articles" className="inline-flex items-center text-brown hover:text-brown-dark mb-6">
               <ChevronLeft size={18} className="mr-1" />
-              Back to Articles
+              Retour aux articles
             </Link>
             
             <div className="inline-flex items-center px-3 py-1 rounded-full bg-orange/10 text-orange text-sm font-medium mb-4">
@@ -146,9 +146,9 @@ const ArticleDetail = () => {
       {/* Call to Action */}
       <section className="py-16 bg-brown text-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-6">Join Our Community</h2>
+          <h2 className="text-3xl font-bold mb-6">Rejoignez notre communauté</h2>
           <p className="text-tan/90 text-lg mb-8 max-w-2xl mx-auto">
-            Be part of our vibrant community and stay updated with our latest articles, events, and initiatives.
+            Participez à notre communauté vibrante et restez informé des derniers articles, événements et initiatives.
           </p>
           <a 
             href="https://www.helloasso.com/associations/your-association/adhesions/membership" 
@@ -156,7 +156,7 @@ const ArticleDetail = () => {
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center bg-orange hover:bg-orange-dark text-white py-3 px-6 rounded-lg font-medium transition-colors"
           >
-            Become a Member
+            Devenez membre
           </a>
         </div>
       </section>

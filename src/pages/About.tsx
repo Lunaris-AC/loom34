@@ -169,7 +169,7 @@ const About = () => {
             centered
           />
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-12">
             {/* Team Member 1 */}
             <div className="bg-white rounded-xl shadow-sm overflow-hidden hover-lift transition-all duration-300">
               <div className="aspect-square">

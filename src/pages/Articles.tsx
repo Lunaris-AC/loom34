@@ -61,8 +61,7 @@ const Articles = () => {
               Articles
             </h1>
             <p className="text-lg text-gray-700">
-              Explore our collection of articles, stories, and perspectives from our community. 
-              Stay updated with the latest news and insights.
+              Explorez les dernières nouvelles des Ours !
             </p>
           </div>
         </div>
@@ -79,7 +78,7 @@ const Articles = () => {
                 </div>
                 <input
                   type="text"
-                  placeholder="Search articles..."
+                  placeholder="Rechercher un article..."
                   className="pl-10 w-full h-12 border border-gray-300 rounded-lg focus:ring-brown focus:border-brown"
                   value={searchQuery}
                   onChange={(e) => {
@@ -100,7 +99,7 @@ const Articles = () => {
                 >
                   <div className="flex items-center">
                     <Filter size={18} className="mr-2 text-gray-500" />
-                    <span>{categoryFilter || 'All Categories'}</span>
+                    <span>{categoryFilter || 'Toutes les catégories'}</span>
                   </div>
                   <ChevronDown size={16} />
                 </button>
@@ -117,7 +116,7 @@ const Articles = () => {
                       document.getElementById('categoriesDropdown')?.classList.add('hidden');
                     }}
                   >
-                    All Categories
+                    Toutes les catégories
                   </div>
                   {categories.map((category) => (
                     <div 
@@ -159,7 +158,7 @@ const Articles = () => {
               <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gray-100 flex items-center justify-center">
                 <Search size={32} className="text-gray-400" />
               </div>
-              <h3 className="text-2xl font-semibold mb-2">No Articles Found</h3>
+              <h3 className="text-2xl font-semibold mb-2">Aucun article trouvé ERR-01</h3>
               <p className="text-gray-600 max-w-md mx-auto">
                 {searchQuery || categoryFilter ? 
                   `No articles match your search criteria. Try different keywords or filters.` : 

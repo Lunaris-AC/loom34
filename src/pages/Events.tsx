@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Search, Calendar, Filter, ChevronDown } from 'lucide-react';
+import { Search, Calendar, Filter, ChevronDown, ArrowUpDown, EyeOff } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import EventCard from '@/components/EventCard';
@@ -16,41 +16,42 @@ const Events = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
-  const [dateFilter, setDateFilter] = useState<Date | undefined>(undefined);
-  const [categories, setCategories] = useState<string[]>([]);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [hidePastEvents, setHidePastEvents] = useState(false);
+  const [locations, setLocations] = useState<string[]>([]);
   const eventsPerPage = 6;
 
   // Fetch all events
   const { data: events = [], isLoading } = useQuery({
-    queryKey: ['events', searchQuery, categoryFilter, dateFilter],
+    queryKey: ['events', searchQuery, categoryFilter, sortOrder, hidePastEvents],
     queryFn: async () => {
       let query = supabase
         .from('events')
         .select('*')
         .eq('published', true)
-        .order('date', { ascending: true });
+        .order('date', { ascending: sortOrder === 'asc' });
       
       if (searchQuery) {
         query = query.or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%,location.ilike.%${searchQuery}%`);
       }
 
       if (categoryFilter) {
-        // Extract category from description for demo (in a real app, you'd have a category field)
-        // This is a simplified approach since we don't have a category field in the events table
-        query = query.ilike('description', `%${categoryFilter}%`);
+        query = query.eq('location', categoryFilter);
       }
 
       const { data, error } = await query;
       
       if (error) throw error;
       
-      // Apply date filter in JS (since our date field is text)
       let filtered = data as Tables<'events'>[];
       
-      if (dateFilter) {
-        const filterDateStr = format(dateFilter, 'MMMM d, yyyy');
+      // Filter out past events if hidePastEvents is true
+      if (hidePastEvents) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
         filtered = filtered.filter(event => {
-          return event.date.includes(filterDateStr);
+          const eventDate = new Date(event.date);
+          return eventDate >= today;
         });
       }
       
@@ -58,25 +59,17 @@ const Events = () => {
     }
   });
 
-  // Extract categories from events (simplified - in a real app, you'd have a proper category field)
+  // Extract unique locations from events
   useEffect(() => {
     if (events.length > 0) {
-      const categoryList = [
-        'Workshop',
-        'Community',
-        'Social',
-        'Educational',
-        'Charity',
-        'Art'
-      ];
-      setCategories(categoryList);
+      const uniqueLocations = Array.from(new Set(events.map(event => event.location)));
+      setLocations(uniqueLocations);
     }
   }, [events]);
 
   const clearFilters = () => {
     setSearchQuery('');
     setCategoryFilter('');
-    setDateFilter(undefined);
     setCurrentPage(1);
   };
 
@@ -126,46 +119,10 @@ const Events = () => {
               </div>
               <div className="flex gap-4 flex-col sm:flex-row">
                 <div className="relative">
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="flex justify-between w-full sm:w-48 h-12"
-                      >
-                        <div className="flex items-center">
-                          <Calendar size={18} className="mr-2 text-gray-500" />
-                          <span>{dateFilter ? format(dateFilter, 'PP') : 'Filtrer par date'}</span>
-                        </div>
-                        <ChevronDown size={16} />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <CalendarComponent
-                        mode="single"
-                        selected={dateFilter}
-                        onSelect={setDateFilter}
-                        initialFocus
-                      />
-                      {dateFilter && (
-                        <div className="p-3 border-t">
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            onClick={() => setDateFilter(undefined)}
-                            className="w-full"
-                          >
-                            Clear Date
-                          </Button>
-                        </div>
-                      )}
-                    </PopoverContent>
-                  </Popover>
-                </div>
-                <div className="relative">
                   <button 
                     className="flex items-center justify-between w-full sm:w-48 h-12 px-4 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
                     onClick={() => {
-                      const dropdown = document.getElementById('categoriesDropdown');
+                      const dropdown = document.getElementById('locationsDropdown');
                       if (dropdown) {
                         dropdown.classList.toggle('hidden');
                       }
@@ -173,13 +130,13 @@ const Events = () => {
                   >
                     <div className="flex items-center">
                       <Filter size={18} className="mr-2 text-gray-500" />
-                      <span>{categoryFilter || 'Toutes les catégories'}</span>
+                      <span>{categoryFilter || 'Tous les lieux'}</span>
                     </div>
                     <ChevronDown size={16} />
                   </button>
-                  {/* Category filter dropdown */}
+                  {/* Locations filter dropdown */}
                   <div 
-                    id="categoriesDropdown"
+                    id="locationsDropdown"
                     className="absolute top-full mt-2 w-full sm:w-48 bg-white rounded-lg shadow-lg overflow-hidden z-10 hidden"
                   >
                     <div 
@@ -187,31 +144,53 @@ const Events = () => {
                       onClick={() => {
                         setCategoryFilter('');
                         setCurrentPage(1);
-                        document.getElementById('categoriesDropdown')?.classList.add('hidden');
+                        document.getElementById('locationsDropdown')?.classList.add('hidden');
                       }}
                     >
-                      All Categories
+                      Tous les lieux
                     </div>
-                    {categories.map((category) => (
+                    {locations.map((location) => (
                       <div 
-                        key={category}
+                        key={location}
                         className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                         onClick={() => {
-                          setCategoryFilter(category);
+                          setCategoryFilter(location);
                           setCurrentPage(1);
-                          document.getElementById('categoriesDropdown')?.classList.add('hidden');
+                          document.getElementById('locationsDropdown')?.classList.add('hidden');
                         }}
                       >
-                        {category}
+                        {location}
                       </div>
                     ))}
                   </div>
+                </div>
+                <div className="relative">
+                  <button 
+                    className="flex items-center justify-between w-full sm:w-48 h-12 px-4 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                    onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
+                  >
+                    <div className="flex items-center">
+                      <ArrowUpDown size={18} className="mr-2 text-gray-500" />
+                      <span>Trier par date {sortOrder === 'asc' ? '(↑)' : '(↓)'}</span>
+                    </div>
+                  </button>
+                </div>
+                <div className="relative">
+                  <button 
+                    className={`flex items-center justify-between w-full sm:w-48 h-12 px-4 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 ${hidePastEvents ? 'bg-gray-200 border-gray-400' : ''}`}
+                    onClick={() => setHidePastEvents(prev => !prev)}
+                  >
+                    <div className="flex items-center">
+                      <EyeOff size={18} className={`mr-2 ${hidePastEvents ? 'text-gray-900' : 'text-gray-500'}`} />
+                      <span>Masquer les événements passés</span>
+                    </div>
+                  </button>
                 </div>
               </div>
             </div>
             
             {/* Active filters */}
-            {(searchQuery || categoryFilter || dateFilter) && (
+            {(searchQuery || categoryFilter || hidePastEvents) && (
               <div className="mt-4 flex items-center flex-wrap gap-2">
                 <span className="text-sm text-gray-600">Filtres actifs :</span>
                 {searchQuery && (
@@ -227,7 +206,7 @@ const Events = () => {
                 )}
                 {categoryFilter && (
                   <span className="inline-flex items-center px-3 py-1 rounded-full bg-gray-100 text-gray-800 text-sm">
-                    Catégorie : {categoryFilter}
+                    Lieu : {categoryFilter}
                     <button 
                       className="ml-2 text-gray-500 hover:text-gray-700"
                       onClick={() => setCategoryFilter('')}
@@ -236,22 +215,22 @@ const Events = () => {
                     </button>
                   </span>
                 )}
-                {dateFilter && (
+                {hidePastEvents && (
                   <span className="inline-flex items-center px-3 py-1 rounded-full bg-gray-100 text-gray-800 text-sm">
-                    Date : {format(dateFilter, 'PP')}
+                    Événements passés masqués
                     <button 
                       className="ml-2 text-gray-500 hover:text-gray-700"
-                      onClick={() => setDateFilter(undefined)}
+                      onClick={() => setHidePastEvents(false)}
                     >
                       ×
                     </button>
                   </span>
                 )}
                 <button 
-                  className="text-sm text-brown hover:text-brown-dark ml-2"
+                  className="text-sm text-brown hover:underline font-medium"
                   onClick={clearFilters}
                 >
-                  Clear all
+                  Effacer tous les filtres
                 </button>
               </div>
             )}
@@ -280,12 +259,12 @@ const Events = () => {
               </div>
               <h3 className="text-2xl font-semibold mb-2">Aucun événement trouvé</h3>
               <p className="text-gray-600 max-w-md mx-auto">
-                {searchQuery || categoryFilter || dateFilter ? 
+                {searchQuery || categoryFilter || hidePastEvents ? 
                   `Aucun événement ne correspond à vos critères de recherche. Essayez d'autres filtres.` : 
                   "Nous n'avons pas d'événements à venir pour le moment. Revenez bientôt !"}
               </p>
               
-              {(searchQuery || categoryFilter || dateFilter) && (
+              {(searchQuery || categoryFilter || hidePastEvents) && (
                 <button 
                   className="mt-4 text-brown hover:underline font-medium"
                   onClick={clearFilters}

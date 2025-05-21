@@ -22,7 +22,7 @@ const EventDetail = () => {
         .single();
       
       if (error) {
-        console.error('Error fetching event:', error);
+        console.error('ERREUR:', error);
         throw error;
       }
       
@@ -48,14 +48,14 @@ const EventDetail = () => {
         <Navbar />
         <div className="container mx-auto px-4 py-24 flex-1">
           <div className="max-w-3xl mx-auto text-center py-12">
-            <h1 className="text-3xl md:text-4xl font-bold mb-6 text-gray-900">Event Not Found</h1>
+            <h1 className="text-3xl md:text-4xl font-bold mb-6 text-gray-900">Événement non trouvé</h1>
             <p className="text-lg text-gray-700 mb-8">
-              The event you're looking for doesn't exist or has been removed.
+              L'événement que vous cherchez n'existe pas ou a été supprimé.
             </p>
             <Link to="/events">
               <Button>
                 <ChevronLeft size={18} className="mr-2" />
-                Back to Events
+                Retour aux événements
               </Button>
             </Link>
           </div>
@@ -75,7 +75,7 @@ const EventDetail = () => {
           <div className="max-w-4xl mx-auto">
             <Link to="/events" className="inline-flex items-center text-brown hover:text-brown-dark mb-6">
               <ChevronLeft size={18} className="mr-1" />
-              Back to Events
+              Retour aux événements
             </Link>
             
             <h1 className="text-3xl md:text-5xl font-bold leading-tight text-gray-900 mb-6">
@@ -101,7 +101,7 @@ const EventDetail = () => {
                 </div>
                 
                 <div className="bg-white rounded-xl shadow-sm p-8">
-                  <h2 className="text-2xl font-bold mb-4">About This Event</h2>
+                  <h2 className="text-2xl font-bold mb-4">À propos de cet événement</h2>
                   <div className="prose max-w-none">
                     {event.description.split('\n\n').map((paragraph, index) => (
                       <p key={index} className="mb-6 text-gray-700">
@@ -117,7 +117,7 @@ const EventDetail = () => {
                 <div className="bg-white rounded-xl shadow-sm p-6 sticky top-24">
                   <div className="space-y-6">
                     <div>
-                      <h3 className="text-lg font-semibold mb-2">Date & Time</h3>
+                      <h3 className="text-lg font-semibold mb-2">Date & Heure</h3>
                       <div className="flex items-start text-gray-700">
                         <CalendarDays size={20} className="mr-3 text-brown mt-0.5" />
                         <div>
@@ -128,7 +128,7 @@ const EventDetail = () => {
                     </div>
                     
                     <div>
-                      <h3 className="text-lg font-semibold mb-2">Location</h3>
+                      <h3 className="text-lg font-semibold mb-2">Lieu</h3>
                       <div className="flex items-start text-gray-700">
                         <MapPin size={20} className="mr-3 text-brown mt-0.5" />
                         <p>{event.location}</p>
@@ -142,7 +142,7 @@ const EventDetail = () => {
                         rel="noopener noreferrer" 
                         className="block w-full bg-brown hover:bg-brown-dark text-white py-3 px-6 rounded-lg font-medium transition-colors text-center mt-8"
                       >
-                        Register for This Event
+                        S'inscrire à cet événement
                         <ExternalLink size={16} className="inline-block ml-2" />
                       </a>
                     )}
@@ -157,9 +157,9 @@ const EventDetail = () => {
       {/* Call to Action */}
       <section className="py-16 bg-brown text-white mt-16">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-6">Interested in More Events?</h2>
+          <h2 className="text-3xl font-bold mb-6">Intéressé par plus d'événements ?</h2>
           <p className="text-tan/90 text-lg mb-8 max-w-2xl mx-auto">
-            Explore our calendar of upcoming events and join our community for exclusive access.
+            Explorez notre calendrier des événements à venir et rejoignez notre communauté pour un accès exclusif.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/events">
@@ -168,7 +168,7 @@ const EventDetail = () => {
                 size="lg"
                 className="bg-orange hover:bg-orange-light transition-all"
               >
-                View All Events
+                Voir tous les événements
               </Button>
             </Link>
             <a
@@ -181,7 +181,7 @@ const EventDetail = () => {
                 size="lg"
                 className="border-white text-white hover:bg-white/10"
               >
-                Become a Member
+                Devenez membre
               </Button>
             </a>
           </div>

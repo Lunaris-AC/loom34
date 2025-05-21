@@ -37,6 +37,7 @@ const Navbar = () => {
   const navLinks = [
     { name: 'Accueil', path: '/' },
     { name: 'À propos', path: '/about' },
+    { name: 'Articles', path: '/articles' },    
     { name: 'Événements', path: '/events' },
     { name: 'Boutique', path: 'https://www.helloasso.com/associations/association-les-ours-occitanie-mediterranee-loom#shop', external: true },
     { name: 'Monsieur Ours', path: '/monsieur-ours' },

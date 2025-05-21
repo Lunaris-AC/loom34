@@ -38,7 +38,7 @@ const Index = () => {
   });
 
   // Fetch upcoming events with debugging
-  const { data: upcomingEvents = [], isLoading: isLoadingEvents } = useQuery({
+  const { data: upcomingEventsRaw = [], isLoading: isLoadingEvents } = useQuery({
     queryKey: ['upcomingEvents'],
     queryFn: async () => {
       console.log('Fetching upcoming events...');
@@ -47,7 +47,7 @@ const Index = () => {
         .select('*')
         .eq('published', true)
         .order('date', { ascending: true })
-        .limit(2);
+        .limit(10); // On récupère plus d'événements pour être sûr d'avoir assez d'événements à venir
       
       if (error) {
         console.error('Error fetching events:', error);
@@ -57,6 +57,15 @@ const Index = () => {
       return data as Tables<'events'>[];
     }
   });
+
+  // Filtrage côté client : uniquement les événements à venir
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // On ignore l'heure
+  const upcomingEvents = (upcomingEventsRaw || []).filter(event => {
+    const eventDate = new Date(event.date);
+    eventDate.setHours(0, 0, 0, 0);
+    return eventDate >= today;
+  }).slice(0, 2); // On limite à 2 événements affichés
 
   // Partners automatic scroll effect
   useEffect(() => {
