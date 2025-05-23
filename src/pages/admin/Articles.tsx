@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/db/client";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -22,7 +22,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/contexts/AuthContext";
-import { ImageUpload } from '@/components/admin/ImageUpload';
+import ImageUpload from "@/components/admin/ImageUpload";
+import MDEditor from '@uiw/react-md-editor';
+import '@uiw/react-md-editor/markdown-editor.css';
+import '@uiw/react-markdown-preview/markdown.css';
 
 interface Article {
   id: string;
@@ -54,7 +57,8 @@ export default function AdminArticles() {
     content: "",
     image: "https://placehold.co/600x400?text=Article+Image",
     published: false,
-    slug: ""
+    slug: "",
+    date: ""
   });
 
   useEffect(() => {
@@ -64,7 +68,7 @@ export default function AdminArticles() {
   async function fetchArticles() {
     try {
       setLoading(true);
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from('articles')
         .select('id, title, category, date, published, slug, content, excerpt, image')
         .order('date', { ascending: false });
@@ -112,7 +116,8 @@ export default function AdminArticles() {
       content: "",
       image: "https://placehold.co/600x400?text=Article+Image",
       published: false,
-      slug: ""
+      slug: "",
+      date: ""
     });
     setIsCreating(true);
     setSelectedArticle(null);
@@ -121,7 +126,7 @@ export default function AdminArticles() {
 
   const handleCreateArticle = async () => {
     try {
-      const { title, category, excerpt, content, image, published, slug } = articleForm;
+      const { title, category, excerpt, content, image, published, slug, date } = articleForm;
       
       if (!title || !category || !excerpt || !content || !slug) {
         toast.error("Please fill all required fields");
@@ -136,10 +141,11 @@ export default function AdminArticles() {
         image,
         published,
         slug,
-        author_id: user?.id
+        author_id: user?.id,
+        date: date || new Date().toISOString(),
       };
       
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from('articles')
         .insert(newArticle)
         .select()
@@ -178,7 +184,7 @@ export default function AdminArticles() {
         updated_at: new Date().toISOString()
       };
       
-      const { error } = await supabase
+      const { error } = await db
         .from('articles')
         .update(updatedArticle)
         .eq('id', selectedArticle.id);
@@ -198,7 +204,7 @@ export default function AdminArticles() {
     if (!selectedArticle) return;
     
     try {
-      const { error } = await supabase
+      const { error } = await db
         .from('articles')
         .delete()
         .eq('id', selectedArticle.id);
@@ -223,7 +229,8 @@ export default function AdminArticles() {
       content: article.content,
       image: article.image,
       published: article.published,
-      slug: article.slug
+      slug: article.slug,
+      date: article.date
     });
     setIsCreating(false);
     setDialogOpen(true);
@@ -389,23 +396,23 @@ export default function AdminArticles() {
             </div>
             <div className="grid grid-cols-4 items-start gap-4">
               <Label htmlFor="content" className="text-right pt-2">Content</Label>
-              <Textarea
-                id="content"
-                name="content"
-                value={articleForm.content}
-                onChange={handleInputChange}
-                className="col-span-3"
-                placeholder="Full article content"
-                rows={10}
-              />
+              <div className="col-span-3">
+                <MDEditor
+                  value={articleForm.content}
+                  onChange={value => setArticleForm(prev => ({ ...prev, content: value || '' }))}
+                  height={300}
+                  preview="edit"
+                  visiableDragbar={false}
+                  textareaProps={{
+                    placeholder: 'Écrivez le contenu de l\'article en markdown...'
+                  }}
+                />
+              </div>
             </div>
             <div className="grid grid-cols-4 items-start gap-4">
               <Label htmlFor="image" className="text-right pt-2">Image</Label>
               <div className="col-span-3">
-                <ImageUpload
-                  onImageUploaded={(url) => setArticleForm(prev => ({ ...prev, image: url }))}
-                  defaultImage={articleForm.image}
-                />
+                <ImageUpload onUploadComplete={(url) => setArticleForm(prev => ({ ...prev, image: url }))} />
               </div>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">

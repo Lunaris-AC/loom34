@@ -72,6 +72,9 @@ const Navbar = () => {
       }`}
     >
       <div className="container mx-auto px-4 flex justify-between items-center">
+        {/* Debug temporaire : Affichage du profil et de isAdmin */}
+
+        
         {/* Logo */}
         <Link to="/" className="flex items-center">
           <img 

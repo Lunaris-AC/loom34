@@ -1,105 +1,139 @@
 import { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { db } from '@/db/client';
+import { Tables } from '@/db/types';
 import { Button } from '@/components/ui/button';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
+import { toast } from 'sonner';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 import AdminLayout from '@/components/admin/AdminLayout';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Separator } from '@/components/ui/separator';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-type TicketStatus = 'Nouveau' | 'En attente' | 'Répondu' | 'Fermé';
+type ContactTicket = Tables<'contact_tickets'> & {
+  id: number;
+  status: string;
+};
 
-const Tickets = () => {
-  const queryClient = useQueryClient();
+export default function Tickets() {
+  const [tickets, setTickets] = useState<ContactTicket[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const { data: tickets, isLoading } = useQuery({
-    queryKey: ['tickets'],
-    queryFn: async () => {
-      const { data, error } = await supabase
+  const fetchTickets = async () => {
+    try {
+      const { data, error } = await db
         .from('contact_tickets')
         .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data;
-    },
-  });
-
-  const updateStatusMutation = useMutation({
-    mutationFn: async ({ id, status }: { id: number; status: TicketStatus }) => {
-      const { error } = await supabase
-        .from('contact_tickets')
-        .update({ status })
-        .eq('id', id);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tickets'] });
-    },
-  });
-
-  const handleStatusChange = (id: number, status: TicketStatus) => {
-    updateStatusMutation.mutate({ id, status });
+      setTickets(data || []);
+    } catch (error) {
+      console.error('Error fetching tickets:', error);
+      setError('Erreur lors du chargement des tickets');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  if (isLoading) {
-    return <div>Chargement...</div>;
+  useEffect(() => {
+    fetchTickets();
+  }, []);
+
+  const updateTicketStatus = async (ticketId: number, newStatus: string) => {
+    try {
+      const { error } = await db
+        .from('contact_tickets')
+        .update({ status: newStatus })
+        .eq('id', ticketId);
+
+      if (error) throw error;
+
+      setTickets(tickets.map(ticket =>
+        ticket.id === ticketId ? { ...ticket, status: newStatus } : ticket
+      ));
+
+      toast.success('Statut mis à jour avec succès');
+    } catch (error) {
+      console.error('Error updating ticket status:', error);
+      toast.error('Erreur lors de la mise à jour du statut');
+    }
+  };
+
+  if (loading) {
+    return (
+      <AdminLayout title="Tickets de contact">
+        <div className="space-y-4">
+          <Skeleton className="h-8 w-[200px]" />
+          <Skeleton className="h-[400px] w-full" />
+        </div>
+      </AdminLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <AdminLayout title="Tickets de contact">
+        <div className="text-center py-8">
+          <p className="text-red-500">{error}</p>
+          <Button onClick={fetchTickets} className="mt-4">
+            Réessayer
+          </Button>
+        </div>
+      </AdminLayout>
+    );
   }
 
   return (
-    <AdminLayout title="Tickets de Contact">
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+    <AdminLayout title="Tickets de contact">
+      <div className="mb-4">
+        <h2 className="text-xl font-semibold text-gray-800">Liste des tickets</h2>
+        <Separator className="my-4" />
+      </div>
+      <div className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Date</TableHead>
               <TableHead>Nom</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Sujet</TableHead>
               <TableHead>Message</TableHead>
-              <TableHead>Statut</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Supprimer</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {tickets?.map((ticket) => (
+            {tickets.map((ticket) => (
               <TableRow key={ticket.id}>
-                <TableCell>
-                  {new Date(ticket.created_at).toLocaleDateString()}
-                </TableCell>
                 <TableCell>{ticket.name}</TableCell>
                 <TableCell>{ticket.email}</TableCell>
                 <TableCell>{ticket.subject}</TableCell>
-                <TableCell className="max-w-xs truncate">
-                  {ticket.message}
-                </TableCell>
+                <TableCell className="max-w-xs truncate">{ticket.message}</TableCell>
+                <TableCell>{format(new Date(ticket.created_at), 'PPp', { locale: fr })}</TableCell>
                 <TableCell>
-                  <Select
-                    value={ticket.status}
-                    onValueChange={(value: TicketStatus) => handleStatusChange(ticket.id, value)}
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    className="bg-red-600 hover:bg-red-700 text-white font-semibold shadow-md transition-all duration-150 px-4 py-2 rounded"
+                    onClick={async () => {
+                      try {
+                        const { error } = await db
+                          .from('contact_tickets')
+                          .delete()
+                          .eq('id', ticket.id);
+                        if (error) throw error;
+                        setTickets(tickets.filter(t => t.id !== ticket.id));
+                        toast.success('Ticket supprimé avec succès');
+                      } catch (error) {
+                        console.error('Erreur lors de la suppression du ticket:', error);
+                        toast.error('Erreur lors de la suppression du ticket');
+                      }
+                    }}
                   >
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Sélectionner un statut" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Nouveau">Nouveau</SelectItem>
-                      <SelectItem value="En attente">En attente</SelectItem>
-                      <SelectItem value="Répondu">Répondu</SelectItem>
-                      <SelectItem value="Fermé">Fermé</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    Supprimer
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
@@ -108,6 +142,4 @@ const Tickets = () => {
       </div>
     </AdminLayout>
   );
-};
-
-export default Tickets; 
+}

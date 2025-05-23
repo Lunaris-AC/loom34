@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/db/client";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -16,17 +16,19 @@ import {
   DialogFooter
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/contexts/AuthContext";
-import { ImageUpload } from '@/components/admin/ImageUpload';
+import ImageUpload from "@/components/admin/ImageUpload";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CalendarIcon, Clock } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import MDEditor from '@uiw/react-md-editor';
+import '@uiw/react-md-editor/markdown-editor.css';
+import '@uiw/react-markdown-preview/markdown.css';
 
 const formatDate = (dateStr: string) => {
   return new Date(dateStr).toLocaleDateString('fr-FR', {
@@ -78,7 +80,7 @@ export default function AdminEvents() {
   async function fetchEvents() {
     try {
       setLoading(true);
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from('events')
         .select('id, title, location, date, time, published, slug, description, image, registration_url')
         .order('date', { ascending: true });
@@ -149,7 +151,7 @@ export default function AdminEvents() {
         author_id: user?.id
       };
       
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from('events')
         .insert(newEvent)
         .select()
@@ -190,7 +192,7 @@ export default function AdminEvents() {
         updated_at: new Date().toISOString()
       };
       
-      const { error } = await supabase
+      const { error } = await db
         .from('events')
         .update(updatedEvent)
         .eq('id', selectedEvent.id);
@@ -210,7 +212,7 @@ export default function AdminEvents() {
     if (!selectedEvent) return;
     
     try {
-      const { error } = await supabase
+      const { error } = await db
         .from('events')
         .delete()
         .eq('id', selectedEvent.id);
@@ -417,23 +419,23 @@ export default function AdminEvents() {
             </div>
             <div className="grid grid-cols-4 items-start gap-4">
               <Label htmlFor="description" className="text-right pt-2">Description</Label>
-              <Textarea
-                id="description"
-                name="description"
-                value={eventForm.description}
-                onChange={handleInputChange}
-                className="col-span-3"
-                placeholder="Event description"
-                rows={6}
-              />
+              <div className="col-span-3">
+                <MDEditor
+                  value={eventForm.description}
+                  onChange={value => setEventForm(prev => ({ ...prev, description: value || '' }))}
+                  height={300}
+                  preview="edit"
+                  visiableDragbar={false}
+                  textareaProps={{
+                    placeholder: 'Écrivez la description de l\'événement en markdown...'
+                  }}
+                />
+              </div>
             </div>
             <div className="grid grid-cols-4 items-start gap-4">
               <Label htmlFor="image" className="text-right pt-2">Image</Label>
               <div className="col-span-3">
-                <ImageUpload
-                  onImageUploaded={(url) => setEventForm(prev => ({ ...prev, image: url }))}
-                  defaultImage={eventForm.image}
-                />
+                <ImageUpload onUploadComplete={(url) => setEventForm(prev => ({ ...prev, image: url }))} />
               </div>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">

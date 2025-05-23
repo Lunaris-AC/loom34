@@ -1,12 +1,11 @@
-
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { db } from '@/db/client';
 import { Search, Filter, ChevronDown } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ArticleCard from '@/components/ArticleCard';
-import { Tables } from '@/integrations/supabase/types';
+import { Tables } from '@/db/types';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 
 const Articles = () => {
@@ -18,7 +17,7 @@ const Articles = () => {
   const { data: articles = [], isLoading } = useQuery({
     queryKey: ['articles', searchQuery, categoryFilter],
     queryFn: async () => {
-      let query = supabase
+      let query = db
         .from('articles')
         .select('*')
         .eq('published', true)

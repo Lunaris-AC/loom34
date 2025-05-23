@@ -1,11 +1,10 @@
-
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from '@tanstack/react-query';
-import { supabase } from "@/integrations/supabase/client";
+import { db } from '@/db/client';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -51,7 +50,7 @@ export function EditUserForm({ profile, onSuccess }: EditUserFormProps) {
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
     try {
-      const { error } = await supabase
+      const { error } = await db
         .from('profiles')
         .update({
           username: data.username,
@@ -63,15 +62,15 @@ export function EditUserForm({ profile, onSuccess }: EditUserFormProps) {
       if (error) throw error;
 
       toast({
-        title: "Success",
-        description: "User updated successfully",
+        title: "Succès",
+        description: "Utilisateur modifié avec succès",
       });
       
       queryClient.invalidateQueries({ queryKey: ['profiles'] });
       onSuccess();
     } catch (error: any) {
       toast({
-        title: "Error",
+        title: "Erreur",
         description: error.message,
         variant: "destructive",
       });
@@ -88,7 +87,7 @@ export function EditUserForm({ profile, onSuccess }: EditUserFormProps) {
           name="username"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Username</FormLabel>
+              <FormLabel>Nom d'utilisateur</FormLabel>
               <FormControl>
                 <Input {...field} className="w-full" />
               </FormControl>
@@ -102,7 +101,7 @@ export function EditUserForm({ profile, onSuccess }: EditUserFormProps) {
           name="full_name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Full Name</FormLabel>
+              <FormLabel>Nom complet</FormLabel>
               <FormControl>
                 <Input {...field} className="w-full" />
               </FormControl>
@@ -123,7 +122,7 @@ export function EditUserForm({ profile, onSuccess }: EditUserFormProps) {
                 />
               </FormControl>
               <div className="space-y-1 leading-none">
-                <FormLabel>Administrator</FormLabel>
+                <FormLabel>Administrateur</FormLabel>
               </div>
               <FormMessage />
             </FormItem>
@@ -132,7 +131,7 @@ export function EditUserForm({ profile, onSuccess }: EditUserFormProps) {
 
         <div className="flex justify-end space-x-4">
           <Button type="submit" disabled={isLoading}>
-            {isLoading ? "Saving..." : "Save Changes"}
+            {isLoading ? "Enregistrement..." : "Enregistrer les modifications"}
           </Button>
         </div>
       </form>

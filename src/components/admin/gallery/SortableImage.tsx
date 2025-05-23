@@ -1,108 +1,112 @@
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { Card, CardContent } from '@/components/ui/card';
+import { useState } from 'react';
+import { db } from '@/db/client';
+import { Tables } from '@/db/types';
 import { Button } from '@/components/ui/button';
-import { Edit, Trash2, MoreVertical } from 'lucide-react';
-import { Tables } from '@/integrations/supabase/types';
-import { Pencil } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { toast } from 'sonner';
+
+type GalleryImage = Tables<'gallery_images'>;
 
 interface SortableImageProps {
-  image: Tables<'gallery_images'>;
-  albums: Tables<'gallery_albums'>[];
-  onEdit: () => void;
-  onDelete: () => void;
+  image: GalleryImage;
+  onReorder: (newOrder: number) => void;
 }
 
-export function SortableImage({ image, albums, onEdit, onDelete }: SortableImageProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging
-  } = useSortable({ id: image.id });
+export default function SortableImage({ image, onReorder }: SortableImageProps) {
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    title: image.title || '',
+    description: image.description || ''
+  });
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-    cursor: 'grab'
+  const handleUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const { error } = await db
+        .from('gallery_images')
+        .update({
+          title: formData.title,
+          description: formData.description,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', image.id);
+
+      if (error) throw error;
+
+      toast.success('Image mise à jour avec succès');
+    } catch (error) {
+      console.error('Error updating image:', error);
+      toast.error('Erreur lors de la mise à jour de l\'image');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const album = albums.find(a => a.id === image.album_id);
+  const handleDelete = async () => {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer cette image ?')) return;
+    setLoading(true);
+
+    try {
+      const { error } = await db
+        .from('gallery_images')
+        .delete()
+        .eq('id', image.id);
+
+      if (error) throw error;
+
+      toast.success('Image supprimée avec succès');
+    } catch (error) {
+      console.error('Error deleting image:', error);
+      toast.error('Erreur lors de la suppression de l\'image');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      className="relative group bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
-    >
-      <div className="aspect-square bg-gray-100 flex items-center justify-center">
+    <div className="space-y-4">
+      <div className="relative aspect-square">
         <img
           src={image.image_url}
           alt={image.title || 'Image'}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover rounded-lg"
         />
       </div>
-      
-      <div className="p-4">
-        <h3 className="font-medium text-gray-900">{image.title || 'Sans titre'}</h3>
-        {image.description && (
-          <p className="text-sm text-gray-500 mt-1 line-clamp-2">
-            {image.description}
-          </p>
-        )}
-        {album && (
-          <p className="text-gray-500 text-xs mt-1">
-            Album: {album.title}
-          </p>
-        )}
-        <div className="mt-1 inline-block px-2 py-0.5 text-xs bg-gray-100 rounded-full">
-          {image.category}
-        </div>
-      </div>
 
-      <div className="absolute top-2 right-2">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 bg-white/80 hover:bg-white"
-            >
-              <MoreVertical className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={(e) => {
-              e.stopPropagation();
-              onEdit();
-            }}>
-              <Edit className="h-4 w-4 mr-2" />
-              Modifier
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete();
-              }}
-              className="text-red-600"
-            >
-              <Trash2 className="h-4 w-4 mr-2" />
-              Supprimer
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+      <form onSubmit={handleUpdate} className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="title">Titre</Label>
+          <Input
+            id="title"
+            value={formData.title}
+            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            disabled={loading}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="description">Description</Label>
+          <Textarea
+            id="description"
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            disabled={loading}
+          />
+        </div>
+
+        <div className="flex space-x-2">
+          <Button type="submit" disabled={loading}>
+            {loading ? 'Mise à jour...' : 'Mettre à jour'}
+          </Button>
+          <Button type="button" variant="destructive" onClick={handleDelete} disabled={loading}>
+            {loading ? 'Suppression...' : 'Supprimer'}
+          </Button>
+        </div>
+      </form>
     </div>
   );
 } 

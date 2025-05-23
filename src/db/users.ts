@@ -1,6 +1,13 @@
-import { db, withRetry } from './client';
+import { db, withRetry, subscribeToChanges } from './client';
 import { Profile } from '@/contexts/AuthContext';
 import { User } from '@supabase/supabase-js';
+
+// Define change event type
+type ChangeEvent<T> = {
+  new: T;
+  old: T;
+  eventType: 'INSERT' | 'UPDATE' | 'DELETE';
+};
 
 /**
  * Get user profile by ID
@@ -69,22 +76,14 @@ export const createUserProfile = async (
  * Update user profile
  */
 export const updateUserProfile = async (
-  userId: string, 
+  userId: string,
   updates: Partial<Profile>
 ): Promise<Profile | null> => {
   try {
-    const now = new Date().toISOString();
-    
-    // Remove read-only fields
-    const { id, created_at, is_admin, ...updateData } = updates as any;
-    
     const { data, error } = await withRetry(async () => {
       return db
         .from('profiles')
-        .update({
-          ...updateData,
-          updated_at: now
-        })
+        .update(updates)
         .eq('id', userId)
         .select()
         .single();
@@ -165,6 +164,24 @@ export const deleteUserAccount = async (userId: string): Promise<boolean> => {
 };
 
 /**
+ * Subscribe to user profile changes
+ */
+export const subscribeToUserProfile = (
+  userId: string,
+  callback: (profile: Profile) => void
+): (() => void) => {
+  return subscribeToChanges<Profile>(
+    'profiles',
+    (payload) => {
+      if (payload.new && payload.new.id === userId) {
+        callback(payload.new);
+      }
+    },
+    `id=eq.${userId}`
+  );
+};
+
+/**
  * List users with pagination
  */
 export const listUsers = async (
@@ -209,4 +226,19 @@ export const listUsers = async (
     console.error('User listing error:', error);
     return { users: [], total: 0 };
   }
+};
+
+/**
+ * Subscribe to user list changes
+ */
+export const subscribeToUserList = (
+  callback: (users: Profile[]) => void
+): (() => void) => {
+  return subscribeToChanges<ChangeEvent<Profile>>(
+    'profiles',
+    async () => {
+      const { users } = await listUsers();
+      callback(users);
+    }
+  );
 }; 

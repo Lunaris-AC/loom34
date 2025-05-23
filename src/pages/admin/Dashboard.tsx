@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/db/client";
 import { FileText, CalendarDays, Image as ImageIcon, Users, ArrowUpRight, MessageSquare } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -96,7 +96,7 @@ export default function AdminDashboard() {
   const { data: ticketsData } = useQuery({
     queryKey: ['ticketsCount'],
     queryFn: async () => {
-      const { count, error } = await supabase
+      const { count, error } = await db
         .from('contact_tickets')
         .select('*', { count: 'exact', head: true });
       
@@ -109,22 +109,22 @@ export default function AdminDashboard() {
     async function fetchStats() {
       try {
         // Fetch article count
-        const { count: articlesCount, error: articlesError } = await supabase
+        const { count: articlesCount, error: articlesError } = await db
           .from('articles')
           .select('*', { count: 'exact', head: true });
 
         // Fetch events count
-        const { count: eventsCount, error: eventsError } = await supabase
+        const { count: eventsCount, error: eventsError } = await db
           .from('events')
           .select('*', { count: 'exact', head: true });
 
         // Fetch gallery count
-        const { count: galleryCount, error: galleryError } = await supabase
+        const { count: galleryCount, error: galleryError } = await db
           .from('gallery_images')
           .select('*', { count: 'exact', head: true });
 
         // Fetch users count
-        const { count: usersCount, error: usersError } = await supabase
+        const { count: usersCount, error: usersError } = await db
           .from('profiles')
           .select('*', { count: 'exact', head: true });
 
@@ -151,14 +151,14 @@ export default function AdminDashboard() {
     async function fetchRecentActivity() {
       try {
         // Fetch recent articles
-        const { data: recentArticles, error: articlesError } = await supabase
+        const { data: recentArticles, error: articlesError } = await db
           .from('articles')
           .select('*')
           .order('created_at', { ascending: false })
           .limit(5);
 
         // Fetch recent events
-        const { data: recentEvents, error: eventsError } = await supabase
+        const { data: recentEvents, error: eventsError } = await db
           .from('events')
           .select('*')
           .order('created_at', { ascending: false })

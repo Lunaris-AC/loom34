@@ -6,6 +6,8 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
+export type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row']
+
 export type Database = {
   public: {
     Tables: {
@@ -73,6 +75,197 @@ export type Database = {
             referencedColumns: ["id"]
           }
         ]
+      }
+      articles: {
+        Row: {
+          id: string
+          title: string
+          slug: string
+          excerpt: string
+          content: string
+          image: string
+          category: string
+          date: string
+          published: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          title: string
+          slug: string
+          excerpt: string
+          content: string
+          image: string
+          category: string
+          date: string
+          published?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          title?: string
+          slug?: string
+          excerpt?: string
+          content?: string
+          image?: string
+          category?: string
+          date?: string
+          published?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      events: {
+        Row: {
+          id: string
+          title: string
+          description: string
+          date: string
+          time: string
+          location: string
+          image: string
+          published: boolean
+          created_at: string
+          updated_at: string
+          slug: string
+          registration_url: string | null
+        }
+        Insert: {
+          id?: string
+          title: string
+          description: string
+          date: string
+          time: string
+          location: string
+          image: string
+          published?: boolean
+          created_at?: string
+          updated_at?: string
+          slug: string
+          registration_url?: string | null
+        }
+        Update: {
+          id?: string
+          title?: string
+          description?: string
+          date?: string
+          time?: string
+          location?: string
+          image?: string
+          published?: boolean
+          created_at?: string
+          updated_at?: string
+          slug?: string
+          registration_url?: string | null
+        }
+        Relationships: []
+      }
+      gallery_albums: {
+        Row: {
+          id: string
+          title: string
+          description: string
+          cover_image: string
+          created_at: string
+          updated_at: string
+          date: string
+        }
+        Insert: {
+          id?: string
+          title: string
+          description: string
+          cover_image: string
+          created_at?: string
+          updated_at?: string
+          date: string
+        }
+        Update: {
+          id?: string
+          title?: string
+          description?: string
+          cover_image?: string
+          created_at?: string
+          updated_at?: string
+          date?: string
+        }
+        Relationships: []
+      }
+      gallery_images: {
+        Row: {
+          id: string
+          album_id: string
+          image_url: string
+          order: number
+          created_at: string
+          updated_at: string
+          title: string | null
+          description: string | null
+        }
+        Insert: {
+          id?: string
+          album_id: string
+          image_url: string
+          order?: number
+          created_at?: string
+          updated_at?: string
+          title?: string | null
+          description?: string | null
+        }
+        Update: {
+          id?: string
+          album_id?: string
+          image_url?: string
+          order?: number
+          created_at?: string
+          updated_at?: string
+          title?: string | null
+          description?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gallery_images_album_id_fkey"
+            columns: ["album_id"]
+            isOneToOne: false
+            referencedRelation: "gallery_albums"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      contact_tickets: {
+        Row: {
+          id: number
+          name: string
+          email: string
+          subject: string
+          message: string
+          status: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          name: string
+          email: string
+          subject: string
+          message: string
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          name?: string
+          email?: string
+          subject?: string
+          message?: string
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
     }
     Views: {

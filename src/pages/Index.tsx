@@ -2,14 +2,14 @@ import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, CalendarDays, ShoppingBag, Users, Image, Heart, ExternalLink } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { db } from '@/db/client';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SectionHeading from '@/components/SectionHeading';
 import ArticleCard from '@/components/ArticleCard';
 import EventCard from '@/components/EventCard';
 import Button from '@/components/Button';
-import { Tables } from '@/integrations/supabase/types';
+import { Tables } from '@/db/types';
 
 const Index = () => {
   // Animation on scroll
@@ -21,7 +21,7 @@ const Index = () => {
     queryKey: ['latestArticles'],
     queryFn: async () => {
       console.log('Fetching latest articles...');
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from('articles')
         .select('*')
         .eq('published', true)
@@ -42,7 +42,7 @@ const Index = () => {
     queryKey: ['upcomingEvents'],
     queryFn: async () => {
       console.log('Fetching upcoming events...');
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from('events')
         .select('*')
         .eq('published', true)
@@ -305,7 +305,7 @@ const Index = () => {
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
           <div className="rounded-3xl overflow-hidden bg-brown text-white relative">
-            <div className="absolute top-0 right-0 w-1/2 h-full bg-[url('https://images.unsplash.com/photo-1525268771113-32d9e9021a97?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')] bg-cover bg-center hidden md:block">
+            <div className="absolute top-0 right-0 w-1/2 h-full bg-[url('https://mcfiles.inferi.fr/api/public/dl/hYD4NeWA?inline=true')] bg-cover bg-center hidden md:block">
               <div className="absolute inset-0 bg-gradient-to-r from-brown to-transparent"></div>
             </div>
             

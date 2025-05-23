@@ -1,166 +1,134 @@
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useToast } from "@/hooks/use-toast";
-import { useQueryClient } from '@tanstack/react-query';
-import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-
-const formSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
-  username: z.string().min(3),
-  full_name: z.string().min(2),
-  is_admin: z.boolean().default(false),
-});
-
-type FormData = z.infer<typeof formSchema>;
+import { db } from '@/db/client';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { toast } from 'sonner';
+import { v4 as uuidv4 } from 'uuid';
 
 interface CreateUserFormProps {
   onSuccess: () => void;
 }
 
 export function CreateUserForm({ onSuccess }: CreateUserFormProps) {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const [isLoading, setIsLoading] = useState(false);
-
-  const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-      username: '',
-      full_name: '',
-      is_admin: false,
-    },
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    username: '',
+    full_name: '',
+    email: '',
+    password: '',
+    is_admin: false
   });
 
-  const onSubmit = async (data: FormData) => {
-    setIsLoading(true);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.username.trim() || !formData.full_name.trim() || !formData.email.trim() || !formData.password.trim()) {
+      toast.error("Veuillez remplir tous les champs obligatoires.");
+      return;
+    }
+    setLoading(true);
+
     try {
-      const { error: signUpError } = await supabase.auth.signUp({
-        email: data.email,
-        password: data.password,
+      // Création de l'utilisateur dans Supabase Auth
+      const { error: signUpError, data: signUpData } = await db.auth.signUp({
+        email: formData.email,
+        password: formData.password,
         options: {
           data: {
-            username: data.username,
-            full_name: data.full_name,
-          },
-        },
+            username: formData.username,
+            full_name: formData.full_name,
+            is_admin: formData.is_admin
+          }
+        }
       });
-
       if (signUpError) throw signUpError;
 
-      toast({
-        title: "Success",
-        description: "User created successfully",
-      });
-      
-      queryClient.invalidateQueries({ queryKey: ['profiles'] });
+      // Ajout dans la table profiles (optionnel si trigger automatique, sinon nécessaire)
+      const { error } = await db
+        .from('profiles')
+        .insert({
+          id: signUpData.user?.id || uuidv4(),
+          username: formData.username,
+          full_name: formData.full_name,
+          email: formData.email,
+          is_admin: formData.is_admin,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        });
+      if (error) throw error;
+
+      toast.success('Utilisateur créé avec succès');
       onSuccess();
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
+    } catch (error) {
+      console.error('Error creating user:', error);
+      toast.error('Erreur lors de la création de l\'utilisateur');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input {...field} type="email" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="username">Nom d'utilisateur</Label>
+        <Input
+          id="username"
+          value={formData.username}
+          onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+          required
+          disabled={loading}
         />
+      </div>
 
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <Input {...field} type="password" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+      <div className="space-y-2">
+        <Label htmlFor="full_name">Nom complet</Label>
+        <Input
+          id="full_name"
+          value={formData.full_name}
+          onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+          required
+          disabled={loading}
         />
+      </div>
 
-        <FormField
-          control={form.control}
-          name="username"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Username</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+      <div className="space-y-2">
+        <Label htmlFor="email">Email</Label>
+        <Input
+          id="email"
+          type="email"
+          value={formData.email}
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          required
+          disabled={loading}
         />
+      </div>
 
-        <FormField
-          control={form.control}
-          name="full_name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Full Name</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+      <div className="space-y-2">
+        <Label htmlFor="password">Mot de passe</Label>
+        <Input
+          id="password"
+          type="password"
+          value={formData.password}
+          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+          required
+          disabled={loading}
         />
+      </div>
 
-        <FormField
-          control={form.control}
-          name="is_admin"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-center space-x-3 space-y-0">
-              <FormControl>
-                <Checkbox
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-              </FormControl>
-              <FormLabel>Is Admin</FormLabel>
-              <FormMessage />
-            </FormItem>
-          )}
+      <div className="flex items-center space-x-2">
+        <Switch
+          id="is_admin"
+          checked={formData.is_admin}
+          onCheckedChange={(checked) => setFormData({ ...formData, is_admin: checked })}
+          disabled={loading}
         />
+        <Label htmlFor="is_admin">Administrateur</Label>
+      </div>
 
-        <Button type="submit" variant="brown" className="w-full" disabled={isLoading}>
-          {isLoading ? "Creating..." : "Create User"}
-        </Button>
-      </form>
-    </Form>
+      <Button type="submit" disabled={loading}>
+        {loading ? 'Création...' : 'Créer l\'utilisateur'}
+      </Button>
+    </form>
   );
 }

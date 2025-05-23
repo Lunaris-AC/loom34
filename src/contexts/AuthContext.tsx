@@ -1,9 +1,9 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { Session, User } from "@supabase/supabase-js";
-import { db, isDbConnected, withRetry } from "@/db/client";
+import { Session, User, AuthError } from "@supabase/supabase-js";
+import { db } from "@/db/client";
 import { toast } from "sonner";
 
-// Define user profile type
+// Types
 export type Profile = {
   id: string;
   username: string | null;
@@ -14,263 +14,116 @@ export type Profile = {
   updated_at: string;
 };
 
-// Define authentication context interface
-interface AuthContextType {
-  session: Session | null;
+type AuthContextType = {
   user: User | null;
   profile: Profile | null;
   isLoading: boolean;
   isAuthenticated: boolean;
   isAdmin: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, userData: Partial<Profile>) => Promise<void>;
   signOut: () => Promise<void>;
-  refreshProfile: () => Promise<void>;
-}
+  error: AuthError | null;
+};
 
-// Create the authentication context
+// Context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Create authentication provider component
+// Provider
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
-  const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [error, setError] = useState<AuthError | null>(null);
 
-  // Reset authentication state
-  const resetAuthState = () => {
-    setSession(null);
-    setUser(null);
-    setProfile(null);
-    setIsAuthenticated(false);
-    setIsAdmin(false);
-  };
-
-  // Fetch user profile from database
-  const fetchProfile = async (userId: string) => {
-    try {
-      // Check database connection
-      const connected = await isDbConnected();
-      if (!connected) {
-        console.error("Database connection failed during profile fetch");
-        return null;
-      }
-
-      // Fetch profile with retry logic
-      const profileData = await withRetry(async () => {
-        const { data, error } = await db
-          .from('profiles')
-          .select('*')
-          .eq('id', userId)
-          .single();
-        
-        if (error) throw error;
-        return data as Profile;
-      });
-      
-      return profileData;
-    } catch (error) {
-      console.error("Failed to fetch profile:", error);
-      return null;
-    }
-  };
-
-  // Update authentication state
-  const updateAuthState = async (currentSession: Session | null) => {
-    setSession(currentSession);
-    
-    if (currentSession?.user) {
-      setUser(currentSession.user);
-      
-      const profileData = await fetchProfile(currentSession.user.id);
-      if (profileData) {
-        setProfile(profileData);
-        setIsAdmin(profileData.is_admin);
-        setIsAuthenticated(true);
-      } else {
-        resetAuthState();
-      }
-    } else {
-      resetAuthState();
-    }
-  };
-
-  // Initialize authentication on component mount
+  // Initialisation
   useEffect(() => {
     let mounted = true;
-    let authSubscription: { data: { subscription: { unsubscribe: () => void } } } | null = null;
-
-    const initAuth = async () => {
-      if (!mounted) return;
+    async function init() {
       setIsLoading(true);
-      
-      try {
-        // Check database connection
-        const connected = await isDbConnected();
-        if (!connected) {
-          console.error("Database connection failed during initialization");
-          resetAuthState();
-          setIsLoading(false);
-          return;
-        }
-
-        // Get current session
-        const { data: { session: currentSession }, error } = await db.auth.getSession();
-        
-        if (error) {
-          console.error("Failed to get session:", error);
-          resetAuthState();
-        } else if (currentSession) {
-          await updateAuthState(currentSession);
-        }
-        
-        // Set up auth state change listener
-        authSubscription = db.auth.onAuthStateChange(async (event, newSession) => {
-          if (!mounted) return;
-          
-          console.log("Auth state changed:", event, newSession?.user?.id);
-          await updateAuthState(newSession);
-        });
-      } catch (error) {
-        console.error("Auth initialization error:", error);
-        resetAuthState();
-      } finally {
-        setIsLoading(false);
+      const { data: { session } } = await db.auth.getSession();
+      setSession(session);
+      if (session?.user) {
+        const { data, error: profileError } = await db
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+        if (mounted) setProfile(data || null);
+      } else {
+        setProfile(null);
       }
-    };
-    
-    initAuth();
-
-    // Cleanup on unmount
+      setIsLoading(false);
+    }
+    init();
+    // Listener pour login/logout
+    const { data: { subscription } } = db.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      if (session?.user) {
+        db.from('profiles').select('*').eq('id', session.user.id).single().then(({ data }) => setProfile(data || null));
+      } else {
+        setProfile(null);
+      }
+    });
     return () => {
       mounted = false;
-      if (authSubscription) {
-        authSubscription.data.subscription.unsubscribe();
-      }
+      subscription.unsubscribe();
     };
   }, []);
-  
-  // Refresh user profile
-  const refreshProfile = async () => {
-    if (!user) return;
-    
-    try {
-      setIsLoading(true);
-      const profileData = await fetchProfile(user.id);
-      
-      if (profileData) {
-        setProfile(profileData);
-        setIsAdmin(profileData.is_admin);
-        setIsAuthenticated(true);
-      }
-    } catch (error) {
-      console.error("Failed to refresh profile:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
-  // Sign in user
+
   const signIn = async (email: string, password: string) => {
-    setIsLoading(true);
-    
     try {
-      const { error } = await db.auth.signInWithPassword({ email, password });
-      
-      if (error) {
-        toast.error(`Sign in failed: ${error.message}`);
-        throw error;
+      const { data, error } = await db.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      setSession(data.session);
+      if (data.session?.user) {
+        const { data: profileData } = await db
+          .from('profiles')
+          .select('*')
+          .eq('id', data.session.user.id)
+          .single();
+        setProfile(profileData || null);
       }
-      
-      toast.success("Signed in successfully");
+      toast.success("Connexion réussie");
     } catch (error) {
-      console.error("Sign in error:", error);
+      setError(error as AuthError);
+      toast.error("Échec de la connexion. Veuillez vérifier vos identifiants.");
       throw error;
-    } finally {
-      setIsLoading(false);
     }
   };
-  
-  // Sign up new user
-  const signUp = async (email: string, password: string, userData: Partial<Profile>) => {
-    setIsLoading(true);
-    
-    try {
-      const { error } = await db.auth.signUp({
-        email,
-        password,
-        options: {
-          data: userData,
-        }
-      });
-      
-      if (error) {
-        toast.error(`Sign up failed: ${error.message}`);
-        throw error;
-      }
-      
-      toast.success("Account created! Please check your email to confirm your registration.");
-    } catch (error) {
-      console.error("Sign up error:", error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
-  // Sign out user
+
   const signOut = async () => {
-    setIsLoading(true);
-    
     try {
-      const { error } = await db.auth.signOut();
-      
-      if (error) {
-        toast.error(`Sign out failed: ${error.message}`);
-        throw error;
-      }
-      
-      resetAuthState();
-      toast.success("Signed out successfully");
+      await db.auth.signOut();
+      setSession(null);
+      setProfile(null);
+      toast.success("Déconnexion réussie");
     } catch (error) {
-      console.error("Sign out error:", error);
-      throw error;
-    } finally {
-      setIsLoading(false);
+      setError(error as AuthError);
+      toast.error("Erreur lors de la déconnexion");
     }
   };
-  
-  // Context value to be provided
-  const contextValue: AuthContextType = {
-    session,
-    user,
-    profile,
-    isLoading,
-    isAuthenticated,
-    isAdmin,
-    signIn,
-    signUp,
-    signOut,
-    refreshProfile,
-  };
-  
+
   return (
-    <AuthContext.Provider value={contextValue}>
+    <AuthContext.Provider value={{
+      user: session?.user || null,
+      profile,
+      isLoading,
+      isAuthenticated: !!session?.user,
+      isAdmin: !!profile?.is_admin,
+      signIn,
+      signOut,
+      error
+    }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-// Custom hook to use the auth context
-export function useAuth() {
+// Hook
+export const useAuth = () => {
   const context = useContext(AuthContext);
-  
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
   }
-  
   return context;
-}
+};

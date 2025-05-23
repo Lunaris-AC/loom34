@@ -3,7 +3,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SectionHeading from '@/components/SectionHeading';
 import { useState } from 'react';
-import { supabase, retryOperation, checkConnection } from '@/integrations/supabase/client';
+import { db } from '@/db/client';
 import { useToast } from '@/hooks/use-toast';
 
 const About = () => {
@@ -30,34 +30,22 @@ const About = () => {
     setIsSubmitting(true);
 
     try {
-      // Vérifier la connexion avant d'envoyer
-      const isConnected = await checkConnection();
-      if (!isConnected) {
-        toast({
-          title: "Erreur de connexion",
-          description: "Impossible de se connecter au serveur. Veuillez réessayer plus tard.",
-          variant: "destructive",
+      const { error } = await db
+        .from('contact_tickets')
+        .insert({
+          name: formData.name,
+          email: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+          status: 'nouveau',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
         });
-        return;
-      }
-
-      // Utiliser retryOperation pour l'envoi du ticket
-      await retryOperation(async () => {
-        const { error } = await supabase
-          .from('contact_tickets')
-          .insert({
-            ...formData,
-            status: 'Nouveau'
-          });
-
-        if (error) throw error;
-      });
-
+      if (error) throw error;
       toast({
-        title: "Message envoyé",
-        description: "Votre message a été envoyé avec succès. Nous vous répondrons dès que possible.",
+        title: 'Message envoyé',
+        description: 'Votre message a bien été envoyé. Nous vous répondrons rapidement.',
       });
-
       // Réinitialiser le formulaire
       setFormData({
         name: '',
@@ -68,9 +56,9 @@ const About = () => {
     } catch (error: any) {
       console.error('Erreur lors de l\'envoi du ticket:', error);
       toast({
-        title: "Erreur",
-        description: "Une erreur est survenue lors de l'envoi du message. Veuillez réessayer.",
-        variant: "destructive",
+        title: 'Erreur',
+        description: "Une erreur est survenue lors de l'envoi du message.",
+        variant: 'destructive',
       });
     } finally {
       setIsSubmitting(false);

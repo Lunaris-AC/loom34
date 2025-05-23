@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { Heart, MapPin, Quote, SunMedium, Leaf, Coffee, CircleDot, X } from "lucide-react";
+import { Heart, MapPin, Quote, SunMedium, Leaf, Coffee, CircleDot, X, MousePointerClick } from "lucide-react";
 import { useState } from "react";
 
 const MonsieurOurs = () => {
@@ -14,13 +14,20 @@ const MonsieurOurs = () => {
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
 
   const timelineItems = [
-    { year: '2017', title: 'Création de Loom', description: 'L\'association est fondée' },
-    { year: '2018', title: 'Premier Monsieur Ours', description: 'Élection du premier Monsieur Ours' },
-    { year: '2019', title: 'Expansion', description: 'L\'association grandit' },
-    { year: '2020', title: 'Adaptation', description: 'Période de pandémie' },
-    { year: '2021', title: 'Renaissance', description: 'Retour des événements' },
-    { year: '2022', title: 'Nouveau Monsieur Ours', description: 'Élection du nouveau Monsieur Ours' },
+    { year: '2018', title: 'Cédric François', description: 'Monsieur Ours élu en 2018' },
+    { year: '2019', title: 'Romain Tertrais', description: 'Monsieur Ours élu en 2019' },
+    { year: '2022', title: 'Pierre Marty Cardin', description: 'Monsieur Ours élu en 2022' },
+    { year: '2023', title: 'Lucas Milani', description: 'Monsieur Ours élu en 2023' },
+    { year: '2024', title: 'Antonio Gabriel', description: 'Monsieur Ours élu en 2024' },
   ];
+
+  const galleryImages: Record<string, { url: string; alt: string } | undefined> = {
+    '2018': { url: 'https://mcfiles.inferi.fr/api/public/dl/4yYoW18R?inline=true', alt: 'Cédric François' },
+    '2019': { url: 'https://mcfiles.inferi.fr/api/public/dl/SNG33NJI?inline=true', alt: 'Romain Tertrais' },
+    '2022': { url: 'https://mcfiles.inferi.fr/api/public/dl/N7p9JwUI?inline=true', alt: 'Pierre Marty Cardin' },
+    '2023': { url: 'https://mcfiles.inferi.fr/api/public/dl/PqPgvVpz?inline=true', alt: 'Lucas Milani' },
+    '2024': { url: 'https://mcfiles.inferi.fr/api/public/dl/_Hf8VSw_?inline=true', alt: 'Antonio Gabriel' },
+  };
 
   const handleTimelineClick = (year: string) => {
     setSelectedYear(year);
@@ -73,10 +80,13 @@ const MonsieurOurs = () => {
                 <div className={`relative mb-16`} key={item.year}>
                   <div className={`absolute left-1/2 transform -translate-x-1/2 -top-4 w-8 h-8 rounded-full border-4 ${isOrange ? 'border-orange' : 'border-brown'} bg-white z-10`}></div>
                   <div className={`ml-auto mr-auto ${index % 2 === 0 ? 'md:ml-0 md:mr-[50%] md:pr-8 text-right' : 'md:ml-[50%] md:mr-0 md:pl-8'} w-full md:w-1/2`}> 
-                    <div className="bg-white p-6 rounded-xl shadow-sm cursor-pointer hover:shadow-md transition-shadow" onClick={() => handleTimelineClick(item.year)}>
-                      <span className={`${isOrange ? 'text-orange' : 'text-brown'} font-bold`}>{item.year}</span>
-                      <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
-                      <p className="text-gray-700">{item.description}</p>
+                    <div className="bg-white p-6 rounded-xl shadow-sm cursor-pointer hover:shadow-md transition-shadow flex items-center justify-between" onClick={() => handleTimelineClick(item.year)}>
+                      <div>
+                        <span className={`${isOrange ? 'text-orange' : 'text-brown'} font-bold`}>{item.year}</span>
+                        <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
+                        <p className="text-gray-700">{item.description}</p>
+                      </div>
+                      <MousePointerClick className="ml-4 text-orange" size={22} aria-label="Voir la galerie" />
                     </div>
                   </div>
                 </div>
@@ -98,8 +108,16 @@ const MonsieurOurs = () => {
                 <X className="h-6 w-6" />
               </button>
             </div>
-            <div className="text-center text-gray-500">
-              Les photos seront ajoutées prochainement
+            <div className="text-center">
+              {selectedYear && galleryImages[selectedYear] ? (
+                <img
+                  src={galleryImages[selectedYear]!.url}
+                  alt={galleryImages[selectedYear]!.alt}
+                  className="mx-auto max-h-[60vh] rounded shadow"
+                />
+              ) : (
+                <div className="text-gray-500">Aucune image disponible pour cette année.</div>
+              )}
             </div>
           </div>
         </div>
@@ -110,8 +128,7 @@ const MonsieurOurs = () => {
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">Rejoignez la communauté</h2>
           <p className="text-tan/90 text-lg mb-8 max-w-2xl mx-auto">
-            Become a member of our vibrant community today and be part of Monsieur Ours' ongoing story.
-            Together, we can create more spaces where everyone feels welcome and appreciated.
+            Devenez membre de notre communauté et participez à nos événements, ateliers et activités. Ensemble, nous faisons la différence!
           </p>
           <button
             onClick={() => window.open(MEMBERSHIP_URL, '_blank', 'noopener,noreferrer')}

@@ -1,4 +1,4 @@
-import { db, withRetry } from './client';
+import { db, withRetry, subscribeToChanges } from './client';
 import { v4 as uuidv4 } from 'uuid';
 
 // Session interface
@@ -11,46 +11,52 @@ export interface Session {
   userAgent?: string;
 }
 
+// Define change event type
+type ChangeEvent<T> = {
+  new: T;
+  old: T;
+  eventType: 'INSERT' | 'UPDATE' | 'DELETE';
+};
+
 /**
- * Creates a new session for a user
+ * Create a new session
  */
 export const createSession = async (
   userId: string,
-  ipAddress?: string, 
+  ipAddress?: string,
   userAgent?: string
 ): Promise<Session | null> => {
   try {
-    // Create expiration date (24 hours from now)
-    const expiresAt = new Date();
-    expiresAt.setHours(expiresAt.getHours() + 24);
-    
-    const sessionId = uuidv4();
     const now = new Date();
-    
-    // Insert session into database
-    const { error } = await withRetry(async () => {
-      return db.from('sessions').insert({
-        id: sessionId,
-        user_id: userId,
-        created_at: now.toISOString(),
-        expires_at: expiresAt.toISOString(),
-        ip_address: ipAddress || null,
-        user_agent: userAgent || null
-      });
+    const expiresAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days
+
+    const { data, error } = await withRetry(async () => {
+      return db
+        .from('sessions')
+        .insert({
+          id: uuidv4(),
+          user_id: userId,
+          created_at: now.toISOString(),
+          expires_at: expiresAt.toISOString(),
+          ip_address: ipAddress,
+          user_agent: userAgent
+        })
+        .select()
+        .single();
     });
-    
-    if (error) {
+
+    if (error || !data) {
       console.error('Failed to create session:', error);
       return null;
     }
-    
+
     return {
-      id: sessionId,
-      userId,
-      createdAt: now,
-      expiresAt,
-      ipAddress,
-      userAgent
+      id: data.id,
+      userId: data.user_id,
+      createdAt: new Date(data.created_at),
+      expiresAt: new Date(data.expires_at),
+      ipAddress: data.ip_address || undefined,
+      userAgent: data.user_agent || undefined
     };
   } catch (error) {
     console.error('Session creation error:', error);
@@ -59,7 +65,7 @@ export const createSession = async (
 };
 
 /**
- * Gets a session by ID
+ * Get session by ID
  */
 export const getSession = async (sessionId: string): Promise<Session | null> => {
   try {
@@ -70,12 +76,12 @@ export const getSession = async (sessionId: string): Promise<Session | null> => 
         .eq('id', sessionId)
         .single();
     });
-    
+
     if (error || !data) {
       console.error('Failed to get session:', error);
       return null;
     }
-    
+
     return {
       id: data.id,
       userId: data.user_id,
@@ -91,7 +97,7 @@ export const getSession = async (sessionId: string): Promise<Session | null> => 
 };
 
 /**
- * Deletes a session by ID
+ * Delete session
  */
 export const deleteSession = async (sessionId: string): Promise<boolean> => {
   try {
@@ -101,12 +107,12 @@ export const deleteSession = async (sessionId: string): Promise<boolean> => {
         .delete()
         .eq('id', sessionId);
     });
-    
+
     if (error) {
       console.error('Failed to delete session:', error);
       return false;
     }
-    
+
     return true;
   } catch (error) {
     console.error('Session deletion error:', error);
@@ -115,51 +121,68 @@ export const deleteSession = async (sessionId: string): Promise<boolean> => {
 };
 
 /**
- * Deletes all sessions for a user
+ * Clean expired sessions
  */
-export const deleteUserSessions = async (userId: string): Promise<boolean> => {
+export const cleanExpiredSessions = async (): Promise<number> => {
   try {
-    const { error } = await withRetry(async () => {
+    const now = new Date().toISOString();
+    
+    const { count, error } = await withRetry(async () => {
       return db
         .from('sessions')
         .delete()
-        .eq('user_id', userId);
+        .lt('expires_at', now)
+        .select('count');
     });
-    
+
     if (error) {
-      console.error('Failed to delete user sessions:', error);
-      return false;
+      console.error('Failed to clean expired sessions:', error);
+      return 0;
     }
-    
-    return true;
+
+    return count || 0;
   } catch (error) {
-    console.error('User sessions deletion error:', error);
-    return false;
+    console.error('Session cleanup error:', error);
+    return 0;
   }
 };
 
 /**
- * Cleans up expired sessions
+ * Subscribe to session changes
  */
-export const cleanupExpiredSessions = async (): Promise<boolean> => {
-  try {
-    const now = new Date().toISOString();
-    
-    const { error } = await withRetry(async () => {
-      return db
-        .from('sessions')
-        .delete()
-        .lt('expires_at', now);
-    });
-    
-    if (error) {
-      console.error('Failed to clean up expired sessions:', error);
-      return false;
-    }
-    
-    return true;
-  } catch (error) {
-    console.error('Session cleanup error:', error);
-    return false;
-  }
+export const subscribeToSession = (
+  sessionId: string,
+  callback: (session: Session | null) => void
+): (() => void) => {
+  const channel = db.channel(`session_${sessionId}`);
+  
+  channel
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'sessions',
+        filter: `id=eq.${sessionId}`
+      },
+      async (payload: any) => {
+        if (payload.eventType === 'DELETE') {
+          callback(null);
+        } else if (payload.new) {
+          callback({
+            id: payload.new.id,
+            userId: payload.new.user_id,
+            createdAt: new Date(payload.new.created_at),
+            expiresAt: new Date(payload.new.expires_at),
+            ipAddress: payload.new.ip_address || undefined,
+            userAgent: payload.new.user_agent || undefined
+          });
+        }
+      }
+    )
+    .subscribe();
+
+  return () => {
+    channel.unsubscribe();
+  };
 }; 

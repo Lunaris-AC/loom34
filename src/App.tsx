@@ -33,6 +33,7 @@ import ExternalRedirect from "./components/ExternalRedirect";
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Terms from './pages/Terms';
 import Unauthorized from './pages/Unauthorized';
+import AlbumDetail from "./pages/AlbumDetail";
 
 const queryClient = new QueryClient();
 
@@ -115,6 +116,7 @@ const App = () => {
               <Route path="/events/:slug" element={<EventDetail />} />
               <Route path="/monsieur-ours" element={<MonsieurOurs />} />
               <Route path="/gallery" element={<Gallery />} />
+              <Route path="/gallery/:albumId" element={<AlbumDetail />} />
               <Route path="/partners" element={<Partners />} />
               
               {/* External Redirects - Using ExternalRedirect component */}

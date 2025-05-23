@@ -1,19 +1,32 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from '@/db/client';
 import { Plus, ImageIcon, FolderOpen, GripVertical, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger, DialogClose } from "@/components/ui/dialog";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { Tables } from "@/integrations/supabase/types";
+import { Tables } from "@/db/types";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { motion } from "framer-motion";
+import DragDropGallery from "@/components/admin/gallery/DragDropGallery";
+import { FixedSizeGrid as Grid } from 'react-window';
+import { GalleryUploadProgress } from "@/components/admin/gallery/GalleryUploadProgress";
 
-interface GalleryAlbum extends Tables<'gallery_albums'> {
-  image_count?: number;
-}
+type GalleryAlbum = Tables<'gallery_albums'>;
+type GalleryImage = {
+  id: string;
+  image_url: string;
+  title: string;
+  description: string;
+  album_id: string | null;
+  created_at: string;
+  updated_at: string;
+};
 
 interface DraggedImage {
   id: string;
@@ -23,9 +36,15 @@ interface DraggedImage {
 export default function Gallery() {
   const [isCreatingAlbum, setIsCreatingAlbum] = useState(false);
   const [newAlbumName, setNewAlbumName] = useState("");
-  const [selectedImage, setSelectedImage] = useState<Tables<'gallery_images'> | null>(null);
+  const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const [uploadProgressOpen, setUploadProgressOpen] = useState(false);
+  const [uploadCurrent, setUploadCurrent] = useState(0);
+  const [uploadTotal, setUploadTotal] = useState(0);
+  const [uploadPercent, setUploadPercent] = useState(0);
+  const [uploadErrors, setUploadErrors] = useState<string[]>([]);
 
   // Récupérer les paramètres depuis l'URL
   const urlParams = new URLSearchParams(window.location.search);
@@ -33,74 +52,58 @@ export default function Gallery() {
   const showUnclassified = urlParams.get('view') === 'unclassified';
 
   // Fetch albums from database
-  const { data: albums = [], isLoading: isLoadingAlbums } = useQuery({
+  const { data: albums = [], isLoading: isLoadingAlbums, refetch } = useQuery<GalleryAlbum[]>({
     queryKey: ['galleryAlbums'],
     queryFn: async () => {
-      const { data: albumsData, error: albumsError } = await supabase
+      const { data, error } = await db
         .from('gallery_albums')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('date', { ascending: false });
 
-      if (albumsError) {
-        console.error('Error fetching albums:', albumsError);
-        throw albumsError;
-      }
+      if (error) throw error;
+      return data || [];
+    }
+  });
 
-      const albumsWithCount: GalleryAlbum[] = await Promise.all(
-        (albumsData || []).map(async (album) => {
-          const { count, error: countError } = await supabase
-            .from('gallery_images')
-            .select('*', { count: 'exact', head: true })
-            .eq('album_id', album.id);
-
-          if (countError) {
-            console.error('Error fetching image count:', countError);
-          }
-
-          return {
-            ...album,
-            image_count: count || 0
-          };
-        })
-      );
-
-      return albumsWithCount;
+  // Fetch all images for sidebar counters
+  const { data: allImages = [] } = useQuery<GalleryImage[]>({
+    queryKey: ['galleryImages', 'all'],
+    queryFn: async () => {
+      const { data, error } = await db
+        .from('gallery_images')
+        .select('id, image_url, title, description, album_id, created_at, updated_at');
+      if (error) throw error;
+      return data || [];
     },
   });
 
   // Trouver l'album sélectionné à partir de l'URL
-  const [selectedAlbum, setSelectedAlbum] = useState<GalleryAlbum | null>(
-    albums.find(album => album.id === albumIdFromUrl) || null
-  );
+  const [selectedAlbum, setSelectedAlbum] = useState<GalleryAlbum | null>(null);
 
-  // Mettre à jour selectedAlbum quand les albums changent
+  // Mettre à jour selectedAlbum quand les albums ou l'URL changent
   useEffect(() => {
-    if (albumIdFromUrl) {
+    if (albumIdFromUrl && albums.length > 0) {
       const album = albums.find(album => album.id === albumIdFromUrl);
-      if (album) {
-        setSelectedAlbum(album);
-      }
+      setSelectedAlbum(album || null);
     } else {
       setSelectedAlbum(null);
     }
   }, [albums, albumIdFromUrl]);
 
   // Fetch images
-  const { data: images = [], isLoading: isLoadingImages } = useQuery({
+  const { data: images = [], isLoading: isLoadingImages, error: imagesError } = useQuery<GalleryImage[]>({
     queryKey: ['galleryImages', selectedAlbum?.id, showUnclassified],
     queryFn: async () => {
-      let query = supabase
+      let query = db
         .from('gallery_images')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .select('id, image_url, title, description, album_id, created_at, updated_at');
 
+      // Afficher toutes les images si aucun album ni unclassified n'est sélectionné
       if (showUnclassified) {
         query = query.is('album_id', null);
       } else if (selectedAlbum) {
-        query = query.eq('album_id', selectedAlbum.id);
-      } else {
-        return [];
-      }
+        query = query.eq('album_id', String(selectedAlbum.id));
+      } // sinon, ne filtre pas : toutes les images
 
       const { data, error } = await query;
         
@@ -109,19 +112,26 @@ export default function Gallery() {
         throw error;
       }
       
-      return data;
+      return data || [];
     },
-    enabled: !!selectedAlbum || showUnclassified,
-    refetchInterval: 1000,
+    enabled: true, // Toujours activer la requête
   });
+
+  if (imagesError) {
+    return (
+      <AdminLayout title="Galerie">
+        <div className="text-red-600 font-bold p-8">Erreur lors du chargement des images : {imagesError.message}</div>
+      </AdminLayout>
+    );
+  }
 
   const createAlbumMutation = useMutation({
     mutationFn: async (title: string) => {
-      const { error } = await supabase
+      const { error } = await db
         .from('gallery_albums')
         .insert({
           title,
-          author_id: user?.id,
+          description: '',
           cover_image: '',
           date: new Date().toISOString()
         });
@@ -130,19 +140,27 @@ export default function Gallery() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['galleryAlbums'] });
+      queryClient.invalidateQueries({ queryKey: ['galleryImages'] });
       setNewAlbumName("");
       setIsCreatingAlbum(false);
-      toast.success("Album créé avec succès");
-      window.location.reload();
+      toast({
+        title: "Album créé",
+        description: "L'album a été créé avec succès.",
+      });
+      refetch();
     },
     onError: (error: any) => {
-      toast.error("Erreur lors de la création de l'album: " + error.message);
+      toast({
+        title: "Erreur",
+        description: "Erreur lors de la création de l'album: " + error.message,
+        variant: "destructive",
+      });
     }
   });
 
   const updateAlbumMutation = useMutation({
     mutationFn: async (data: { id: string; title: string; description?: string }) => {
-      const { error } = await supabase
+      const { error } = await db
         .from('gallery_albums')
         .update({
           title: data.title,
@@ -153,20 +171,28 @@ export default function Gallery() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries();
+      queryClient.invalidateQueries({ queryKey: ['galleryAlbums'] });
+      queryClient.invalidateQueries({ queryKey: ['galleryImages'] });
       setNewAlbumName("");
-      toast.success("Album modifié avec succès");
-      window.location.reload();
+      toast({
+        title: "Album modifié",
+        description: "L'album a été modifié avec succès.",
+      });
+      refetch();
     },
     onError: (error: any) => {
-      toast.error("Erreur lors de la modification de l'album: " + error.message);
+      toast({
+        title: "Erreur",
+        description: "Erreur lors de la modification de l'album: " + error.message,
+        variant: "destructive",
+      });
     }
   });
 
   const deleteAlbumMutation = useMutation({
     mutationFn: async (albumId: string) => {
       // D'abord, mettre à jour toutes les images de l'album pour les mettre en non classées
-      const { error: updateError } = await supabase
+      const { error: updateError } = await db
         .from('gallery_images')
         .update({ album_id: null })
         .eq('album_id', albumId);
@@ -174,7 +200,7 @@ export default function Gallery() {
       if (updateError) throw updateError;
 
       // Ensuite, supprimer l'album
-      const { error: deleteError } = await supabase
+      const { error: deleteError } = await db
         .from('gallery_albums')
         .delete()
         .eq('id', albumId);
@@ -182,19 +208,27 @@ export default function Gallery() {
       if (deleteError) throw deleteError;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries();
+      queryClient.invalidateQueries({ queryKey: ['galleryAlbums'] });
+      queryClient.invalidateQueries({ queryKey: ['galleryImages'] });
       setSelectedAlbum(null);
-      toast.success("Album supprimé avec succès");
-      window.location.reload();
+      toast({
+        title: "Album supprimé",
+        description: "L'album a été supprimé avec succès.",
+      });
+      refetch();
     },
     onError: (error: any) => {
-      toast.error("Erreur lors de la suppression de l'album: " + error.message);
+      toast({
+        title: "Erreur",
+        description: "Erreur lors de la suppression de l'album: " + error.message,
+        variant: "destructive",
+      });
     }
   });
 
   const updateImageMutation = useMutation({
     mutationFn: async (data: { id: string; title?: string; description?: string; album_id?: string | null }) => {
-      const { error } = await supabase
+      const { error } = await db
         .from('gallery_images')
         .update({
           title: data.title,
@@ -207,16 +241,24 @@ export default function Gallery() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['galleryImages'] });
-      toast.success("Photo modifiée avec succès");
+      queryClient.invalidateQueries({ queryKey: ['galleryAlbums'] });
+      toast({
+        title: "Photo modifiée",
+        description: "La photo a été modifiée avec succès.",
+      });
     },
     onError: (error: any) => {
-      toast.error("Erreur lors de la modification de la photo: " + error.message);
+      toast({
+        title: "Erreur",
+        description: "Erreur lors de la modification de la photo: " + error.message,
+        variant: "destructive",
+      });
     }
   });
 
   const deleteImageMutation = useMutation({
     mutationFn: async (imageId: string) => {
-      const { error } = await supabase
+      const { error } = await db
         .from('gallery_images')
         .delete()
         .eq('id', imageId);
@@ -224,11 +266,20 @@ export default function Gallery() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Photo supprimée avec succès");
-      window.location.reload();
+      queryClient.invalidateQueries({ queryKey: ['galleryImages'] });
+      queryClient.invalidateQueries({ queryKey: ['galleryAlbums'] });
+      toast({
+        title: "Photo supprimée",
+        description: "La photo a été supprimée avec succès.",
+      });
+      refetch();
     },
     onError: (error: any) => {
-      toast.error("Erreur lors de la suppression de la photo: " + error.message);
+      toast({
+        title: "Erreur",
+        description: "Erreur lors de la suppression de la photo: " + error.message,
+        variant: "destructive",
+      });
     }
   });
 
@@ -254,7 +305,7 @@ export default function Gallery() {
 
       try {
         // Upload vers le stockage
-        const { data: uploadData, error: uploadError } = await supabase.storage
+        const { data: uploadData, error: uploadError } = await db.storage
           .from('images')
           .upload(filePath, file, {
             cacheControl: '3600',
@@ -267,115 +318,137 @@ export default function Gallery() {
         }
 
         // Obtenir l'URL publique
-        const { data: { publicUrl } } = supabase.storage
+        const { data: { publicUrl } } = db.storage
           .from('images')
           .getPublicUrl(filePath);
 
         // Créer l'enregistrement dans la base de données
-        const { data: insertData, error: insertError } = await supabase
+        const { error: insertError } = await db
           .from('gallery_images')
           .insert({
-            title: file.name,
             image_url: publicUrl,
             album_id: albumId,
-            author_id: user.id,
-            category: 'default'
-          })
-          .select()
-          .single();
+            title: file.name,
+            description: '',
+            category: '' // Ajout d'une valeur par défaut pour la colonne obligatoire
+          });
 
         if (insertError) {
           // Si l'insertion échoue, supprimer le fichier uploadé
-          await supabase.storage
+          await db.storage
             .from('images')
             .remove([filePath]);
-          throw new Error(`Erreur lors de l'enregistrement: ${insertError.message}`);
+          throw insertError;
         }
 
-        return insertData;
+        // Si l'image est ajoutée à un album, mettre à jour la couverture de l'album
+        if (albumId) {
+          const { error: updateError } = await db
+            .from('gallery_albums')
+            .update({ cover_image: publicUrl })
+            .eq('id', albumId);
+
+          if (updateError) {
+            console.error('Erreur mise à jour couverture:', updateError);
+          }
+        }
       } catch (error: any) {
-        console.error('Erreur dans le processus d\'upload:', error);
-        throw error;
+        console.error('Erreur complète:', error);
+        throw new Error(`Erreur lors de l'upload: ${error.message}`);
       }
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['galleryImages'] });
-      toast.success("Image ajoutée avec succès");
+      queryClient.invalidateQueries({ queryKey: ['galleryAlbums'] });
+      toast({
+        title: "Photo uploadée",
+        description: "La photo a été uploadée avec succès.",
+      });
     },
     onError: (error: any) => {
-      toast.error(error.message || "Erreur lors de l'ajout de l'image");
+      toast({
+        title: "Erreur",
+        description: "Erreur lors de l'upload de la photo: " + error.message,
+        variant: "destructive",
+      });
     }
   });
 
   const moveImageMutation = useMutation({
     mutationFn: async ({ imageId, newAlbumId }: { imageId: string, newAlbumId: string | null }) => {
-      const { error } = await supabase
+      const { error } = await db
         .from('gallery_images')
         .update({ album_id: newAlbumId })
         .eq('id', imageId);
-        
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Image déplacée avec succès");
-      window.location.reload();
+      queryClient.invalidateQueries({ queryKey: ['galleryImages'] });
+      queryClient.invalidateQueries({ queryKey: ['galleryAlbums'] });
+      toast({
+        title: "Image déplacée",
+        description: "Image déplacée avec succès.",
+      });
+      queryClient.invalidateQueries({ queryKey: ['galleryImages'] }); // Rafraîchit seulement les images
     },
     onError: (error: any) => {
-      toast.error("Erreur lors du déplacement de l'image: " + error.message);
+      toast({
+        title: "Erreur",
+        description: "Erreur lors du déplacement de l'image: " + error.message,
+        variant: "destructive",
+      });
     }
   });
 
-  const handleFileDrop = async (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.currentTarget.classList.remove('bg-gray-50');
-
-    // Vérifier si c'est une image existante qui est glissée
-    const draggedImageData = e.dataTransfer.getData('application/json');
-    if (draggedImageData) {
+  // Upload asynchrone avec 8 concurrents
+  async function uploadFilesAsync(files: File[], albumId: string | null) {
+    setUploadProgressOpen(true);
+    setUploadCurrent(0);
+    setUploadTotal(files.length);
+    setUploadPercent(0);
+    setUploadErrors([]);
+    let completed = 0;
+    let errors: string[] = [];
+    const concurrency = 8;
+    let index = 0;
+    async function next() {
+      if (index >= files.length) return;
+      const file = files[index++];
+      let uploadFile = file;
+      // Plus de conversion HEIC/HEIF : on accepte le fichier tel quel
       try {
-        const { id, albumId } = JSON.parse(draggedImageData) as DraggedImage;
-        const targetAlbumId = showUnclassified ? null : selectedAlbum?.id;
-        
-        // Ne rien faire si on déplace vers le même album
-        if (albumId === targetAlbumId) return;
-        
-        await moveImageMutation.mutateAsync({
-          imageId: id,
-          newAlbumId: targetAlbumId
-        });
-      } catch (error) {
-        console.error('Error moving image:', error);
+        await uploadImageMutation.mutateAsync({ file: uploadFile, albumId });
+      } catch (err: any) {
+        errors.push(`Erreur upload ${file.name}: ${err?.message || err}`);
+        setUploadErrors([...errors]);
       }
-      return;
-    }
-
-    // Sinon, c'est un nouveau fichier
-    const files = Array.from(e.dataTransfer.files);
-    for (const file of files) {
-      if (file.type.startsWith('image/')) {
-        await uploadImageMutation.mutateAsync({
-          file,
-          albumId: showUnclassified ? null : selectedAlbum?.id || null
-        });
+      setUploadCurrent(++completed);
+      setUploadPercent(Math.round((completed / files.length) * 100));
+      if (completed === files.length) {
+        setTimeout(() => setUploadProgressOpen(false), 1200);
       }
+      return next();
     }
-  };
+    // Lancer 8 uploads en parallèle
+    await Promise.all(Array(Math.min(concurrency, files.length)).fill(0).map(next));
+  }
 
+  // Nouveau handleFileInput
   const handleFileInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    console.log('Files selected:', files);
-    
-    for (const file of files) {
-      if (file.type.startsWith('image/')) {
-        await uploadImageMutation.mutateAsync({
-          file,
-          albumId: showUnclassified ? null : selectedAlbum?.id || null
-        });
-      }
-    }
+    if (files.length === 0) return;
+    await uploadFilesAsync(files, selectedAlbum?.id || null);
   };
 
-  const handleImageDragStart = (e: React.DragEvent<HTMLDivElement>, image: any) => {
+  // Nouveau handleFileDrop
+  const handleFileDrop = async (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length === 0) return;
+    await uploadFilesAsync(files, selectedAlbum?.id || null);
+  };
+
+  const handleImageDragStart = (e: React.DragEvent<HTMLDivElement>, image: GalleryImage) => {
     e.dataTransfer.setData('application/json', JSON.stringify({
       id: image.id,
       albumId: image.album_id
@@ -384,23 +457,104 @@ export default function Gallery() {
 
   const handleAlbumClick = (album: GalleryAlbum) => {
     setSelectedAlbum(album);
-    // Mettre à jour l'URL avec l'ID de l'album
-    const newUrl = new URL(window.location.href);
-    newUrl.searchParams.set('albumId', album.id);
-    newUrl.searchParams.delete('view'); // Supprimer le paramètre view s'il existe
-    window.history.pushState({}, '', newUrl);
-    window.location.reload();
+    setSelectedImage(null);
+    window.history.pushState({}, '', `?albumId=${album.id}`);
   };
 
   const handleUnclassifiedClick = () => {
     setSelectedAlbum(null);
-    // Mettre à jour l'URL pour les photos non classées
-    const newUrl = new URL(window.location.href);
-    newUrl.searchParams.delete('albumId');
-    newUrl.searchParams.set('view', 'unclassified');
-    window.history.pushState({}, '', newUrl);
-    window.location.reload();
+    setSelectedImage(null);
+    window.history.pushState({}, '', '?view=unclassified');
   };
+
+  const GalleryImageCell = memo(({ columnIndex, rowIndex, style, data }: any) => {
+    const { images, columns, handleImageDragStart, updateImageMutation, deleteImageMutation, setSelectedImage, setNewAlbumName, Dialog, DialogTrigger, Button, Edit, DialogContent, Label, Input, DialogClose, Trash2 } = data;
+    const index = rowIndex * columns + columnIndex;
+    if (index >= images.length) return null;
+    const image = images[index];
+    // Utilise uniquement image_url (pas de thumbnail_url)
+    const imgSrc = image.image_url;
+    return (
+      <div style={style} className="relative group aspect-square cursor-move rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow" draggable onDragStart={(e) => handleImageDragStart(e, image)}>
+        <img
+          src={imgSrc}
+          alt={image.title}
+          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          loading="lazy"
+          onError={(e) => {
+            console.error('Error loading image:', imgSrc);
+            (e.target as HTMLImageElement).src = 'https://placehold.co/400x300?text=Image+non+disponible';
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+          <div className="w-full">
+            <p className="text-white text-sm font-medium truncate mb-2">{image.title}</p>
+            <div className="flex justify-end gap-2">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="text-white bg-white/20 hover:bg-white/30"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedImage(image);
+                    }}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <div className="space-y-4">
+                    <Label>Nom de la photo</Label>
+                    <Input
+                      defaultValue={image.title}
+                      onChange={(e) => {
+                        setNewAlbumName(e.target.value);
+                      }}
+                    />
+                    <div className="flex justify-end gap-2">
+                      <DialogClose asChild>
+                        <Button variant="outline">Annuler</Button>
+                      </DialogClose>
+                      <DialogClose asChild>
+                        <Button
+                          onClick={() => {
+                            if (image.title.trim()) {
+                              updateImageMutation.mutate({
+                                id: image.id,
+                                title: image.title,
+                                description: image.description
+                              });
+                            }
+                          }}
+                        >
+                          Enregistrer
+                        </Button>
+                      </DialogClose>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+              <Button
+                variant="destructive"
+                size="sm"
+                className="bg-red-500/20 hover:bg-red-500/30 text-white"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (window.confirm("Êtes-vous sûr de vouloir supprimer cette photo ?")) {
+                    deleteImageMutation.mutate(image.id);
+                  }
+                }}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  });
 
   if (isLoadingAlbums) {
     return (
@@ -416,9 +570,18 @@ export default function Gallery() {
 
   return (
     <AdminLayout title="Galerie">
+      {/* Popup de progression d'upload */}
+      <GalleryUploadProgress
+        open={uploadProgressOpen}
+        current={uploadCurrent}
+        total={uploadTotal}
+        percent={uploadPercent}
+        errors={uploadErrors}
+        onClose={() => setUploadProgressOpen(false)}
+      />
       <div className="flex h-full">
         {/* Sidebar */}
-        <div className="w-64 border-r p-4 space-y-4">
+        <div className="w-72 border-r p-4 space-y-4 bg-gray-50">
           <Dialog open={isCreatingAlbum} onOpenChange={setIsCreatingAlbum}>
             <DialogTrigger asChild>
               <Button variant="brown" className="w-full">
@@ -448,7 +611,7 @@ export default function Gallery() {
           <div className="space-y-2">
             <Button 
               variant={showUnclassified ? "default" : "ghost"}
-              className="w-full justify-start relative"
+              className="w-full justify-start relative hover:bg-gray-100 transition-colors"
               onClick={handleUnclassifiedClick}
               onDragOver={(e) => {
                 e.preventDefault();
@@ -475,227 +638,182 @@ export default function Gallery() {
               Photos non classées
             </Button>
 
-            {albums.map(album => (
-              <div key={album.id} className="flex items-center gap-1">
-                <Button 
-                  variant={selectedAlbum?.id === album.id ? "default" : "ghost"}
-                  className="flex-1 justify-start"
-                  onClick={() => handleAlbumClick(album)}
-                  onDragOver={(e) => {
-                    e.preventDefault();
-                    e.currentTarget.classList.add('bg-gray-100');
-                  }}
-                  onDragLeave={(e) => {
-                    e.preventDefault();
-                    e.currentTarget.classList.remove('bg-gray-100');
-                  }}
-                  onDrop={async (e) => {
-                    e.preventDefault();
-                    e.currentTarget.classList.remove('bg-gray-100');
-                    const draggedImageData = e.dataTransfer.getData('application/json');
-                    if (draggedImageData) {
-                      const { id } = JSON.parse(draggedImageData) as DraggedImage;
-                      await moveImageMutation.mutateAsync({
-                        imageId: id,
-                        newAlbumId: album.id
-                      });
-                    }
-                  }}
+            {albums.map(album => {
+              // Utilise allImages pour le compteur
+              const imageCount = Array.isArray(allImages) ? allImages.filter(img => img.album_id === album.id).length : 0;
+              return (
+                <motion.div 
+                  key={album.id} 
+                  className="flex items-center gap-1"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
                 >
-                  <ImageIcon className="h-4 w-4 mr-2" />
-                  <span className="truncate block max-w-[140px]" title={album.title}>{album.title}</span>
-                  <span className="ml-auto text-sm text-gray-500">
-                    {album.image_count}
-                  </span>
-                </Button>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8"
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <div className="space-y-4">
-                      <Label>Nom de l'album</Label>
-                      <Input
-                        defaultValue={album.title}
-                        onChange={(e) => {
-                          const newTitle = e.target.value;
-                          setNewAlbumName(newTitle);
-                        }}
-                      />
-                      <div className="flex justify-end gap-2">
-                        <DialogClose asChild>
-                          <Button variant="outline">Annuler</Button>
-                        </DialogClose>
-                        <DialogClose asChild>
-                          <Button
-                            onClick={() => {
-                              if (newAlbumName.trim()) {
-                                updateAlbumMutation.mutate({
-                                  id: album.id,
-                                  title: newAlbumName,
-                                  description: album.description
-                                });
-                              }
-                            }}
-                          >
-                            Enregistrer
-                          </Button>
-                        </DialogClose>
-                      </div>
+                  <Button 
+                    variant={selectedAlbum?.id === album.id ? "default" : "ghost"}
+                    className="flex-1 justify-start group relative overflow-hidden"
+                    onClick={() => handleAlbumClick(album)}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.currentTarget.classList.add('bg-gray-100');
+                    }}
+                    onDragLeave={(e) => {
+                      e.preventDefault();
+                      e.currentTarget.classList.remove('bg-gray-100');
+                    }}
+                    onDrop={async (e) => {
+                      e.preventDefault();
+                      e.currentTarget.classList.remove('bg-gray-100');
+                      const draggedImageData = e.dataTransfer.getData('application/json');
+                      if (draggedImageData) {
+                        const { id } = JSON.parse(draggedImageData) as DraggedImage;
+                        await moveImageMutation.mutateAsync({
+                          imageId: id,
+                          newAlbumId: album.id
+                        });
+                      }
+                    }}
+                  >
+                    <div className="relative z-10 flex items-center">
+                      <ImageIcon className="h-4 w-4 mr-2" />
+                      <span className="truncate block max-w-[110px]" title={album.title}>{album.title}</span>
+                      <span className="ml-2 text-xs text-gray-500 bg-gray-200 rounded px-2 py-0.5">{imageCount}</span>
                     </div>
-                  </DialogContent>
-                </Dialog>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
-                  onClick={() => {
-                    if (window.confirm("Êtes-vous sûr de vouloir supprimer cet album ? Les photos seront déplacées dans la section non classée.")) {
-                      deleteAlbumMutation.mutate(album.id);
-                    }
-                  }}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
+                  </Button>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 hover:bg-gray-100"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <div className="space-y-4">
+                        <Label>Nom de l'album</Label>
+                        <Input
+                          defaultValue={album.title}
+                          onChange={(e) => {
+                            setNewAlbumName(e.target.value);
+                          }}
+                        />
+                        <div className="flex justify-end gap-2">
+                          <DialogClose asChild>
+                            <Button variant="outline">Annuler</Button>
+                          </DialogClose>
+                          <DialogClose asChild>
+                            <Button
+                              onClick={() => {
+                                if (newAlbumName.trim()) {
+                                  updateAlbumMutation.mutate({
+                                    id: album.id,
+                                    title: newAlbumName,
+                                    description: album.description
+                                  });
+                                }
+                              }}
+                            >
+                              Enregistrer
+                            </Button>
+                          </DialogClose>
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                    onClick={() => {
+                      if (window.confirm("Êtes-vous sûr de vouloir supprimer cet album ? Les photos seront déplacées dans la section non classée.")) {
+                        deleteAlbumMutation.mutate(album.id);
+                      }
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
 
         {/* Main content */}
-        <div className="flex-1 p-4">
+        <div className="flex-1 p-6 bg-white">
           <div
-            className="min-h-[200px] border-2 border-dashed rounded-lg p-4 mb-4"
+            className="min-h-[200px] border-2 border-dashed rounded-lg p-8 mb-6 bg-gray-50 hover:bg-gray-100 transition-colors"
             onDragOver={(e) => {
               e.preventDefault();
-              e.currentTarget.classList.add('bg-gray-50');
+              e.currentTarget.classList.add('bg-gray-100');
             }}
             onDragLeave={(e) => {
               e.preventDefault();
-              e.currentTarget.classList.remove('bg-gray-50');
+              e.currentTarget.classList.remove('bg-gray-100');
             }}
             onDrop={(e) => {
               e.preventDefault();
-              e.currentTarget.classList.remove('bg-gray-50');
+              e.currentTarget.classList.remove('bg-gray-100');
               handleFileDrop(e);
             }}
           >
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
-                <ImageIcon className="h-12 w-12 mx-auto text-gray-400" />
-                <p className="mt-2 text-sm text-gray-500">
+                <ImageIcon className="h-16 w-16 mx-auto text-gray-400 mb-4" />
+                <p className="text-lg text-gray-600 mb-4">
                   Glissez-déposez vos images ici
                 </p>
                 <input
                   type="file"
                   multiple
-                  accept="image/*"
+                  accept="image/*,.heic,.heif"
                   className="hidden"
                   id="file-upload"
                   onChange={handleFileInput}
                 />
                 <Button
                   variant="outline"
-                  className="mt-2"
+                  className="mt-2 hover:bg-gray-100"
                   onClick={() => document.getElementById('file-upload')?.click()}
                 >
                   Ou sélectionnez des fichiers
+                  <span className="block text-xs text-gray-400 mt-1">(Formats supportés : jpg, png, webp, heic, heif...)</span>
                 </Button>
               </div>
             </div>
           </div>
 
-          {images.length > 0 && (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {images.map(image => (
-                <div 
-                  key={image.id} 
-                  className="relative group aspect-square cursor-move"
-                  draggable
-                  onDragStart={(e) => handleImageDragStart(e, image)}
-                >
-                  <img
-                    src={image.image_url}
-                    alt={image.title}
-                    className="w-full h-full object-cover rounded-lg"
-                    onError={(e) => {
-                      console.error('Error loading image:', image.image_url);
-                      (e.target as HTMLImageElement).src = 'https://placehold.co/400x300?text=Image+non+disponible';
-                    }}
-                  />
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-opacity flex items-center justify-center gap-2">
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button
-                            variant="secondary"
-                            size="sm"
-                            className="text-white"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedImage(image);
-                            }}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <div className="space-y-4">
-                            <Label>Nom de la photo</Label>
-                            <Input
-                              defaultValue={image.title}
-                              onChange={(e) => {
-                                const newTitle = e.target.value;
-                                setNewAlbumName(newTitle);
-                              }}
-                            />
-                            <div className="flex justify-end gap-2">
-                              <DialogClose asChild>
-                                <Button variant="outline">Annuler</Button>
-                              </DialogClose>
-                              <DialogClose asChild>
-                                <Button
-                                  onClick={() => {
-                                    if (newAlbumName.trim()) {
-                                      updateImageMutation.mutate({
-                                        id: image.id,
-                                        title: newAlbumName,
-                                        description: image.description
-                                      });
-                                    }
-                                  }}
-                                >
-                                  Enregistrer
-                                </Button>
-                              </DialogClose>
-                            </div>
-                          </div>
-                        </DialogContent>
-                      </Dialog>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        className="text-white"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (window.confirm("Êtes-vous sûr de vouloir supprimer cette photo ?")) {
-                            deleteImageMutation.mutate(image.id);
-                          }
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                      <GripVertical className="w-6 h-6 text-white" />
-                    </div>
-                  </div>
-                </div>
-              ))}
+          {Array.isArray(images) && images.length > 0 && (
+            <div style={{ width: '100%', height: 800 }}>
+              <Grid
+                columnCount={4}
+                columnWidth={240}
+                height={800}
+                rowCount={Math.ceil((Array.isArray(images) ? images.length : 0) / 4)}
+                rowHeight={260}
+                width={1000}
+                itemData={{
+                  images: Array.isArray(images) ? images : [],
+                  columns: 4,
+                  handleImageDragStart,
+                  updateImageMutation,
+                  deleteImageMutation,
+                  setSelectedImage,
+                  setNewAlbumName,
+                  Dialog,
+                  DialogTrigger,
+                  Button,
+                  Edit,
+                  DialogContent,
+                  Label,
+                  Input,
+                  DialogClose,
+                  Trash2
+                }}
+              >
+                {GalleryImageCell}
+              </Grid>
             </div>
           )}
         </div>
