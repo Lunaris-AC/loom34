@@ -1,0 +1,22 @@
+.admin-gallery {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+}
+
+.album-manager {
+  flex: 1;
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+
+.image-manager {
+  flex: 2;
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+
+.image-manager img {
+  max-width: 100px;
+  margin-right: 10px;
+}

@@ -69,7 +69,7 @@ const MonsieurOurs = () => {
       {/* Timeline Section */}
       <section className="py-16 bg-tan/20">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">Notre histoire</h2>
+          <h2 className="text-3xl font-bold text-center mb-12">Les Monsieur Ours</h2>
           <div className="relative max-w-3xl mx-auto mt-16">
             {/* Timeline line */}
             <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-brown/30"></div>

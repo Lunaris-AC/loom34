@@ -79,35 +79,38 @@ const EventDetail = () => {
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">{event.title}</h1>
           
-          <div className="bg-white rounded-xl overflow-hidden shadow-sm mb-8">
-            <img 
-              src={event.image} 
-              alt={event.title} 
-              className="w-full h-96 object-cover"
-            />
+          <div className="flex flex-col md:flex-row gap-8 mb-8 items-start">
+            <div className="md:w-[70%] w-full">
+              <div className="relative w-full aspect-[9/16] bg-white rounded-xl shadow-md overflow-hidden flex items-center justify-center">
+                <img 
+                  src={event.image} 
+                  alt={event.title} 
+                  className="max-w-full max-h-full object-contain"
+                />
+              </div>
+            </div>
+            <div className="md:w-[30%] w-full flex flex-col justify-start bg-white rounded-xl shadow-md p-4 gap-4 min-h-[120px] max-w-xs mx-auto md:mx-0 mt-4 md:mt-0">
+              <div className="flex items-center text-gray-600">
+                <CalendarDays size={20} className="mr-2 text-brown" />
+                <span>{new Date(event.date).toLocaleDateString('fr-FR', { 
+                  weekday: 'long', 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })}</span>
+              </div>
+              <div className="flex items-center text-gray-600">
+                <Clock size={20} className="mr-2 text-brown" />
+                <span>{event.time}</span>
+              </div>
+              <div className="flex items-center text-gray-600">
+                <MapPin size={20} className="mr-2 text-brown" />
+                <span>{event.location}</span>
+              </div>
+            </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="flex items-center text-gray-600">
-              <CalendarDays size={20} className="mr-2 text-brown" />
-              <span>{new Date(event.date).toLocaleDateString('fr-FR', { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-              })}</span>
-            </div>
-            <div className="flex items-center text-gray-600">
-              <Clock size={20} className="mr-2 text-brown" />
-              <span>{event.time}</span>
-            </div>
-            <div className="flex items-center text-gray-600">
-              <MapPin size={20} className="mr-2 text-brown" />
-              <span>{event.location}</span>
-            </div>
-          </div>
-          
-          <div className="prose max-w-none mb-8 text-lg text-gray-700">
+          <div className="prose prose-neutral max-w-none mb-8 text-lg whitespace-pre-line">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>{event.description}</ReactMarkdown>
           </div>
           
@@ -116,7 +119,7 @@ const EventDetail = () => {
               <Button 
                 size="lg"
                 onClick={() => window.open(event.registration_url, '_blank')}
-                className="flex items-center"
+                className="flex items-center text-white bg-brown hover:bg-brown-dark"
               >
                 S'inscrire à l'événement
                 <ExternalLink size={18} className="ml-2" />

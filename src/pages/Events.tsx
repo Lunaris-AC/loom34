@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { db } from '@/db/client';
 import { useQuery } from '@tanstack/react-query';
-import { CalendarDays, MapPin, Clock, Search, Filter } from 'lucide-react';
+import { CalendarDays, MapPin, Clock, Search, Filter, Ticket } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Tables } from '@/db/types';
@@ -190,12 +190,13 @@ const Events = () => {
                         </div>
                       </div>
                       {event.registration_url && (
-                        <Button 
-                          className="w-full mt-4"
+                        <button 
+                          className="w-full mt-4 bg-brown text-white py-2 px-4 rounded-md hover:bg-brown/90 transition-colors flex items-center justify-center"
                           onClick={e => { e.stopPropagation(); e.preventDefault(); window.open(event.registration_url, '_blank'); }}
                         >
+                          <Ticket size={16} className="mr-2" />
                           S'inscrire
-                        </Button>
+                        </button>
                       )}
                     </div>
                   </div>

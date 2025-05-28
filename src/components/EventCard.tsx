@@ -81,19 +81,20 @@ const EventCard = ({
           </Button>
           {registrationUrl && (
             <Button
-              variant="default"
+              variant="brown"
               size="sm"
               className="w-full"
               asChild
             >
               <Link
                 to={registrationUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: 'white !important' }}
                 aria-label={`S'inscrire à l'événement : ${title}`}
               >
-                <Ticket className="w-4 h-4 mr-2" />
-                S'inscrire
+                <Ticket className="w-4 h-4 mr-2" style={{ color: 'white' }} />
+                <span style={{ color: 'white' }}>S'inscrire</span>
               </Link>
             </Button>
           )}

@@ -147,7 +147,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          author_id?: string | null
+          author_id: string // Make author_id required
           cover_image: string
           created_at?: string
           date: string
@@ -269,7 +269,7 @@ export type Tables<
   }
     ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never,
 > = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
   ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
       Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {

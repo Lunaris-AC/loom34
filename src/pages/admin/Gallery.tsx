@@ -651,7 +651,7 @@ export default function Gallery() {
                 >
                   <Button 
                     variant={selectedAlbum?.id === album.id ? "default" : "ghost"}
-                    className="flex-1 justify-start group relative overflow-hidden"
+                    className={`flex-1 justify-start group relative overflow-hidden ${selectedAlbum?.id === album.id ? "text-white" : ""}`}
                     onClick={() => handleAlbumClick(album)}
                     onDragOver={(e) => {
                       e.preventDefault();
@@ -741,7 +741,7 @@ export default function Gallery() {
         </div>
 
         {/* Main content */}
-        <div className="flex-1 p-6 bg-white">
+        <div className="flex-1 p-6 bg-white overflow-hidden">
           <div
             className="min-h-[200px] border-2 border-dashed rounded-lg p-8 mb-6 bg-gray-50 hover:bg-gray-100 transition-colors"
             onDragOver={(e) => {
@@ -785,35 +785,92 @@ export default function Gallery() {
           </div>
 
           {Array.isArray(images) && images.length > 0 && (
-            <div style={{ width: '100%', height: 800 }}>
-              <Grid
-                columnCount={4}
-                columnWidth={240}
-                height={800}
-                rowCount={Math.ceil((Array.isArray(images) ? images.length : 0) / 4)}
-                rowHeight={260}
-                width={1000}
-                itemData={{
-                  images: Array.isArray(images) ? images : [],
-                  columns: 4,
-                  handleImageDragStart,
-                  updateImageMutation,
-                  deleteImageMutation,
-                  setSelectedImage,
-                  setNewAlbumName,
-                  Dialog,
-                  DialogTrigger,
-                  Button,
-                  Edit,
-                  DialogContent,
-                  Label,
-                  Input,
-                  DialogClose,
-                  Trash2
-                }}
-              >
-                {GalleryImageCell}
-              </Grid>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
+              {images.map((image) => (
+                <div
+                  key={image.id}
+                  className="relative group aspect-square cursor-move rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow"
+                  draggable
+                  onDragStart={(e) => handleImageDragStart(e, image)}
+                >
+                  <img
+                    src={image.image_url}
+                    alt={image.title}
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    loading="lazy"
+                    onError={(e) => {
+                      console.error('Error loading image:', image.image_url);
+                      (e.target as HTMLImageElement).src = 'https://placehold.co/400x300?text=Image+non+disponible';
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                    <div className="w-full">
+                      <p className="text-white text-sm font-medium truncate mb-2">{image.title}</p>
+                      <div className="flex justify-end gap-2">
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              className="text-white bg-white/20 hover:bg-white/30"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedImage(image);
+                              }}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <div className="space-y-4">
+                              <Label>Nom de la photo</Label>
+                              <Input
+                                defaultValue={image.title}
+                                onChange={(e) => {
+                                  setNewAlbumName(e.target.value);
+                                }}
+                              />
+                              <div className="flex justify-end gap-2">
+                                <DialogClose asChild>
+                                  <Button variant="outline">Annuler</Button>
+                                </DialogClose>
+                                <DialogClose asChild>
+                                  <Button
+                                    onClick={() => {
+                                      if (image.title.trim()) {
+                                        updateImageMutation.mutate({
+                                          id: image.id,
+                                          title: image.title,
+                                          description: image.description
+                                        });
+                                      }
+                                    }}
+                                  >
+                                    Enregistrer
+                                  </Button>
+                                </DialogClose>
+                              </div>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          className="bg-red-500/20 hover:bg-red-500/30 text-white"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (window.confirm("Êtes-vous sûr de vouloir supprimer cette photo ?")) {
+                              deleteImageMutation.mutate(image.id);
+                            }
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>

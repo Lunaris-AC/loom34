@@ -79,30 +79,33 @@ const ArticleDetail = () => {
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">{article.title}</h1>
           
-          <div className="flex items-center gap-4 mb-8">
-            <div className="flex items-center text-gray-600">
-              <CalendarDays size={18} className="mr-2 text-brown" />
-              <span>{new Date(article.date).toLocaleDateString('fr-FR', { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-              })}</span>
+          <div className="flex flex-col md:flex-row gap-8 mb-8 items-start">
+            <div className="md:w-[70%] w-full">
+              <div className="relative w-full aspect-[16/9] bg-white rounded-xl shadow-md overflow-hidden flex items-center justify-center">
+                <img 
+                  src={article.image} 
+                  alt={article.title} 
+                  className="max-w-full max-h-full object-contain"
+                />
+              </div>
             </div>
-            <div className="flex items-center text-gray-600">
-              <Tag size={18} className="mr-2 text-brown" />
-              <span>{article.category}</span>
+            <div className="md:w-[30%] w-full flex flex-col justify-start bg-white rounded-xl shadow-md p-4 gap-4 min-h-[120px] max-w-xs mx-auto md:mx-0 mt-4 md:mt-0">
+              <div className="flex items-center text-gray-600">
+                <CalendarDays size={18} className="mr-2 text-brown" />
+                <span>{new Date(article.date).toLocaleDateString('fr-FR', { 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })}</span>
+              </div>
+              <div className="flex items-center text-gray-600">
+                <Tag size={18} className="mr-2 text-brown" />
+                <span>{article.category}</span>
+              </div>
             </div>
           </div>
           
-          <div className="bg-white rounded-xl overflow-hidden shadow-sm mb-8">
-            <img 
-              src={article.image} 
-              alt={article.title} 
-              className="w-full h-96 object-cover"
-            />
-          </div>
-          
-          <div className="prose max-w-none text-lg text-gray-700">
+          <div className="prose prose-neutral max-w-none text-lg text-gray-700 whitespace-pre-line">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>{article.content}</ReactMarkdown>
           </div>
         </div>
